@@ -25,8 +25,6 @@ import {
   getXAxisLabel,
   Metric,
   getValueFormatter,
-  t,
-  tooltipHtml,
 } from '@superset-ui/core';
 import { EChartsCoreOption, graphic } from 'echarts/core';
 import {
@@ -38,6 +36,7 @@ import {
 import { getDateFormatter, parseMetricValue } from '../utils';
 import { getDefaultTooltip } from '../../utils/tooltip';
 import { Refs } from '../../types';
+import { tooltipCustomHtml } from './tooltip';
 
 const formatPercentChange = getNumberFormatter(
   NumberFormats.PERCENT_SIGNED_1_POINT,
@@ -103,16 +102,12 @@ export default function transformProps(
   let secondTrendLineData: TimeSeriesDatum[] | undefined;
 
   const metricColtypeIndex = colnames.findIndex(name => name === metricName);
-  const metricSecondColtypeIndex = colnames.findIndex(
-    name => name === secondMetricName,
-  );
+
   const metricColtype =
     metricColtypeIndex > -1 ? coltypes[metricColtypeIndex] : null;
 
   if (data.length > 0) {
-    // problem with colnames, there is no secondMetricName
     // const hasSecondMetricInData = colnames.includes(secondMetricName);
-    console.log('colnames', colnames, secondMetric);
     if (secondMetric) {
       secondTrendLineData = (data as BigNumberDatum[])
         .map(d => [d[xAxisLabel], parseMetricValue(d[secondMetricName])])
@@ -120,7 +115,6 @@ export default function transformProps(
         .sort(
           (a, b) => (a[0] as number) - (b[0] as number),
         ) as TimeSeriesDatum[];
-      // console.log('colnames', secondTrendLineData, colnames);
     }
 
     const sortedData = (data as BigNumberDatum[])
@@ -257,45 +251,8 @@ export default function transformProps(
           ...getDefaultTooltip(refs),
           show: !inContextMenu,
           trigger: 'axis',
-          formatter: (params: { data: TimeSeriesDatum }[]) => {
-            const items = [
-              [
-                metricName,
-                params[0]?.data?.[1] != null
-                  ? headerFormatter.format(params[0].data[1])
-                  : t('N/A'),
-              ],
-            ];
-            if (secondTrendLineData && params[1]) {
-              items.push([
-                secondMetricName,
-                params[1]?.data?.[1] != null
-                  ? headerFormatter.format(params[1].data[1])
-                  : t('N/A'),
-              ]);
-            }
-            return tooltipHtml(items, formatTime(params[0]?.data?.[0]));
-          },
-          //  (params: { data: TimeSeriesDatum }[]) =>
-          //   tooltipHtml(
-          //     [
-          //       [
-          //         metricName,
-          //         params[0].data[1] === null
-          //           ? t('N/A')
-          //           : headerFormatter.format(params[0].data[1]),
-          //       ],
-          //       secondMetric
-          //         ? [
-          //             secondMetricName,
-          //             params[1]?.data?.[1] != null
-          //               ? headerFormatter.format(params[1].data[1])
-          //               : t('N/A'),
-          //           ]
-          //         : null,
-          //     ].filter(Boolean) as string[][],
-          //     formatTime(params[0].data[0]),
-          //   ),
+          formatter: (params: any) =>
+            tooltipCustomHtml(params, formatTime, headerFormatter),
         },
         aria: {
           enabled: true,

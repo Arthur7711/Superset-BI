@@ -252,7 +252,13 @@ export default function transformProps(
           show: !inContextMenu,
           trigger: 'axis',
           formatter: (params: any) =>
-            tooltipCustomHtml(params, formatTime, headerFormatter),
+            tooltipCustomHtml(
+              params,
+              formatTime,
+              headerFormatter,
+              data,
+              metric,
+            ),
         },
         aria: {
           enabled: true,

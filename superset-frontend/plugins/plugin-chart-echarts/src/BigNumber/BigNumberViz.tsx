@@ -94,6 +94,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 
   renderKicker(maxHeight: number) {
     const { timestamp, showTimestamp, formatTime, width } = this.props;
+
     if (
       !formatTime ||
       !showTimestamp ||
@@ -188,9 +189,19 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderSubheader(maxHeight: number) {
-    const { bigNumber, subheader, width, bigNumberFallback } = this.props;
+    const { bigNumber, subheader, width, bigNumberFallback, trendLineData } =
+      this.props;
     let fontSize = 0;
-
+    let subHeaderProcentText = '';
+    let isPrcentPositive = false;
+    if (trendLineData && trendLineData?.length > 1) {
+      const [prevLastData, lastData] = trendLineData.slice(-2).map(d => d[1]);
+      if (lastData && prevLastData) {
+        const prcent = ((lastData / prevLastData - 1) * 100).toFixed(1);
+        subHeaderProcentText = `${prcent}%`;
+        isPrcentPositive = lastData >= prevLastData;
+      }
+    }
     const NO_DATA_OR_HASNT_LANDED = t(
       'No data after filtering or data is NULL for the latest time record',
     );
@@ -219,9 +230,18 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
           style={{
             fontSize,
             height: maxHeight,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3rem',
           }}
         >
           {text}
+          <span>
+            <span style={{ color: isPrcentPositive ? '#02FB02' : 'red' }}>
+              ●
+            </span>
+            <span>{subHeaderProcentText}</span>
+          </span>
         </div>
       );
     }

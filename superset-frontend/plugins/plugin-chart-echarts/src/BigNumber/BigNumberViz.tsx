@@ -189,18 +189,28 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderSubheader(maxHeight: number) {
-    const { bigNumber, subheader, width, bigNumberFallback, trendLineData } =
-      this.props;
+    const {
+      bigNumber,
+      subheader,
+      width,
+      bigNumberFallback,
+      echartOptions,
+      formData,
+    } = this.props;
+    // @ts-ignore
+    const planningData = echartOptions?.series?.[1]?.data?.slice(-1)?.[0]?.[1];
     let fontSize = 0;
     let subHeaderProcentText = '';
     let isPrcentPositive = false;
-    if (trendLineData && trendLineData?.length > 1) {
-      const [prevLastData, lastData] = trendLineData.slice(-2).map(d => d[1]);
-      if (lastData && prevLastData) {
-        const prcent = ((lastData / prevLastData - 1) * 100).toFixed(1);
-        subHeaderProcentText = `${prcent}%`;
-        isPrcentPositive = lastData >= prevLastData;
-      }
+    const showSecondarySubHeader =
+      formData?.vizType === 'big_number_with_multi-lines';
+    if (bigNumber && showSecondarySubHeader && planningData) {
+      const prcent = (
+        (Number(bigNumber) / Number(planningData) - 1) *
+        100
+      ).toFixed(1);
+      subHeaderProcentText = `${prcent}%`;
+      isPrcentPositive = bigNumber >= planningData;
     }
     const NO_DATA_OR_HASNT_LANDED = t(
       'No data after filtering or data is NULL for the latest time record',
@@ -236,12 +246,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
           }}
         >
           {text}
-          <span>
-            <span style={{ color: isPrcentPositive ? '#02FB02' : 'red' }}>
-              ●
+          {showSecondarySubHeader ? (
+            <span>
+              <span style={{ color: isPrcentPositive ? '#02FB02' : 'red' }}>
+                ●
+              </span>
+              <span>{subHeaderProcentText}</span>
             </span>
-            <span>{subHeaderProcentText}</span>
-          </span>
+          ) : null}
         </div>
       );
     }

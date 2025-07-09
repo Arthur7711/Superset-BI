@@ -226,7 +226,7 @@ export default function transformProps(
                   symbol: 'diamond',
                   symbolSize: 8,
                   showSymbol: false,
-                  color: theme.colors.secondary.light2,
+                  color: theme.colors.info.dark2,
                 },
               ]
             : []),

@@ -61,7 +61,6 @@ import { ForecastSeriesEnum, ForecastValue, Refs } from '../types';
 import { parseAxisBound } from '../utils/controls';
 import {
   calculateLowerLogTick,
-  dedupSeries,
   extractDataTotalValues,
   extractSeries,
   extractShowValueIndexes,
@@ -105,6 +104,7 @@ import {
   getXAxisFormatter,
   getYAxisFormatter,
 } from '../utils/formatters';
+import { customDedupSeries } from './helpers';
 
 export default function transformProps(
   chartProps: EchartsTimeseriesChartProps,
@@ -536,8 +536,18 @@ export default function transformProps(
     grid: {
       ...defaultGrid,
       ...padding,
+      left: 0,
+      right: 0,
+      bottom: 10,
+      top: 10,
+      containLabel: false,
     },
-    xAxis,
+    xAxis: {
+      ...xAxis,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+    },
     yAxis,
     tooltip: {
       ...getDefaultTooltip(refs),
@@ -627,7 +637,7 @@ export default function transformProps(
       ),
       data: legendData as string[],
     },
-    series: dedupSeries(series),
+    series: customDedupSeries(series),
     toolbox: {
       show: zoomable,
       top: TIMESERIES_CONSTANTS.toolboxTop,

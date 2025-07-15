@@ -279,7 +279,7 @@ export default function transformProps(
   const array = ensureIsArray(chartProps.rawFormData?.time_compare);
   const inverted = invert(verboseMap);
 
-  const offsetLineWidths = {};
+  const offsetLineWidths: Record<string, number> = {};
 
   rawSeries.forEach(entry => {
     const derivedSeries = isDerivedSeries(entry, chartProps.rawFormData);
@@ -548,7 +548,12 @@ export default function transformProps(
       axisTick: { show: false },
       axisLabel: { show: false },
     },
-    yAxis,
+    yAxis: {
+      ...yAxis,
+      splitLine: {
+        show: false,
+      },
+    },
     tooltip: {
       ...getDefaultTooltip(refs),
       show: !inContextMenu,

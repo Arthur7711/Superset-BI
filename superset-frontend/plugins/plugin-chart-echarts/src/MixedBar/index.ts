@@ -48,7 +48,7 @@ export default class EchartsTimeseriesMixedBarChartPlugin extends EchartsChartPl
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../Timeseries/EchartsTimeseries'),
+      loadChart: () => import('./EchartsTimeseries'),
       metadata: {
         behaviors: [
           Behavior.InteractiveChart,

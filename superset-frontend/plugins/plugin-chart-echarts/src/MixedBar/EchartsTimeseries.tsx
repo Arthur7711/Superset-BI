@@ -34,7 +34,8 @@ import { EchartsHandler, EventHandlers } from '../types';
 import Echart from '../components/Echart';
 import { TimeseriesChartTransformedProps } from '../Timeseries/types';
 import { formatSeriesName } from '../utils/series';
-import { ExtraControls } from '../components/ExtraControls';
+// import { ExtraControls } from '../components/ExtraControls';
+import { Header } from './components/header';
 
 const TIMER_DURATION = 300;
 
@@ -47,7 +48,7 @@ export default function EchartsTimeseries({
   labelMap,
   selectedValues,
   setDataMask,
-  setControlValue,
+  // setControlValue,
   legendData = [],
   onContextMenu,
   onLegendStateChanged,
@@ -266,13 +267,13 @@ export default function EchartsTimeseries({
   const [currentData, plannedData] = series.map(({ data }) => data);
   const currentSummary = getTotal(currentData);
   const plannedSummary = getTotal(plannedData);
-  console.log('formData', currentSummary, plannedSummary);
 
   return (
     <>
-      {/* <div ref={extraControlRef}>
-        <ExtraControls formData={formData} setControlValue={setControlValue} />
-      </div> */}
+      <div ref={extraControlRef}>
+        <Header total={currentSummary} prevTotal={plannedSummary} />
+        {/* <ExtraControls formData={formData} setControlValue={setControlValue} /> */}
+      </div>
       <Echart
         ref={echartRef}
         refs={refs}

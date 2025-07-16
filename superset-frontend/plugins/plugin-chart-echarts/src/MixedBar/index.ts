@@ -26,10 +26,7 @@ import { EchartsChartPlugin } from '../types';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
-import thumbnail from './images/thumbnail.png';
-import example1 from './images/Bar1.png';
-import example2 from './images/Bar2.png';
-import example3 from './images/Bar3.png';
+import thumbnail from './images/Bar.png';
 
 const barTransformProps = (chartProps: EchartsTimeseriesChartProps) =>
   transformProps({
@@ -60,11 +57,7 @@ export default class EchartsTimeseriesMixedBarChartPlugin extends EchartsChartPl
         description: t(
           'Mixed Bar Charts are used to show metrics as a series of MixedBars.',
         ),
-        exampleGallery: [
-          { url: example1 },
-          { url: example2 },
-          { url: example3 },
-        ],
+        exampleGallery: [{ url: thumbnail }],
         supportedAnnotationTypes: [
           AnnotationType.Event,
           AnnotationType.Formula,

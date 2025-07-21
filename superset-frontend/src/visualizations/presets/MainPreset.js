@@ -72,6 +72,8 @@ import {
   BigNumberPeriodOverPeriodChartPlugin,
   EchartsHeatmapChartPlugin,
   BigNumberWithMultiLinesChartPlugin,
+  EchartsMixedBarChartPlugin,
+  EchartsProfileTimelineChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
   SelectFilterPlugin,
@@ -106,6 +108,12 @@ export default class MainPreset extends Preset {
         new BigNumberChartPlugin().configure({ key: 'big_number' }),
         new BigNumberWithMultiLinesChartPlugin().configure({
           key: 'big_number_with_multi-lines',
+        }),
+        new EchartsMixedBarChartPlugin().configure({
+          key: 'mixed_bar',
+        }),
+        new EchartsProfileTimelineChartPlugin().configure({
+          key: 'profile_timeline',
         }),
         new BigNumberTotalChartPlugin().configure({ key: 'big_number_total' }),
         new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),

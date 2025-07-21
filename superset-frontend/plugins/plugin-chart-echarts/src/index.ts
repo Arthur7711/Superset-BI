@@ -44,6 +44,8 @@ export { default as EchartsSunburstChartPlugin } from './Sunburst';
 export { default as EchartsBubbleChartPlugin } from './Bubble';
 export { default as EchartsSankeyChartPlugin } from './Sankey';
 export { default as EchartsWaterfallChartPlugin } from './Waterfall';
+export { default as EchartsMixedBarChartPlugin } from './MixedBar';
+export { default as EchartsProfileTimelineChartPlugin } from './ProfileTimeline';
 
 export { default as BoxPlotTransformProps } from './BoxPlot/transformProps';
 export { default as FunnelTransformProps } from './Funnel/transformProps';

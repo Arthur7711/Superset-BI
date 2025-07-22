@@ -14,99 +14,104 @@ const config: ControlPanelConfig = {
       label: t('Columns'),
       expanded: true,
       controlSetRows: [
-        [
-          {
-            name: 'category_column',
-            config: {
-              type: 'SelectControl',
-              label: t('Category Column'),
-              description: t('Column for category (Y-axis)'),
-              clearable: false,
-              valueKey: 'column_name',
-              labelKey: 'column_name',
-              default: null,
-              mapStateToProps: state => {
-                const columns = state.datasource?.columns ?? [];
-                return {
-                  options: columns.map(col => ({
-                    value: col.column_name,
-                    label: col.column_name,
-                  })),
-                };
-              },
-            },
-          },
-        ],
-        [
-          {
-            name: 'start_column',
-            config: {
-              type: 'SelectControl',
-              label: t('Start Time Column'),
-              description: t('Column for start timestamp'),
-              clearable: false,
-              valueKey: 'column_name',
-              labelKey: 'column_name',
-              default: null,
-              mapStateToProps: state => {
-                const columns = state.datasource?.columns ?? [];
-                return {
-                  options: columns.map(col => ({
-                    value: col.column_name,
-                    label: col.column_name,
-                  })),
-                };
-              },
-            },
-          },
-        ],
-        [
-          {
-            name: 'end_column',
-            config: {
-              type: 'SelectControl',
-              label: t('End Time Column'),
-              description: t('Column for end timestamp'),
-              clearable: false,
-              valueKey: 'column_name',
-              labelKey: 'column_name',
-              default: null,
-              mapStateToProps: state => {
-                const columns = state.datasource?.columns ?? [];
-                return {
-                  options: columns.map(col => ({
-                    value: col.column_name,
-                    label: col.column_name,
-                  })),
-                };
-              },
-            },
-          },
-        ],
-        [
-          {
-            name: 'type_column',
-            config: {
-              type: 'SelectControl',
-              label: t('Type Column'),
-              description: t('Column for colored type label'),
-              clearable: false,
-              valueKey: 'column_name',
-              labelKey: 'column_name',
-              default: null,
-              mapStateToProps: state => {
-                const columns = state.datasource?.columns ?? [];
-                return {
-                  options: columns.map(col => ({
-                    value: col.column_name,
-                    label: col.column_name,
-                  })),
-                };
-              },
-            },
-          },
-        ],
+        ['granularity'],
+        // ['time_range'],
+        ['columns'], // <-- Ensure this is included
       ],
+      //   controlSetRows: [
+      //     [
+      //       {
+      //         name: 'category_column',
+      //         config: {
+      //           type: 'SelectControl',
+      //           label: t('Category Column'),
+      //           description: t('Column for category (Y-axis)'),
+      //           clearable: false,
+      //           valueKey: 'column_name',
+      //           labelKey: 'column_name',
+      //           default: null,
+      //           mapStateToProps: state => {
+      //             const columns = state.datasource?.columns ?? [];
+      //             return {
+      //               options: columns.map(col => ({
+      //                 value: col.column_name,
+      //                 label: col.column_name,
+      //               })),
+      //             };
+      //           },
+      //         },
+      //       },
+      //     ],
+      //     [
+      //       {
+      //         name: 'start_column',
+      //         config: {
+      //           type: 'SelectControl',
+      //           label: t('Start Time Column'),
+      //           description: t('Column for start timestamp'),
+      //           clearable: false,
+      //           valueKey: 'column_name',
+      //           labelKey: 'column_name',
+      //           default: null,
+      //           mapStateToProps: state => {
+      //             const columns = state.datasource?.columns ?? [];
+      //             return {
+      //               options: columns.map(col => ({
+      //                 value: col.column_name,
+      //                 label: col.column_name,
+      //               })),
+      //             };
+      //           },
+      //         },
+      //       },
+      //     ],
+      //     [
+      //       {
+      //         name: 'end_column',
+      //         config: {
+      //           type: 'SelectControl',
+      //           label: t('End Time Column'),
+      //           description: t('Column for end timestamp'),
+      //           clearable: false,
+      //           valueKey: 'column_name',
+      //           labelKey: 'column_name',
+      //           default: null,
+      //           mapStateToProps: state => {
+      //             const columns = state.datasource?.columns ?? [];
+      //             return {
+      //               options: columns.map(col => ({
+      //                 value: col.column_name,
+      //                 label: col.column_name,
+      //               })),
+      //             };
+      //           },
+      //         },
+      //       },
+      //     ],
+      //     [
+      //       {
+      //         name: 'type_column',
+      //         config: {
+      //           type: 'SelectControl',
+      //           label: t('Type Column'),
+      //           description: t('Column for colored type label'),
+      //           clearable: false,
+      //           valueKey: 'column_name',
+      //           labelKey: 'column_name',
+      //           default: null,
+      //           mapStateToProps: state => {
+      //             const columns = state.datasource?.columns ?? [];
+      //             return {
+      //               options: columns.map(col => ({
+      //                 value: col.column_name,
+      //                 label: col.column_name,
+      //               })),
+      //             };
+      //           },
+      //         },
+      //       },
+      //     ],
+      //   ],
     },
     // sections.legendSection,
     // {
@@ -119,6 +124,14 @@ const config: ControlPanelConfig = {
     // },
     sections.colorScheme,
   ],
+  controlOverrides: {
+    columns: {
+      label: t('Timeline Columns'),
+      description: t('Columns to show in timeline'),
+      multi: true,
+      validators: [], // add required if you want to force selection
+    },
+  },
 };
 
 export default config;

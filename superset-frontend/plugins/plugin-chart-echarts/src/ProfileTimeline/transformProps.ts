@@ -10,6 +10,39 @@ const types = [
   { name: 'GPU Memory', color: '#dc77dc' },
   { name: 'GPU', color: '#72b362' },
 ];
+const mockData = [
+  {
+    name: 'JS Heap',
+    value: [0, 1721400000000, 1721400005000, 5000],
+    itemStyle: { normal: { color: '#7b9ce1' } },
+  },
+  {
+    name: 'Documents',
+    value: [1, 1721400010000, 1721400013000, 3000],
+    itemStyle: { normal: { color: '#bd6d6c' } },
+  },
+  {
+    name: 'Nodes',
+    value: [2, 1721400020000, 1721400027000, 7000],
+    itemStyle: { normal: { color: '#75d874' } },
+  },
+  {
+    name: 'Listeners',
+    value: [0, 1721400030000, 1721400034000, 4000],
+    itemStyle: { normal: { color: '#e0bc78' } },
+  },
+  {
+    name: 'GPU Memory',
+    value: [1, 1721400040000, 1721400048000, 8000],
+    itemStyle: { normal: { color: '#dc77dc' } },
+  },
+  {
+    name: 'GPU',
+    value: [2, 1721400050000, 1721400052000, 2000],
+    itemStyle: { normal: { color: '#72b362' } },
+  },
+];
+
 const renderItem = (params: any, api: any) => {
   console.log('paramsApi', params, api);
   const categoryIndex = api.value(0);
@@ -54,64 +87,102 @@ export default function transformProps(chartProps: ChartProps) {
 
   const option: echarts.EChartsOption = {
     tooltip: {
-      trigger: 'axis',
+      trigger: 'item',
+      formatter: (params: any) => {
+        return `${params.marker} ${params.name}<br/>Duration: ${params.value[3]} ms`;
+      },
     },
-    title: {
-      text: 'Profile',
-      left: 'center',
-    },
-    // dataZoom: [
-    //   {
-    //     type: 'slider',
-    //     filterMode: 'weakFilter',
-    //     showDataShadow: false,
-    //     top: 400,
-    //     labelFormatter: '',
-    //   },
-    //   {
-    //     type: 'inside',
-    //     filterMode: 'weakFilter',
-    //   },
-    // ],
     grid: {
-      height: 300,
+      height: 250,
     },
     xAxis: {
-      min: startTime,
       scale: true,
-      //   axisLabel: {
-      //     formatter: function (val) {
-      //       return Math.max(0, val - startTime) + ' ms';
-      //     },
-      //   },
+      axisLabel: {
+        formatter: val => `${(val as number) - mockData[0].value[1]} ms`,
+      },
     },
     yAxis: {
+      type: 'category',
       data: categories,
     },
-    series: columns.map(col => ({
-      name: col,
-      type: 'custom',
-      data: data.map(d => {
-        console.log('queriesData', d, d[col]);
-        return d[col];
-      }),
-      renderItem: renderItem,
-    })),
-    // series: [
-    //   {
-    //     type: 'custom',
-    //     renderItem: renderItem,
-    //     itemStyle: {
-    //       opacity: 0.8,
-    //     },
-    //     encode: {
-    //       x: [1, 2],
-    //       y: 0,
-    //     },
-    //     data: columns,
-    //   },
-    // ],
+    series: [
+      {
+        name: 'Memory Profile',
+        type: 'custom',
+        renderItem: renderItem,
+        itemStyle: {
+          opacity: 0.8,
+        },
+        encode: {
+          x: [1, 2],
+          y: 0,
+        },
+        data: mockData,
+      },
+    ],
   };
+
+  // const option: echarts.EChartsOption = {
+  //   tooltip: {
+  //     trigger: 'axis',
+  //   },
+  //   title: {
+  //     text: 'Profile',
+  //     left: 'center',
+  //   },
+  //   // dataZoom: [
+  //   //   {
+  //   //     type: 'slider',
+  //   //     filterMode: 'weakFilter',
+  //   //     showDataShadow: false,
+  //   //     top: 400,
+  //   //     labelFormatter: '',
+  //   //   },
+  //   //   {
+  //   //     type: 'inside',
+  //   //     filterMode: 'weakFilter',
+  //   //   },
+  //   // ],
+  //   grid: {
+  //     height: 300,
+  //   },
+  //   xAxis: {
+  //     min: startTime,
+  //     scale: true,
+  //     //   axisLabel: {
+  //     //     formatter: function (val) {
+  //     //       return Math.max(0, val - startTime) + ' ms';
+  //     //     },
+  //     //   },
+  //   },
+  //   yAxis: {
+  //     data: categories,
+  //   },
+  //   series: [
+  //     {
+  //       name: 'Memory Profile',
+  //       type: 'custom',
+  //       renderItem: renderItem,
+  //       itemStyle: {
+  //         opacity: 0.8,
+  //       },
+  //       encode: {
+  //         x: [1, 2], // start and end times
+  //         y: 0, // category index
+  //       },
+  //       data: mockData,
+  //     },
+  //   ],
+  //   // series: columns.map(col => ({
+  //   //   name: col,
+  //   //   type: 'custom',
+  //   //   data: data.map(d => {
+  //   //     console.log('queriesData', d, d[col]);
+  //   //     return d[col];
+  //   //   }),
+  //   //   renderItem: renderItem,
+  //   // })),
+  // };
 
   return {
     width,

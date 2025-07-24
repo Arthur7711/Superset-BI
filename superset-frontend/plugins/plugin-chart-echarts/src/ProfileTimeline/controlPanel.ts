@@ -1,11 +1,5 @@
 import { t } from '@superset-ui/core';
-import {
-  ControlPanelConfig,
-  sections,
-  sharedControls,
-} from '@superset-ui/chart-controls';
-
-console.log('sections', sections);
+import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -13,115 +7,8 @@ const config: ControlPanelConfig = {
     {
       label: t('Columns'),
       expanded: true,
-      controlSetRows: [
-        ['granularity'],
-        // ['time_range'],
-        ['columns'], // <-- Ensure this is included
-      ],
-      //   controlSetRows: [
-      //     [
-      //       {
-      //         name: 'category_column',
-      //         config: {
-      //           type: 'SelectControl',
-      //           label: t('Category Column'),
-      //           description: t('Column for category (Y-axis)'),
-      //           clearable: false,
-      //           valueKey: 'column_name',
-      //           labelKey: 'column_name',
-      //           default: null,
-      //           mapStateToProps: state => {
-      //             const columns = state.datasource?.columns ?? [];
-      //             return {
-      //               options: columns.map(col => ({
-      //                 value: col.column_name,
-      //                 label: col.column_name,
-      //               })),
-      //             };
-      //           },
-      //         },
-      //       },
-      //     ],
-      //     [
-      //       {
-      //         name: 'start_column',
-      //         config: {
-      //           type: 'SelectControl',
-      //           label: t('Start Time Column'),
-      //           description: t('Column for start timestamp'),
-      //           clearable: false,
-      //           valueKey: 'column_name',
-      //           labelKey: 'column_name',
-      //           default: null,
-      //           mapStateToProps: state => {
-      //             const columns = state.datasource?.columns ?? [];
-      //             return {
-      //               options: columns.map(col => ({
-      //                 value: col.column_name,
-      //                 label: col.column_name,
-      //               })),
-      //             };
-      //           },
-      //         },
-      //       },
-      //     ],
-      //     [
-      //       {
-      //         name: 'end_column',
-      //         config: {
-      //           type: 'SelectControl',
-      //           label: t('End Time Column'),
-      //           description: t('Column for end timestamp'),
-      //           clearable: false,
-      //           valueKey: 'column_name',
-      //           labelKey: 'column_name',
-      //           default: null,
-      //           mapStateToProps: state => {
-      //             const columns = state.datasource?.columns ?? [];
-      //             return {
-      //               options: columns.map(col => ({
-      //                 value: col.column_name,
-      //                 label: col.column_name,
-      //               })),
-      //             };
-      //           },
-      //         },
-      //       },
-      //     ],
-      //     [
-      //       {
-      //         name: 'type_column',
-      //         config: {
-      //           type: 'SelectControl',
-      //           label: t('Type Column'),
-      //           description: t('Column for colored type label'),
-      //           clearable: false,
-      //           valueKey: 'column_name',
-      //           labelKey: 'column_name',
-      //           default: null,
-      //           mapStateToProps: state => {
-      //             const columns = state.datasource?.columns ?? [];
-      //             return {
-      //               options: columns.map(col => ({
-      //                 value: col.column_name,
-      //                 label: col.column_name,
-      //               })),
-      //             };
-      //           },
-      //         },
-      //       },
-      //     ],
-      //   ],
+      controlSetRows: [['granularity'], ['columns']],
     },
-    // sections.legendSection,
-    // {
-    //   label: t('Legend'),
-    //   expanded: true,
-    //   controlSetRows: [
-    //     [sharedControls.legendPosition],
-    //     [sharedControls.showLegend],
-    //   ],
-    // },
     sections.colorScheme,
   ],
   controlOverrides: {
@@ -129,7 +16,7 @@ const config: ControlPanelConfig = {
       label: t('Timeline Columns'),
       description: t('Columns to show in timeline'),
       multi: true,
-      validators: [], // add required if you want to force selection
+      validators: [],
     },
   },
 };

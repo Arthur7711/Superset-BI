@@ -1,47 +1,8 @@
 import { ChartProps, getCategoricalSchemeRegistry } from '@superset-ui/core';
 import * as echarts from 'echarts';
 
-const categories = ['categoryA', 'categoryB', 'categoryC'];
-const types = [
-  { name: 'JS Heap', color: '#7b9ce1' },
-  { name: 'Documents', color: '#bd6d6c' },
-  { name: 'Nodes', color: '#75d874' },
-  { name: 'Listeners', color: '#e0bc78' },
-  { name: 'GPU Memory', color: '#dc77dc' },
-  { name: 'GPU', color: '#72b362' },
-];
-const mockData = [
-  {
-    name: 'JS Heap',
-    value: [0, 1721400000000, 1721400005000, 5000],
-    itemStyle: { normal: { color: '#7b9ce1' } },
-  },
-  {
-    name: 'Documents',
-    value: [1, 1721400010000, 1721400013000, 3000],
-    itemStyle: { normal: { color: '#bd6d6c' } },
-  },
-  {
-    name: 'Nodes',
-    value: [2, 1721400020000, 1721400027000, 7000],
-    itemStyle: { normal: { color: '#75d874' } },
-  },
-  {
-    name: 'Listeners',
-    value: [0, 1721400030000, 1721400034000, 4000],
-    itemStyle: { normal: { color: '#e0bc78' } },
-  },
-  {
-    name: 'GPU Memory',
-    value: [1, 1721400040000, 1721400048000, 8000],
-    itemStyle: { normal: { color: '#dc77dc' } },
-  },
-  {
-    name: 'GPU',
-    value: [2, 1721400050000, 1721400052000, 2000],
-    itemStyle: { normal: { color: '#72b362' } },
-  },
-];
+const categories = ['cat_A', 'cat_B', 'cat_C'];
+
 const dataConverter = (
   data: {
     category_index: number;
@@ -119,7 +80,7 @@ export default function transformProps(chartProps: ChartProps) {
   const { columns, colorScheme } = formData;
 
   const data = queriesData[0]?.data || [];
-  console.log('queriesData', formData);
+
   if (!columns || columns.length === 0) {
     throw new Error('No columns selected');
   }
@@ -144,11 +105,12 @@ export default function transformProps(chartProps: ChartProps) {
       type: 'category',
       data: categories,
     },
+    // @ts-ignore
     series: [
       {
         name: 'Memory Profile',
         type: 'custom',
-        renderItem: renderItem,
+        renderItem,
         itemStyle: {
           opacity: 0.8,
         },

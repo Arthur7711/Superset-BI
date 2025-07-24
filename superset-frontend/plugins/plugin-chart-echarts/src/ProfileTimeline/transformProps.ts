@@ -1,4 +1,4 @@
-import { ChartProps } from '@superset-ui/core';
+import { ChartProps, getCategoricalSchemeRegistry } from '@superset-ui/core';
 import * as echarts from 'echarts';
 
 const categories = ['categoryA', 'categoryB', 'categoryC'];
@@ -42,7 +42,6 @@ const mockData = [
     itemStyle: { normal: { color: '#72b362' } },
   },
 ];
-
 const dataConverter = (
   data: {
     category_index: number;
@@ -50,10 +49,25 @@ const dataConverter = (
     name: string;
     start_time: number;
   }[],
+  colorSchemeName = 'SupersetColors',
 ) => {
+  const scheme = getCategoricalSchemeRegistry().get(colorSchemeName);
+  const colors = scheme?.colors || [];
+
+  const nameColorMap: { [key: string]: string } = {};
+  let colorIndex = 0;
+
+  data.forEach(el => {
+    if (!nameColorMap[el.name]) {
+      nameColorMap[el.name] = colors[colorIndex % colors.length];
+      colorIndex += 1;
+    }
+  });
+  // console.log('queriesData', getCategoricalSchemeRegistry());
+
   const fixedData = data.map(el => {
-    console.log('queriesData', el);
-    return {
+    // console.log('queriesData', el);
+    const value = {
       name: el.name,
       value: [
         el.category_index,
@@ -62,9 +76,10 @@ const dataConverter = (
         el.end_time - el.start_time,
       ],
       itemStyle: {
-        color: 'red', // need to use superset colors here!,
+        color: nameColorMap[el.name],
       },
     };
+    return value;
   });
   // console.log('queriesData', data, fixedData);
 
@@ -101,10 +116,10 @@ const renderItem = (params: any, api: any) => {
 
 export default function transformProps(chartProps: ChartProps) {
   const { formData, queriesData, width, height } = chartProps;
-  const { columns } = formData;
+  const { columns, colorScheme } = formData;
 
   const data = queriesData[0]?.data || [];
-
+  console.log('queriesData', formData);
   if (!columns || columns.length === 0) {
     throw new Error('No columns selected');
   }
@@ -112,9 +127,8 @@ export default function transformProps(chartProps: ChartProps) {
   const option: echarts.EChartsOption = {
     tooltip: {
       trigger: 'item',
-      formatter: (params: any) => {
-        return `${params.marker} ${params.name}<br/>Duration: ${params.value[3]} ms`;
-      },
+      formatter: (params: any) =>
+        `${params.marker} ${params.name}<br/>Duration: ${params.value[3]} ms`,
     },
     grid: {
       height: 250,
@@ -122,8 +136,8 @@ export default function transformProps(chartProps: ChartProps) {
     xAxis: {
       scale: true,
       axisLabel: {
-        formatter: val =>
-          `${(val as number) - dataConverter(data)[0].value[1]} ms`,
+        formatter: (val: number) =>
+          `${val - dataConverter(data, colorScheme)[0].value[1]} ms`,
       },
     },
     yAxis: {
@@ -142,7 +156,7 @@ export default function transformProps(chartProps: ChartProps) {
           x: [1, 2],
           y: 0,
         },
-        data: dataConverter(data),
+        data: dataConverter(data, colorScheme),
       },
     ],
   };

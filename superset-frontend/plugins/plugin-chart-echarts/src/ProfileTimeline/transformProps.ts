@@ -43,8 +43,34 @@ const mockData = [
   },
 ];
 
+const dataConverter = (
+  data: {
+    category_index: number;
+    end_time: number;
+    name: string;
+    start_time: number;
+  }[],
+) => {
+  const fixedData = data.map(el => {
+    console.log('queriesData', el);
+    return {
+      name: el.name,
+      value: [
+        el.category_index,
+        el.start_time,
+        el.end_time,
+        el.end_time - el.start_time,
+      ],
+      itemStyle: {
+        color: 'red', // need to use superset colors here!,
+      },
+    };
+  });
+  // console.log('queriesData', data, fixedData);
+
+  return fixedData;
+};
 const renderItem = (params: any, api: any) => {
-  console.log('paramsApi', params, api);
   const categoryIndex = api.value(0);
   const start = api.coord([api.value(1), categoryIndex]);
   const end = api.coord([api.value(2), categoryIndex]);
@@ -72,7 +98,6 @@ const renderItem = (params: any, api: any) => {
     }
   );
 };
-const startTime = +new Date();
 
 export default function transformProps(chartProps: ChartProps) {
   const { formData, queriesData, width, height } = chartProps;
@@ -83,7 +108,6 @@ export default function transformProps(chartProps: ChartProps) {
   if (!columns || columns.length === 0) {
     throw new Error('No columns selected');
   }
-  console.log('queriesData', columns, columns.slice(1));
 
   const option: echarts.EChartsOption = {
     tooltip: {
@@ -98,7 +122,8 @@ export default function transformProps(chartProps: ChartProps) {
     xAxis: {
       scale: true,
       axisLabel: {
-        formatter: val => `${(val as number) - mockData[0].value[1]} ms`,
+        formatter: val =>
+          `${(val as number) - dataConverter(data)[0].value[1]} ms`,
       },
     },
     yAxis: {
@@ -117,72 +142,10 @@ export default function transformProps(chartProps: ChartProps) {
           x: [1, 2],
           y: 0,
         },
-        data: mockData,
+        data: dataConverter(data),
       },
     ],
   };
-
-  // const option: echarts.EChartsOption = {
-  //   tooltip: {
-  //     trigger: 'axis',
-  //   },
-  //   title: {
-  //     text: 'Profile',
-  //     left: 'center',
-  //   },
-  //   // dataZoom: [
-  //   //   {
-  //   //     type: 'slider',
-  //   //     filterMode: 'weakFilter',
-  //   //     showDataShadow: false,
-  //   //     top: 400,
-  //   //     labelFormatter: '',
-  //   //   },
-  //   //   {
-  //   //     type: 'inside',
-  //   //     filterMode: 'weakFilter',
-  //   //   },
-  //   // ],
-  //   grid: {
-  //     height: 300,
-  //   },
-  //   xAxis: {
-  //     min: startTime,
-  //     scale: true,
-  //     //   axisLabel: {
-  //     //     formatter: function (val) {
-  //     //       return Math.max(0, val - startTime) + ' ms';
-  //     //     },
-  //     //   },
-  //   },
-  //   yAxis: {
-  //     data: categories,
-  //   },
-  //   series: [
-  //     {
-  //       name: 'Memory Profile',
-  //       type: 'custom',
-  //       renderItem: renderItem,
-  //       itemStyle: {
-  //         opacity: 0.8,
-  //       },
-  //       encode: {
-  //         x: [1, 2], // start and end times
-  //         y: 0, // category index
-  //       },
-  //       data: mockData,
-  //     },
-  //   ],
-  //   // series: columns.map(col => ({
-  //   //   name: col,
-  //   //   type: 'custom',
-  //   //   data: data.map(d => {
-  //   //     console.log('queriesData', d, d[col]);
-  //   //     return d[col];
-  //   //   }),
-  //   //   renderItem: renderItem,
-  //   // })),
-  // };
 
   return {
     width,

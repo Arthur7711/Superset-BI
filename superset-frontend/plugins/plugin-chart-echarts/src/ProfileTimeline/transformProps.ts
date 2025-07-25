@@ -15,19 +15,7 @@ const dataConverter = (
   const scheme = getCategoricalSchemeRegistry().get(colorSchemeName);
   const colors = scheme?.colors || [];
 
-  const nameColorMap: { [key: string]: string } = {};
-  let colorIndex = 0;
-
-  data.forEach(el => {
-    if (!nameColorMap[el.name]) {
-      nameColorMap[el.name] = colors[colorIndex % colors.length];
-      colorIndex += 1;
-    }
-  });
-  // console.log('queriesData', getCategoricalSchemeRegistry());
-
-  const fixedData = data.map(el => {
-    // console.log('queriesData', el);
+  const fixedData = data.map((el, i) => {
     const value = {
       name: el.name,
       value: [
@@ -37,12 +25,11 @@ const dataConverter = (
         el.end_time - el.start_time,
       ],
       itemStyle: {
-        color: nameColorMap[el.name],
+        color: colors[i % colors.length],
       },
     };
     return value;
   });
-  // console.log('queriesData', data, fixedData);
 
   return fixedData;
 };

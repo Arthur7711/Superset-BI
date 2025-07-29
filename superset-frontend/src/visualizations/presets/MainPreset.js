@@ -45,7 +45,6 @@ import {
 } from '@superset-ui/legacy-preset-chart-nvd3';
 import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
 import {
-  
   BigNumberChartPlugin,
   BigNumberTotalChartPlugin,
   EchartsPieChartPlugin,

@@ -40,6 +40,7 @@ import { logEvent } from 'src/logger/actions';
 import { store } from 'src/views/store';
 import { RootContextProviders } from './RootContextProviders';
 import { ScrollToTop } from './ScrollToTop';
+import { ServiceModal } from 'src/features/serviceRating';
 
 setupApp();
 setupPlugins();
@@ -78,6 +79,11 @@ const App = () => (
         data={bootstrapData.common.menu_data}
         isFrontendRoute={isFrontendRoute}
       />
+      <ServiceModal>
+        <div>
+          <h1>Service Rating</h1>
+        </div>
+      </ServiceModal>
       <Switch>
         {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
           <Route path={path} key={path}>

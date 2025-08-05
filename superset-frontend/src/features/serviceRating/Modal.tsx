@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { css, styled } from '@superset-ui/core';
+import { styled } from '@superset-ui/core';
 import Modal from '../../components/Modal';
 
 interface ModalProps {
   children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const StyledModal = styled(Modal)`
   .ant-modal-body {
-    min-height: 720px;
+    min-height: 500px;
   }
 
   .ant-collapse > .ant-collapse-item {
@@ -33,11 +34,9 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-export function ServiceModal({ children }: ModalProps) {
-  const [isOpen, setIsOpen] = useState(true);
-  const onClose = () => setIsOpen(false);
+export function ServiceModal({ children, isOpen, onClose }: ModalProps) {
   return (
-    <StyledModal show={isOpen} onHide={onClose} title="">
+    <StyledModal show={isOpen} onHide={onClose} title="" hideFooter>
       {children}
     </StyledModal>
   );

@@ -29,8 +29,9 @@ import { GlobalStyles } from 'src/GlobalStyles';
 import ErrorBoundary from 'src/components/ErrorBoundary';
 import Loading from 'src/components/Loading';
 import Menu from 'src/features/home/Menu';
-import getBootstrapData from 'src/utils/getBootstrapData';
+import { ServiceRating } from 'src/features/serviceRating';
 import ToastContainer from 'src/components/MessageToasts/ToastContainer';
+import getBootstrapData from 'src/utils/getBootstrapData';
 import setupApp from 'src/setup/setupApp';
 import setupPlugins from 'src/setup/setupPlugins';
 import { routes, isFrontendRoute } from 'src/views/routes';
@@ -40,7 +41,6 @@ import { logEvent } from 'src/logger/actions';
 import { store } from 'src/views/store';
 import { RootContextProviders } from './RootContextProviders';
 import { ScrollToTop } from './ScrollToTop';
-import { ServiceModal } from 'src/features/serviceRating';
 
 setupApp();
 setupPlugins();
@@ -79,11 +79,7 @@ const App = () => (
         data={bootstrapData.common.menu_data}
         isFrontendRoute={isFrontendRoute}
       />
-      <ServiceModal>
-        <div>
-          <h1>Service Rating</h1>
-        </div>
-      </ServiceModal>
+      <ServiceRating />
       <Switch>
         {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
           <Route path={path} key={path}>

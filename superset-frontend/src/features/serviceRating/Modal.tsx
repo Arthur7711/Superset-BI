@@ -36,7 +36,13 @@ const StyledModal = styled(Modal)`
 
 export function ServiceModal({ children, isOpen, onClose }: ModalProps) {
   return (
-    <StyledModal show={isOpen} onHide={onClose} title="" hideFooter>
+    <StyledModal
+      show={isOpen}
+      onHide={onClose}
+      title=""
+      hideFooter
+      maskClosable={false}
+    >
       {children}
     </StyledModal>
   );

@@ -1,28 +1,11 @@
 import { useState } from 'react';
-import { Button, Input } from 'antd';
-import { styled } from '@superset-ui/core';
+import { Input } from 'antd';
 import { ServiceModal } from './Modal';
 import { Stars } from './Stars';
+import { commentText, nextText, questions, submitText } from './constants';
+import { DetailsContainer } from './stylesContants';
 
-const ButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin: 16px 0;
-`;
-const DetailsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-const questions = [
-  'Overall satisfaction with Superset?',
-  'Data quality?',
-  'Platform stability/performance?',
-];
-const commentText = 'Please provide any additional comments or feedback:';
-const submitText = 'Submit';
-const nextText = 'Next';
+const { TextArea } = Input;
 
 export function ServiceRating() {
   const [isOpen, setIsOpen] = useState(true);
@@ -41,22 +24,27 @@ export function ServiceRating() {
     }
   };
   return (
-    <ServiceModal isOpen={isOpen} onClose={onClose}>
+    <ServiceModal
+      isOpen={isOpen}
+      onClose={onClose}
+      buttonTitle={
+        activeQuestionIndex < questions.length - 1 ? nextText : submitText
+      }
+      onHandledPrimaryAction={nextQuestion}
+    >
       <div>
-        <h2>{questions[activeQuestionIndex]}</h2>
+        <h3>{questions[activeQuestionIndex]}</h3>
         <Stars rating={rating} onChange={setRating} />
         <div>
           <DetailsContainer>
-            <h4>{commentText}</h4>
-            <Input value={comment} onChange={e => setComment(e.target.value)} />
+            <p>{commentText}</p>
+            <TextArea
+              value={comment}
+              onChange={e => setComment(e.target.value)}
+              placeholder="Enter additional comments here..."
+              autoSize={{ minRows: 4, maxRows: 10 }}
+            />
           </DetailsContainer>
-          <ButtonContainer>
-            <Button type="primary" onClick={nextQuestion}>
-              {activeQuestionIndex < questions.length - 1
-                ? nextText
-                : submitText}
-            </Button>
-          </ButtonContainer>
         </div>
       </div>
     </ServiceModal>

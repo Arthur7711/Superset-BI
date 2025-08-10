@@ -5,6 +5,8 @@ interface ModalProps {
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  buttonTitle: string;
+  onHandledPrimaryAction: () => void;
 }
 
 const StyledModal = styled(Modal)`
@@ -34,14 +36,22 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-export function ServiceModal({ children, isOpen, onClose }: ModalProps) {
+export function ServiceModal({
+  children,
+  isOpen,
+  onClose,
+  buttonTitle,
+  onHandledPrimaryAction,
+}: ModalProps) {
   return (
     <StyledModal
       show={isOpen}
       onHide={onClose}
       title=""
-      hideFooter
+      // hideFooter
       maskClosable={false}
+      primaryButtonName={buttonTitle}
+      onHandledPrimaryAction={onHandledPrimaryAction}
     >
       {children}
     </StyledModal>

@@ -218,7 +218,27 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const NO_DATA = t(
       'Try applying different filters or ensuring your datasource has data',
     );
-    let text = subheader;
+    const [value, writtenTimeGrainText] = subheader.split(' ');
+    let text = '';
+    if (writtenTimeGrainText) {
+      text = subheader;
+    } else {
+      // @ts-ignore
+      switch (formData.timeGrainSqla) {
+        case 'P1M':
+          text = `${value} ${t('MoM')}`;
+          break;
+        case 'P1W':
+          text = `${value} ${t('WoW')}`;
+          break;
+        case 'P1D':
+          text = `${value} ${t('DoD')}`;
+          break;
+
+        default:
+          break;
+      }
+    }
     if (bigNumber === null) {
       text = bigNumberFallback ? NO_DATA : NO_DATA_OR_HASNT_LANDED;
     }

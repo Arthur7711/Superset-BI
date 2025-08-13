@@ -235,7 +235,23 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
             text = `${value} ${t('WoW')}`;
             break;
           case 'P1D':
-            text = `${value} ${t('DoD')}`;
+            if (
+              trendLineData &&
+              trendLineData.length >= 8 &&
+              formData?.vizType === 'big_number_with_multi-lines'
+            ) {
+              const lastWeekData = trendLineData.slice(-8).map(d => d[1]);
+              const effectivePrcent =
+                ((Number(lastWeekData[lastWeekData.length - 1]) -
+                  Number(lastWeekData[0])) /
+                  Number(lastWeekData[0])) *
+                100;
+              text = `${
+                effectivePrcent > 0 ? '+' : '-'
+              }${effectivePrcent.toFixed(1)}% ${t('DoD')}`;
+            } else {
+              text = `${value} ${t('DoD')}`;
+            }
             break;
 
           default:

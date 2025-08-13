@@ -196,6 +196,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       bigNumberFallback,
       echartOptions,
       formData,
+      trendLineData,
     } = this.props;
     // @ts-ignore
     const planningData = echartOptions?.series?.[1]?.data?.slice(-1)?.[0]?.[1];
@@ -218,25 +219,29 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const NO_DATA = t(
       'Try applying different filters or ensuring your datasource has data',
     );
-    const [value, writtenTimeGrainText] = subheader.split(' ');
-    let text = '';
-    if (writtenTimeGrainText) {
-      text = subheader;
-    } else {
-      // @ts-ignore
-      switch (formData.timeGrainSqla) {
-        case 'P1M':
-          text = `${value} ${t('MoM')}`;
-          break;
-        case 'P1W':
-          text = `${value} ${t('WoW')}`;
-          break;
-        case 'P1D':
-          text = `${value} ${t('DoD')}`;
-          break;
+    let text = subheader;
 
-        default:
-          break;
+    if (subheader) {
+      const [value, writtenTimeGrainText] = subheader.split(' ');
+      if (writtenTimeGrainText) {
+        text = subheader;
+      } else {
+        // @ts-ignore
+        switch (formData.timeGrainSqla) {
+          case 'P1M':
+            text = `${value} ${t('MoM')}`;
+            break;
+          case 'P1W':
+            text = `${value} ${t('WoW')}`;
+            break;
+          case 'P1D':
+            text = `${value} ${t('DoD')}`;
+            break;
+
+          default:
+            text = subheader;
+            break;
+        }
       }
     }
     if (bigNumber === null) {

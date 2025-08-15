@@ -284,14 +284,11 @@ const config: ControlPanelConfig = {
       ...temporalColumnMixin,
     },
   },
-  formDataOverrides: formData => {
-    console.log('formDataOverrides', formData);
-    return {
-      ...formData,
-      metric: getStandardizedControls().shiftMetric(),
-      second_metric: getStandardizedControls().shiftSecondMetric(),
-    };
-  },
+  formDataOverrides: formData => ({
+    ...formData,
+    metric: getStandardizedControls().shiftMetric(),
+    second_metric: getStandardizedControls().shiftSecondMetric(),
+  }),
 };
 
 export default config;

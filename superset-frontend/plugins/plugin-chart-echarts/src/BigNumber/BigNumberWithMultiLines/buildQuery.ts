@@ -32,32 +32,28 @@ import {
 
 export default function buildQuery(formData: QueryFormData) {
   const { metric, second_metric } = formData;
-  return buildQueryContext(formData, baseQueryObject => {
-    console.log('colnames', 11111, baseQueryObject);
-
-    return [
-      {
-        ...baseQueryObject,
-        metrics: [metric, second_metric].filter(Boolean),
-        columns: [
-          ...(isXAxisSet(formData)
-            ? ensureIsArray(getXAxisColumn(formData))
-            : []),
-        ],
-        ...(isXAxisSet(formData) ? {} : { is_timeseries: true }),
-        post_processing: [
-          pivotOperator(formData, {
-            ...baseQueryObject,
-            metrics: [metric, second_metric],
-          }),
-          rollingWindowOperator(formData, baseQueryObject),
-          resampleOperator(formData, baseQueryObject),
-          flattenOperator(formData, {
-            ...baseQueryObject,
-            metrics: [metric, second_metric],
-          }),
-        ],
-      },
-    ];
-  });
+  return buildQueryContext(formData, baseQueryObject => [
+    {
+      ...baseQueryObject,
+      metrics: [metric, second_metric].filter(Boolean),
+      columns: [
+        ...(isXAxisSet(formData)
+          ? ensureIsArray(getXAxisColumn(formData))
+          : []),
+      ],
+      ...(isXAxisSet(formData) ? {} : { is_timeseries: true }),
+      post_processing: [
+        pivotOperator(formData, {
+          ...baseQueryObject,
+          metrics: [metric, second_metric],
+        }),
+        rollingWindowOperator(formData, baseQueryObject),
+        resampleOperator(formData, baseQueryObject),
+        flattenOperator(formData, {
+          ...baseQueryObject,
+          metrics: [metric, second_metric],
+        }),
+      ],
+    },
+  ]);
 }

@@ -5,13 +5,24 @@ import {
   TimeFormatter,
   ValueFormatter,
 } from '@superset-ui/core';
+import { getWeekFromRange } from './helpers/getWeekFromRange';
 
+const weekDays = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
 export const tooltipCustomHtml = (
   params: any[],
   formatTime: TimeFormatter,
   headerFormatter: TimeFormatter | ValueFormatter,
   allData: DataRecord[],
   metric: QueryFormMetric,
+  timeGrainSqla: string,
 ) => {
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
@@ -40,10 +51,25 @@ export const tooltipCustomHtml = (
   const redDot = `<span style="color:red;">●</span>`;
   const greenArrow = `<span style="color:#02FB02;">▲</span>`;
   const redArrow = `<span style="color:red;">▼</span>`;
+  let resultTimeText: string | number = '';
+  switch (timeGrainSqla) {
+    case 'P1D': {
+      const weekDayIndex = new Date(date).getDay();
+
+      resultTimeText = `(${weekDays[weekDayIndex]})`;
+      break;
+    }
+    case 'P1W': {
+      resultTimeText = `WEEK: (${getWeekFromRange(date)})`;
+      break;
+    }
+    default:
+      break;
+  }
 
   return `
       <div style="line-height: 1.6;">
-        <strong>${date}</strong><br/><br/>
+        <strong>${date} ${resultTimeText}</strong><br/><br/>
         <strong>Fact:</strong> $ ${headerFormatter.format(current)}<br/><br/>
         <strong>Plan:</strong> $ ${headerFormatter.format(plan)}<br/>
         <strong>Plan exec:</strong> ${

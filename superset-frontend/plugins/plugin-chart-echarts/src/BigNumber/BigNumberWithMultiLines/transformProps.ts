@@ -73,6 +73,7 @@ export default function transformProps(
     currencyFormat,
     timeRangeFixed,
     secondMetric = 'value',
+    timeGrainSqla,
   } = formData;
 
   const granularity = extractTimegrain(rawFormData);
@@ -258,6 +259,7 @@ export default function transformProps(
               headerFormatter,
               data,
               metric,
+              timeGrainSqla,
             ),
         },
         aria: {

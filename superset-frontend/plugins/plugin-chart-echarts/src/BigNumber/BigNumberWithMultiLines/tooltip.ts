@@ -7,15 +7,7 @@ import {
 } from '@superset-ui/core';
 import { getWeekFromRange } from './helpers/getWeekFromRange';
 
-const weekDays = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const tooltipCustomHtml = (
   params: any[],
   formatTime: TimeFormatter,
@@ -39,7 +31,8 @@ export const tooltipCustomHtml = (
 
   const last = Number(prevItem[getMetricLabel(metric)]);
   const planDiff = current - plan;
-  const planExecPct = plan ? ((current / plan) * 100).toFixed(1) : 'N/A';
+  const prcent = (current / plan) * 100;
+  const planExecPct = plan ? prcent.toFixed(1) : 'N/A';
   const prevValue = Number(prevItem[getMetricLabel(metric)]) ?? 0;
   const wowNum = prevValue !== 0 ? current / prevValue : current;
   const wowText = current - prevValue;
@@ -49,6 +42,9 @@ export const tooltipCustomHtml = (
 
   const greenDot = `<span style="color:#02FB02;">●</span>`;
   const redDot = `<span style="color:red;">●</span>`;
+  const orangeDot = `<span style="color:orange;">●</span>`;
+  const dotController =
+    prcent < 90 ? redDot : prcent >= 90 && prcent < 98 ? orangeDot : greenDot;
   const greenArrow = `<span style="color:#02FB02;">▲</span>`;
   const redArrow = `<span style="color:red;">▼</span>`;
   let resultTimeText: string | number = '';
@@ -60,7 +56,7 @@ export const tooltipCustomHtml = (
       break;
     }
     case 'P1W': {
-      resultTimeText = `WEEK: (${getWeekFromRange(date)})`;
+      resultTimeText = `(WEEK: ${getWeekFromRange(date)})`;
       break;
     }
     default:
@@ -72,11 +68,9 @@ export const tooltipCustomHtml = (
         <strong>${date} ${resultTimeText}</strong><br/><br/>
         <strong>Fact:</strong> $ ${headerFormatter.format(current)}<br/><br/>
         <strong>Plan:</strong> $ ${headerFormatter.format(plan)}<br/>
-        <strong>Plan exec:</strong> ${
-          isOkDiff ? greenDot : redDot
-        } ${planExecPct}% (${isOkDiff ? '+' : ''}${headerFormatter.format(
-          planDiff,
-        )}$)<br/><br/>
+        <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
+          isOkDiff ? '+' : ''
+        }${headerFormatter.format(planDiff)}$)<br/><br/>
         <strong>Last period:</strong> $  ${headerFormatter.format(last)}<br/>
        <strong>WoW:</strong> ${isOkLast ? greenArrow : redArrow} ${wowPrc}% (${
          isOkLast ? '+' : ''

@@ -202,16 +202,20 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const planningData = echartOptions?.series?.[1]?.data?.slice(-1)?.[0]?.[1];
     let fontSize = 0;
     let subHeaderProcentText = '';
-    let isPrcentPositive = false;
+    let roundedColor = '';
     const showSecondarySubHeader =
       formData?.vizType === 'big_number_with_multi-lines';
     if (bigNumber && showSecondarySubHeader && planningData) {
-      const prcent = (
-        (Number(bigNumber) / Number(planningData) - 1) *
-        100
-      ).toFixed(1);
+      const prcentNum = (Number(bigNumber) / Number(planningData)) * 100;
+      const prcent = prcentNum.toFixed(1);
+      if (prcentNum < 90) {
+        roundedColor = 'red';
+      } else if (prcentNum >= 90 && prcentNum < 98) {
+        roundedColor = 'orange';
+      } else {
+        roundedColor = '#02FB02';
+      }
       subHeaderProcentText = `${prcent}%`;
-      isPrcentPositive = bigNumber >= planningData;
     }
     const NO_DATA_OR_HASNT_LANDED = t(
       'No data after filtering or data is NULL for the latest time record',
@@ -289,7 +293,13 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
           {text}
           {showSecondarySubHeader ? (
             <span>
-              <span style={{ color: isPrcentPositive ? '#02FB02' : 'red' }}>
+              <span
+                style={{
+                  color: roundedColor,
+                  width: '30px',
+                  height: '30px',
+                }}
+              >
                 ●
               </span>
               <span>{subHeaderProcentText}</span>

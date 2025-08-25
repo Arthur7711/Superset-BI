@@ -11,7 +11,6 @@ interface SupersetUser {
 
 export const GetUserData = () => {
   const [user, setUser] = useState<SupersetUser | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/v1/me/', {
@@ -26,9 +25,8 @@ export const GetUserData = () => {
         }
         return res.json();
       })
-      .then(data => setUser(data.result))
-      .catch(err => setError(err.message));
+      .then(data => setUser(data.result));
   }, []);
   console.log('user', user);
-  return { user, error };
+  return { user };
 };

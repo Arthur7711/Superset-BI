@@ -34,6 +34,11 @@ const StyledModal = styled(Modal)`
       flex: 1 1 auto;
     }
   }
+  .ant-modal-footer {
+    [data-test='modal-cancel-button'] {
+      display: none;
+    }
+  }
 `;
 
 export function ServiceModal({
@@ -48,7 +53,6 @@ export function ServiceModal({
       show={isOpen}
       onHide={onClose}
       title=""
-      // hideFooter
       maskClosable={false}
       primaryButtonName={buttonTitle}
       onHandledPrimaryAction={onHandledPrimaryAction}

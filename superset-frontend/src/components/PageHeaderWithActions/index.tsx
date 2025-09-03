@@ -28,6 +28,7 @@ import CertifiedBadge, { CertifiedBadgeProps } from '../CertifiedBadge';
 import FaveStar, { FaveStarProps } from '../FaveStar';
 import Icons from '../Icons';
 import Button from '../Button';
+import DockImage from './icons/docs.png';
 
 export const menuTriggerStyles = (theme: SupersetTheme) => css`
   width: ${theme.gridUnit * 8}px;
@@ -105,6 +106,11 @@ const buttonsStyles = (theme: SupersetTheme) => css`
 const additionalActionsContainerStyles = (theme: SupersetTheme) => css`
   margin-left: ${theme.gridUnit * 2}px;
 `;
+const buttonsBlockStyles = css`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
 
 export type PageHeaderWithActionsProps = {
   editableTitleProps: DynamicEditableTitleProps;
@@ -150,6 +156,19 @@ export const PageHeaderWithActions = ({
             {titlePanelAdditionalItems}
           </div>
         )}
+        <div css={buttonsBlockStyles}>
+          {/* need real href here to paste */}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`https://someHref/${faveStarProps.itemId}`}
+          >
+            <img src={DockImage} alt="Docks" height="28px" />
+          </a>
+          {/* <a target="_blank" rel="noopener noreferrer" href="https://someHref">
+            <button type="button">info</button>
+          </a> */}
+        </div>
       </div>
       <div className="right-button-panel">
         {rightPanelAdditionalItems}

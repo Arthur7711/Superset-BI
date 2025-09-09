@@ -28,7 +28,8 @@ import CertifiedBadge, { CertifiedBadgeProps } from '../CertifiedBadge';
 import FaveStar, { FaveStarProps } from '../FaveStar';
 import Icons from '../Icons';
 import Button from '../Button';
-import DockImage from './icons/docs.png';
+import ConfluenceImage from './icons/confluence.png';
+import MetadataImage from './icons/metadata.png';
 
 export const menuTriggerStyles = (theme: SupersetTheme) => css`
   width: ${theme.gridUnit * 8}px;
@@ -106,10 +107,25 @@ const buttonsStyles = (theme: SupersetTheme) => css`
 const additionalActionsContainerStyles = (theme: SupersetTheme) => css`
   margin-left: ${theme.gridUnit * 2}px;
 `;
-const buttonsBlockStyles = css`
+const buttonsBlockStyles = (theme: SupersetTheme) => css`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: 1px solid ${theme.colors.grayscale.light2};
+    border-radius: 4px;
+    background-color: ${theme.colors.grayscale.light5};
+
+    &:hover {
+      background-color: ${theme.colors.grayscale.light3};
+      border: 1px solid ${theme.colors.grayscale.light3};
+    }
+  }
 `;
 
 export type PageHeaderWithActionsProps = {
@@ -156,18 +172,22 @@ export const PageHeaderWithActions = ({
             {titlePanelAdditionalItems}
           </div>
         )}
-        <div css={buttonsBlockStyles}>
+        <div css={buttonsBlockStyles(theme)}>
           {/* need real href here to paste */}
           <a
             target="_blank"
             rel="noopener noreferrer"
             href={`https://someHref/${faveStarProps.itemId}`}
           >
-            <img src={DockImage} alt="Docks" height="28px" />
+            <img src={ConfluenceImage} alt="Docks" height="28px" />
           </a>
-          {/* <a target="_blank" rel="noopener noreferrer" href="https://someHref">
-            <button type="button">info</button>
-          </a> */}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`https://someHref/${faveStarProps.itemId}`}
+          >
+            <img src={MetadataImage} alt="Docks" height="28px" />
+          </a>
         </div>
       </div>
       <div className="right-button-panel">

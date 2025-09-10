@@ -14,12 +14,14 @@ const headerStyles: React.CSSProperties = {
 export const Header = (props: HeaderProps) => {
   const { total, prevTotal } = props;
   const percent = (total / prevTotal) * 100 - 100;
+  const UIPercent = percent.toFixed(2);
   const colors = ['red', '#02FB02'];
   const isPositiveChange = percent >= 0;
   const spaceSymbol = '\u00A0';
+  const UItotal = total.toFixed(1);
   return (
     <div style={headerStyles}>
-      <h2 style={{ fontWeight: 500 }}>{total}</h2>
+      <h2 style={{ fontWeight: 500 }}>{UItotal}</h2>
       <div>
         <span>WoW: </span>
         {isPositiveChange ? (
@@ -27,7 +29,7 @@ export const Header = (props: HeaderProps) => {
         ) : (
           <span style={{ color: colors[0] }}>▼ </span>
         )}
-        <span>{percent}% </span>
+        <span>{UIPercent}% </span>
         <span>
           {[...Array(4)].map((_, index) => (
             <Fragment key={index}>{spaceSymbol}</Fragment>

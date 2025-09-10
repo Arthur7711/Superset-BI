@@ -189,7 +189,11 @@ export default function transformProps(
     yAxisTitleMargin,
     yAxisTitlePosition,
     zoomable,
-  }: EchartsTimeseriesFormData = { ...DEFAULT_FORM_DATA, ...{ showLegend: false }, ...formData };
+  }: EchartsTimeseriesFormData = {
+    ...DEFAULT_FORM_DATA,
+    ...{ showLegend: false },
+    ...formData,
+  };
   const refs: Refs = {};
   const groupBy = ensureIsArray(groupby);
   const labelMap: { [key: string]: string[] } = Object.entries(
@@ -536,23 +540,24 @@ export default function transformProps(
     grid: {
       ...defaultGrid,
       ...padding,
-      left: 0,
+      left: 20,
       right: 0,
-      bottom: 10,
+      bottom: 30,
       top: 10,
       containLabel: false,
     },
     xAxis: {
       ...xAxis,
-      axisLine: { show: false },
+      axisLine: { show: true },
       axisTick: { show: false },
-      axisLabel: { show: false },
+      axisLabel: { show: true },
     },
     yAxis: {
       ...yAxis,
       splitLine: {
         show: false,
       },
+      axisLabel: { show: false },
     },
     tooltip: {
       ...getDefaultTooltip(refs),

@@ -62,7 +62,6 @@ import { parseAxisBound } from '../utils/controls';
 import {
   calculateLowerLogTick,
   extractDataTotalValues,
-  extractSeries,
   extractShowValueIndexes,
   extractTooltipKeys,
   getAxisType,
@@ -79,7 +78,6 @@ import {
   extractForecastSeriesContexts,
   extractForecastValuesFromTooltipParams,
   formatForecastTooltipSeries,
-  rebaseForecastDatum,
 } from '../utils/forecast';
 import { convertInteger } from '../utils/convertInteger';
 import { defaultGrid, defaultYAxis } from '../defaults';
@@ -104,7 +102,7 @@ import {
   getXAxisFormatter,
   getYAxisFormatter,
 } from '../utils/formatters';
-import { customDedupSeries } from './helpers';
+import { customDedupSeries, extractSeries } from './helpers';
 
 export default function transformProps(
   chartProps: EchartsTimeseriesChartProps,
@@ -209,7 +207,8 @@ export default function transformProps(
     return { ...acc, [entry[0]]: entry[1] };
   }, {});
   const colorScale = CategoricalColorNamespace.getScale(colorScheme as string);
-  const rebasedData = rebaseForecastDatum(data, verboseMap);
+  const rebasedData = data;
+
   let xAxisLabel = getXAxisLabel(chartProps.rawFormData) as string;
   if (
     isPhysicalColumn(chartProps.rawFormData?.x_axis) &&
@@ -233,8 +232,11 @@ export default function transformProps(
 
   const isMultiSeries = groupBy.length || metrics?.length > 1;
 
+  const getMetricsOrders = () => metrics.map(metric => getMetricLabel(metric));
+
   const [rawSeries, sortedTotalValues, minPositiveValue] = extractSeries(
     rebasedData,
+    getMetricsOrders(),
     {
       fillNeighborValue: stack && !forecastEnabled ? 0 : undefined,
       xAxis: xAxisLabel,
@@ -250,6 +252,9 @@ export default function transformProps(
         : undefined,
     },
   );
+
+  // console.log('rawSeries', rawSeries, formData);
+
   const showValueIndexes = extractShowValueIndexes(rawSeries, {
     stack,
     onlyTotal,
@@ -288,6 +293,7 @@ export default function transformProps(
   rawSeries.forEach(entry => {
     const derivedSeries = isDerivedSeries(entry, chartProps.rawFormData);
     const lineStyle: LineStyleOption = {};
+
     if (derivedSeries) {
       const offset = getTimeOffset(
         entry,
@@ -375,7 +381,7 @@ export default function transformProps(
   annotationLayers
     .filter((layer: AnnotationLayer) => layer.show)
     .forEach((layer: AnnotationLayer) => {
-      if (isFormulaAnnotationLayer(layer))
+      if (isFormulaAnnotationLayer(layer)) {
         series.push(
           transformFormulaAnnotation(
             layer,
@@ -387,7 +393,7 @@ export default function transformProps(
             orientation,
           ),
         );
-      else if (isIntervalAnnotationLayer(layer)) {
+      } else if (isIntervalAnnotationLayer(layer)) {
         series.push(
           ...transformIntervalAnnotation(
             layer,

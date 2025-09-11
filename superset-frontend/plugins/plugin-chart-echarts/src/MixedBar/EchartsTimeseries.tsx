@@ -265,13 +265,12 @@ export default function EchartsTimeseries({
     data.reduce((sum, [, value]) => sum + (value ?? 0), 0);
 
   const [currentData, plannedData] = series.map(({ data }) => data);
-  const currentSummary = getTotal(currentData);
-  const plannedSummary = getTotal(plannedData);
-
+  const currentSummary = currentData ? getTotal(currentData) : 0;
+  const plannedSummary = plannedData ? getTotal(plannedData) : 0;
   return (
     <>
       <div ref={extraControlRef}>
-        <Header total={currentSummary} prevTotal={plannedSummary} />
+        <Header total={plannedSummary} sum={currentSummary} />
         {/* <ExtraControls formData={formData} setControlValue={setControlValue} /> */}
       </div>
       <Echart

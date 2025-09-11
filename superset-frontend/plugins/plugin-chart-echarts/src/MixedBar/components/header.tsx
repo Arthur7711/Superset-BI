@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 interface HeaderProps {
   total: number;
-  prevTotal: number;
+  sum: number;
 }
 
 const headerStyles: React.CSSProperties = {
@@ -12,8 +12,8 @@ const headerStyles: React.CSSProperties = {
 };
 
 export const Header = (props: HeaderProps) => {
-  const { total, prevTotal } = props;
-  const percent = (total / prevTotal) * 100 - 100;
+  const { total, sum } = props;
+  const percent = (total / sum) * 100 - 100;
   const UIPercent = percent.toFixed(2);
   const colors = ['red', '#02FB02'];
   const isPositiveChange = percent >= 0;
@@ -34,7 +34,7 @@ export const Header = (props: HeaderProps) => {
           {[...Array(4)].map((_, index) => (
             <Fragment key={index}>{spaceSymbol}</Fragment>
           ))}
-          {prevTotal}
+          {sum}
         </span>
       </div>
     </div>

@@ -25,7 +25,6 @@ import {
   CategoricalColorNamespace,
   CurrencyFormatter,
   ensureIsArray,
-  tooltipHtml,
   GenericDataType,
   getCustomFormatter,
   getMetricLabel,
@@ -103,6 +102,7 @@ import {
   getYAxisFormatter,
 } from '../utils/formatters';
 import { customDedupSeries, extractSeries } from './helpers';
+import { tooltipHtml } from './components/tooltip';
 
 export default function transformProps(
   chartProps: EchartsTimeseriesChartProps,

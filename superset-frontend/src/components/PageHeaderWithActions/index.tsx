@@ -17,6 +17,7 @@
  * under the License.
  */
 import { ReactNode, ReactElement } from 'react';
+import { useLocation } from 'react-router-dom';
 import { css, SupersetTheme, t, useTheme } from '@superset-ui/core';
 import { AntdDropdown, AntdDropdownProps } from 'src/components';
 import { TooltipPlacement } from 'src/components/Tooltip';
@@ -159,6 +160,9 @@ export const PageHeaderWithActions = ({
   tooltipProps,
 }: PageHeaderWithActionsProps) => {
   const theme = useTheme();
+  const { pathname } = useLocation();
+
+  const showLinks = pathname.includes('superset/dashboard');
   return (
     <div css={headerStyles} className="header-with-actions">
       <div className="title-panel">
@@ -172,23 +176,25 @@ export const PageHeaderWithActions = ({
             {titlePanelAdditionalItems}
           </div>
         )}
-        <div css={buttonsBlockStyles(theme)}>
-          {/* need real href here to paste */}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`https://someHref/${faveStarProps.itemId}`}
-          >
-            <img src={ConfluenceImage} alt="Docks" height="28px" />
-          </a>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`https://someHref/${faveStarProps.itemId}`}
-          >
-            <img src={MetadataImage} alt="Docks" height="28px" />
-          </a>
-        </div>
+        {showLinks ? (
+          <div css={buttonsBlockStyles(theme)}>
+            {/* need real href here to paste */}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://confluence.uzum.com/${faveStarProps.itemId}`}
+            >
+              <img src={ConfluenceImage} alt="Docks" height="28px" />
+            </a>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://open-metadata.org/${faveStarProps.itemId}`}
+            >
+              <img src={MetadataImage} alt="Docks" height="28px" />
+            </a>
+          </div>
+        ) : null}
       </div>
       <div className="right-button-panel">
         {rightPanelAdditionalItems}

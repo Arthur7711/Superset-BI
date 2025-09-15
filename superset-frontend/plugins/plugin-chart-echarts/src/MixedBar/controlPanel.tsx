@@ -16,259 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import { t } from '@superset-ui/core';
 import {
   ControlPanelConfig,
-  // ControlSetRow,
-  // ControlSubSectionHeader,
-  // D3_TIME_FORMAT_DOCS,
-  // formatSelectOptions,
+  ControlSubSectionHeader,
   getStandardizedControls,
   sections,
-  // sharedControls,
 } from '@superset-ui/chart-controls';
-// import {
-//   legendSection,
-//   minorTicks,
-//   richTooltipSection,
-//   seriesOrderSection,
-//   showValueSection,
-//   truncateXAxis,
-//   xAxisBounds,
-//   xAxisLabelRotation,
-// } from '../controls';
+import {
+  legendSection,
+  minorTicks,
+  richTooltipSection,
+  seriesOrderSection,
+  showValueSection,
+} from '../controls';
 
-// import {
-//   DEFAULT_FORM_DATA,
-//   TIME_SERIES_DESCRIPTION_TEXT,
-// } from '../Timeseries/constants';
-
-// const { logAxis, minorSplitLine, truncateYAxis, yAxisBounds, zoomable } =
-//   DEFAULT_FORM_DATA;
-
-// function createAxisTitleControl(): ControlSetRow[] {
-//   const isVertical = true;
-//   return [
-//     [
-//       {
-//         name: 'x_axis_title',
-//         config: {
-//           type: 'TextControl',
-//           label: t('Axis Title'),
-//           renderTrigger: true,
-//           default: '',
-//           description: t('Changing this control takes effect instantly'),
-//           visibility: () => isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'x_axis_title_margin',
-//         config: {
-//           type: 'SelectControl',
-//           freeForm: true,
-//           clearable: true,
-//           label: t('AXIS TITLE MARGIN'),
-//           renderTrigger: true,
-//           default: sections.TITLE_MARGIN_OPTIONS[0],
-//           choices: formatSelectOptions(sections.TITLE_MARGIN_OPTIONS),
-//           description: t('Changing this control takes effect instantly'),
-//           visibility: () => isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'y_axis_title',
-//         config: {
-//           type: 'TextControl',
-//           label: t('Axis Title'),
-//           renderTrigger: true,
-//           default: '',
-//           description: t('Changing this control takes effect instantly'),
-//           visibility: () => true,
-//           disableStash: true,
-//           resetOnHide: !isVertical,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'y_axis_title_margin',
-//         config: {
-//           type: 'SelectControl',
-//           freeForm: true,
-//           clearable: true,
-//           label: t('AXIS TITLE MARGIN'),
-//           renderTrigger: true,
-//           default: sections.TITLE_MARGIN_OPTIONS[0],
-//           choices: formatSelectOptions(sections.TITLE_MARGIN_OPTIONS),
-//           description: t('Changing this control takes effect instantly'),
-//           visibility: () => isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'y_axis_title_position',
-//         config: {
-//           type: 'SelectControl',
-//           freeForm: true,
-//           clearable: false,
-//           label: t('AXIS TITLE POSITION'),
-//           renderTrigger: true,
-//           default: sections.TITLE_POSITION_OPTIONS[0][0],
-//           choices: sections.TITLE_POSITION_OPTIONS,
-//           description: t('Changing this control takes effect instantly'),
-//           visibility: () => !isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//   ];
-// }
-
-// function createAxisControl(): ControlSetRow[] {
-//   const isVertical = true;
-//   return [
-//     [
-//       {
-//         name: 'x_axis_time_format',
-//         config: {
-//           ...sharedControls.x_axis_time_format,
-//           default: 'smart_date',
-//           description: `${D3_TIME_FORMAT_DOCS}. ${TIME_SERIES_DESCRIPTION_TEXT}`,
-//           visibility: () => isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: xAxisLabelRotation.name,
-//         config: {
-//           ...xAxisLabelRotation.config,
-//           visibility: () => isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'y_axis_format',
-//         config: {
-//           ...sharedControls.y_axis_format,
-//           label: t('Axis Format'),
-//           visibility: () => !isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     ['currency_format'],
-//     [
-//       {
-//         name: 'logAxis',
-//         config: {
-//           type: 'CheckboxControl',
-//           label: t('Logarithmic axis'),
-//           renderTrigger: true,
-//           default: logAxis,
-//           description: t('Logarithmic axis'),
-//           visibility: () => !isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'minorSplitLine',
-//         config: {
-//           type: 'CheckboxControl',
-//           label: t('Minor Split Line'),
-//           renderTrigger: true,
-//           default: minorSplitLine,
-//           description: t('Draw split lines for minor axis ticks'),
-//           visibility: () => !isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [truncateXAxis],
-//     [xAxisBounds],
-//     [
-//       {
-//         name: 'truncateYAxis',
-//         config: {
-//           type: 'CheckboxControl',
-//           label: t('Truncate Axis'),
-//           default: truncateYAxis,
-//           renderTrigger: true,
-//           description: t(
-//             'It’s not recommended to truncate axis in MixedBar chart.',
-//           ),
-//           visibility: () => !isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//     [
-//       {
-//         name: 'y_axis_bounds',
-//         config: {
-//           type: 'BoundsControl',
-//           label: t('Axis Bounds'),
-//           renderTrigger: true,
-//           default: yAxisBounds,
-//           description: t(
-//             'Bounds for the axis. When left empty, the bounds are ' +
-//               'dynamically defined based on the min/max of the data. Note that ' +
-//               "this feature will only expand the axis range. It won't " +
-//               "narrow the data's extent.",
-//           ),
-//           visibility: () => !isVertical,
-//           disableStash: true,
-//           resetOnHide: false,
-//         },
-//       },
-//     ],
-//   ];
-// }
-
+const neededRichTooltipSection = richTooltipSection.slice(0, -1);
 const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.echartsTimeSeriesQueryWithXAxisSort,
-    // sections.advancedAnalyticsControls,
-    // sections.annotationsAndLayersControls,
-    // sections.forecastIntervalControls,
-    // {
-    //   label: t('Chart Title'),
-    //   tabOverride: 'customize',
-    //   expanded: true,
-    //   controlSetRows: [
-    //     [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
-    //     ...createAxisTitleControl(),
-    //     [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
-    //     ...createAxisTitleControl(),
-    //   ],
-    // },
     {
       label: t('Chart Options'),
       expanded: true,
-      controlSetRows: [['color_scheme']], // need add right values
+      controlSetRows: [
+        ...seriesOrderSection,
+        ...showValueSection,
+        [minorTicks],
+        ...legendSection,
+        [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
+        ...neededRichTooltipSection,
+      ],
     },
   ],
   formDataOverrides: formData => ({

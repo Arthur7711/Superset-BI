@@ -262,7 +262,7 @@ export default function transformProps(
     legendState,
   });
   const seriesContexts = extractForecastSeriesContexts(
-    rawSeries.map(series => series.name as string),
+    rawSeries.map(series => series.name as string).reverse(),
   );
   const isAreaExpand = stack === StackControlsValue.Expand;
   const xAxisDataType = dataTypes?.[xAxisLabel] ?? dataTypes?.[xAxisOrig];
@@ -356,6 +356,7 @@ export default function transformProps(
       } else {
         series.push(transformedSeries);
       }
+      series.reverse();
     }
   });
 

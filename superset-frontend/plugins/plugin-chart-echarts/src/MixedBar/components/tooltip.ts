@@ -45,21 +45,25 @@ export function tooltipHtml(
       <table>
           ${data.length === 0 ? `<tr><td>No data</td></tr>` : ''}
           ${data
+            .reverse()
             .map((row, i) => {
               const rowStyle =
                 i === focusedRow ? 'font-weight: 700;' : 'opacity: 0.8;';
               const cells = row.map((cell, j) => {
                 const cellStyle = `
-                  text-align: ${j > 0 ? 'right' : 'left'};
+                  text-align: left;
                   padding-left: ${j === 0 ? 0 : 16}px;
                   ${TRUNCATION_STYLE}
                 `;
-                return `<td style="${cellStyle}">${cell}</td>`;
+                return `<td style="${cellStyle}">${cell} ${
+                  i === 0 && j === 1 && wowNum !== '--'
+                    ? `WoW: <span style="font-weight: 700; margin-left: 4px;">${wowNum}%</span>`
+                    : ''
+                }</td>`;
               });
-              return `<tr style="${rowStyle}">${cells.join('')}</tr>`;
+              return `<tr style="${rowStyle}">${cells.join('')} </tr>`;
             })
             .join('')}
       </table>
-      <p style="padding-top: 16px;">WoW: <span style="font-weight: 700;">${wowNum}%</span></p>
     </div>`;
 }

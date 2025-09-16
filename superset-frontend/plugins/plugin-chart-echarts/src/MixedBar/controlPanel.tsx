@@ -20,19 +20,16 @@
 import { t } from '@superset-ui/core';
 import {
   ControlPanelConfig,
-  ControlSubSectionHeader,
   getStandardizedControls,
   sections,
 } from '@superset-ui/chart-controls';
 import {
   legendSection,
   minorTicks,
-  richTooltipSection,
   seriesOrderSection,
   showValueSection,
 } from '../controls';
 
-const neededRichTooltipSection = richTooltipSection.slice(0, -1);
 const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.echartsTimeSeriesQueryWithXAxisSort,
@@ -44,8 +41,6 @@ const config: ControlPanelConfig = {
         ...showValueSection,
         [minorTicks],
         ...legendSection,
-        [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
-        ...neededRichTooltipSection,
       ],
     },
   ],

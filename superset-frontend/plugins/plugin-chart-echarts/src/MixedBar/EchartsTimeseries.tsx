@@ -63,6 +63,7 @@ export default function EchartsTimeseries({
   const { series } = echartOptions as {
     series: { data: [number, number][] }[];
   };
+
   const echartRef = useRef<EchartsHandler | null>(null);
   // eslint-disable-next-line no-param-reassign
   refs.echartRef = echartRef;
@@ -265,8 +266,30 @@ export default function EchartsTimeseries({
     data.reduce((sum, [, value]) => sum + (value ?? 0), 0);
 
   const [currentData, plannedData] = series.map(({ data }) => data);
-  const currentSummary = currentData ? getTotal(currentData) : 0;
-  const plannedSummary = plannedData ? getTotal(plannedData) : 0;
+
+  function sumWithZeroSkip(
+    arr1: [number, number][],
+    arr2: [number, number][],
+  ): [number, number] {
+    let sum1 = 0;
+    let sum2 = 0;
+
+    const length = Math.min(arr1.length, arr2.length); // макс 24 по часам будет
+
+    for (let i = 0; i < length; i += 1) {
+      if (arr1[i][1] === 0 || arr2[i][1] === 0) {
+        continue;
+      }
+      sum1 += arr1[i][1];
+      sum2 += arr2[i][1];
+    }
+
+    return [sum1, sum2];
+  }
+  const [currentSummary, plannedSummary] = sumWithZeroSkip(
+    currentData,
+    plannedData,
+  );
   return (
     <>
       <div ref={extraControlRef}>

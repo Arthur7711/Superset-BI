@@ -83,6 +83,41 @@ export const extractForecastValuesFromTooltipParams = (
   return values;
 };
 
+export const mixedBarFormatForecastTooltipSeries = ({
+  seriesName,
+  observation,
+  forecastTrend,
+  forecastLower,
+  forecastUpper,
+  marker,
+  formatter,
+}: ForecastValue & {
+  seriesName: string;
+  marker: TooltipMarker;
+  formatter: ValueFormatter;
+}): [string, string, number] => {
+  const name = `${marker}${sanitizeHtml(seriesName)}`;
+  let value = isNumber(observation) ? formatter(observation) : '';
+  const reserveValue = observation || 0;
+  if (forecastTrend || forecastLower || forecastUpper) {
+    // forecast values take the form of "20, y = 30 (10, 40)"
+    // where the first part is the observation, the second part is the forecast trend
+    // and the third part is the lower and upper bounds
+    if (forecastTrend) {
+      if (value) value += ', ';
+      value += `ŷ = ${formatter(forecastTrend)}`;
+    }
+    if (forecastLower && forecastUpper) {
+      if (value) value += ' ';
+      // the lower bound needs to be added to the upper bound
+      value += `(${formatter(forecastLower)}, ${formatter(
+        forecastLower + forecastUpper,
+      )})`;
+    }
+  }
+  return [name, value, reserveValue];
+};
+
 export const formatForecastTooltipSeries = ({
   seriesName,
   observation,

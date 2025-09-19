@@ -24,16 +24,15 @@ const TRUNCATION_STYLE = `
 `;
 
 export function tooltipHtml(
-  data: string[][],
-  title?: string,
+  data: [string, string, number][],
+  title: string,
   focusedRow?: number,
 ) {
   const [firstData, secondData] = data;
+
   let wowNum = '--';
   if (firstData[1] && secondData[1]) {
-    wowNum = ((Number(secondData[1]) / Number(firstData[1]) - 1) * 100).toFixed(
-      1,
-    );
+    wowNum = ((secondData[2] / firstData[2] - 1) * 100).toFixed(1);
   }
 
   const titleRow = title
@@ -49,7 +48,7 @@ export function tooltipHtml(
             .map((row, i) => {
               const rowStyle =
                 i === focusedRow ? 'font-weight: 700;' : 'opacity: 0.8;';
-              const cells = row.map((cell, j) => {
+              const cells = row.slice(0, 2).map((cell, j) => {
                 const cellStyle = `
                   text-align: left;
                   padding-left: ${j === 0 ? 0 : 16}px;

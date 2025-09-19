@@ -76,7 +76,7 @@ import {
   extractForecastSeriesContext,
   extractForecastSeriesContexts,
   extractForecastValuesFromTooltipParams,
-  formatForecastTooltipSeries,
+  mixedBarFormatForecastTooltipSeries,
 } from '../utils/forecast';
 import { convertInteger } from '../utils/convertInteger';
 import { defaultGrid, defaultYAxis } from '../defaults';
@@ -252,8 +252,6 @@ export default function transformProps(
         : undefined,
     },
   );
-
-  // console.log('rawSeries', rawSeries, formData);
 
   const showValueIndexes = extractShowValueIndexes(rawSeries, {
     stack,
@@ -557,7 +555,7 @@ export default function transformProps(
       ...xAxis,
       axisLine: { show: true },
       axisTick: { show: false },
-      axisLabel: { show: true },
+      axisLabel: { show: false },
     },
     yAxis: {
       ...yAxis,
@@ -593,8 +591,7 @@ export default function transformProps(
         const formatter = forcePercentFormatter
           ? percentFormatter
           : getCustomFormatter(customFormatters, metrics) ?? defaultFormatter;
-
-        const rows: string[][] = [];
+        const rows: [string, string, number][] = [];
         const total = Object.values(forecastValues).reduce(
           (acc, value) =>
             value.observation !== undefined ? acc + value.observation : acc,
@@ -612,7 +609,7 @@ export default function transformProps(
             if (value.observation === 0 && stack) {
               return;
             }
-            const row = formatForecastTooltipSeries({
+            const row = mixedBarFormatForecastTooltipSeries({
               ...value,
               seriesName: key,
               formatter,
@@ -634,7 +631,11 @@ export default function transformProps(
           }
         }
         if (allowTotal && showTooltipTotal) {
-          const totalRow = ['Total', formatter.format(total)];
+          const totalRow = ['Total', formatter.format(total), total] as [
+            string,
+            string,
+            number,
+          ];
           if (showPercentage) {
             totalRow.push(percentFormatter.format(1));
           }

@@ -34,7 +34,6 @@ export function tooltipHtml(
   if (firstData[1] && secondData[1]) {
     wowNum = ((secondData[2] / firstData[2] - 1) * 100).toFixed(1);
   }
-
   const titleRow = title
     ? `<span style="font-weight: 700;${TRUNCATION_STYLE}">${title}</span>`
     : '';

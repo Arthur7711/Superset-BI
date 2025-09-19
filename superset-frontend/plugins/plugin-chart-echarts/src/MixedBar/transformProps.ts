@@ -282,7 +282,6 @@ export default function transformProps(
     yAxisFormat,
     currencyFormat,
   );
-
   const array = ensureIsArray(chartProps.rawFormData?.time_compare);
   const inverted = invert(verboseMap);
 
@@ -614,6 +613,7 @@ export default function transformProps(
               seriesName: key,
               formatter,
             });
+            // console.log('row', row);
             if (showPercentage && value.observation !== undefined) {
               row.push(
                 percentFormatter.format(value.observation / (total || 1)),

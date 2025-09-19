@@ -41,6 +41,7 @@ const config: ControlPanelConfig = {
         ...showValueSection,
         [minorTicks],
         ...legendSection,
+        ['currency_format'],
       ],
     },
   ],

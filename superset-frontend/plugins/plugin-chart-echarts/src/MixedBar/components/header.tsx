@@ -1,9 +1,13 @@
-import { getNumberFormatter } from '@superset-ui/core';
+import { getCurrencySymbol, getNumberFormatter } from '@superset-ui/core';
 import { Fragment } from 'react';
 
 interface HeaderProps {
   total: number;
   sum: number;
+  currencyFormat?: {
+    symbol: string;
+    symbolPosition: 'prefix' | 'suffix';
+  };
 }
 
 const headerStyles: React.CSSProperties = {
@@ -13,7 +17,7 @@ const headerStyles: React.CSSProperties = {
 };
 
 export const Header = (props: HeaderProps) => {
-  const { total, sum } = props;
+  const { total, sum, currencyFormat } = props;
   const formatter = getNumberFormatter();
   const percent = (total / sum) * 100 - 100;
   const UIPercent = percent.toFixed(1);
@@ -22,9 +26,25 @@ export const Header = (props: HeaderProps) => {
   const spaceSymbol = '\u00A0';
   const UItotal = formatter(total);
   const UISum = formatter(sum);
+  const currencySymbol = currencyFormat?.symbol
+    ? getCurrencySymbol(currencyFormat)
+    : '';
+  const currencyPosition = currencyFormat?.symbolPosition || 'suffix';
+
   return (
     <div style={headerStyles}>
-      <h2 style={{ fontWeight: 500 }}>{UItotal}</h2>
+      <h2
+        style={{
+          fontWeight: 500,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          flexDirection: currencyPosition === 'prefix' ? 'row-reverse' : 'row',
+        }}
+      >
+        <span>{UItotal}</span>
+        <span>{currencySymbol}</span>
+      </h2>
       <div>
         <span>WoW: </span>
         {isPositiveChange ? (

@@ -262,8 +262,8 @@ export default function EchartsTimeseries({
       }
     },
   };
-  const getTotal = (data: [number, number][]) =>
-    data.reduce((sum, [, value]) => sum + (value ?? 0), 0);
+  // const getTotal = (data: [number, number][]) =>
+  //   data.reduce((sum, [, value]) => sum + (value ?? 0), 0);
 
   const [currentData, plannedData] = series.map(({ data }) => data);
 
@@ -290,10 +290,15 @@ export default function EchartsTimeseries({
     currentData,
     plannedData,
   );
+
   return (
     <>
       <div ref={extraControlRef}>
-        <Header total={plannedSummary} sum={currentSummary} />
+        <Header
+          total={plannedSummary}
+          sum={currentSummary}
+          currencyFormat={formData?.currencyFormat}
+        />
         {/* <ExtraControls formData={formData} setControlValue={setControlValue} /> */}
       </div>
       <Echart

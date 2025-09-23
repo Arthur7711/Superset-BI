@@ -60,8 +60,9 @@ export default function EchartsTimeseries({
   coltypeMapping,
 }: TimeseriesChartTransformedProps) {
   const { stack } = formData;
-  const { series } = echartOptions as {
+  const { series, yoyData } = echartOptions as {
     series: { data: [number, number][] }[];
+    yoyData?: { data: [number, number][] };
   };
 
   const echartRef = useRef<EchartsHandler | null>(null);
@@ -266,13 +267,16 @@ export default function EchartsTimeseries({
   //   data.reduce((sum, [, value]) => sum + (value ?? 0), 0);
 
   const [currentData, plannedData] = series.map(({ data }) => data);
+  const YoYData = yoyData?.data;
 
   function sumWithZeroSkip(
     arr1: [number, number][],
     arr2: [number, number][],
-  ): [number, number] {
+    arr3?: [number, number][],
+  ): [number, number, number] {
     let sum1 = 0;
     let sum2 = 0;
+    let sum3 = 0;
 
     const length = Math.min(arr1.length, arr2.length); // макс 24 по часам будет
 
@@ -282,21 +286,25 @@ export default function EchartsTimeseries({
       }
       sum1 += arr1[i][1];
       sum2 += arr2[i][1];
+      if (arr3) {
+        sum3 += arr3[i][1];
+      }
     }
 
-    return [sum1, sum2];
+    return [sum1, sum2, sum3];
   }
-  const [currentSummary, plannedSummary] = sumWithZeroSkip(
+  const [currentSummary, plannedSummary, YoYSummary] = sumWithZeroSkip(
     currentData,
     plannedData,
+    YoYData,
   );
-
   return (
     <>
       <div ref={extraControlRef}>
         <Header
           total={plannedSummary}
           sum={currentSummary}
+          yoySum={YoYSummary}
           currencyFormat={formData?.currencyFormat}
         />
         {/* <ExtraControls formData={formData} setControlValue={setControlValue} /> */}

@@ -10,22 +10,28 @@ import { StackType } from '../types';
 import { sortRows } from '../utils/series';
 import { StackControlsValue } from '../constants';
 
-export function customDedupSeries(series: SeriesOption[]): SeriesOption[] {
+export function customDedupSeries(
+  series: SeriesOption[],
+): [SeriesOption[], SeriesOption | undefined] {
   const counter = new Map<string, number>();
   const secondaryBarColor = '#cccccc';
-  const primaryBarColor = '#6E00F7';
+  // const primaryBarColor = '#6E00F7';
   const customStyles = [
-    { itemStyle: { color: secondaryBarColor }, barWidth: 10, z: 1 },
     {
-      itemStyle: { color: primaryBarColor },
+      itemStyle: { color: secondaryBarColor },
+      barWidth: 10,
+      z: 1,
+    },
+    {
+      // itemStyle: { color: primaryBarColor },
       barWidth: 4,
       z: 2,
       barGap: '-70%',
     },
   ];
-  const data = series.slice(0, 2).map((row, index) => {
+  const data = series.map((row, index) => {
+    if (row?.id === undefined) return row;
     let { id } = row;
-    if (id === undefined) return row;
     id = String(id);
     const count = counter.get(id) || 0;
     const suffix = count > 0 ? ` (${count})` : '';
@@ -36,7 +42,8 @@ export function customDedupSeries(series: SeriesOption[]): SeriesOption[] {
       ...customStyles[index],
     };
   });
-  return data;
+
+  return [data.slice(0, 2), data?.[2]];
 }
 
 export function extractSeries(

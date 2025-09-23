@@ -39,6 +39,7 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         ...seriesOrderSection,
         ...showValueSection,
+        ['color_scheme'],
         [minorTicks],
         ...legendSection,
         ['currency_format'],

@@ -260,7 +260,7 @@ export default function transformProps(
     legendState,
   });
   const seriesContexts = extractForecastSeriesContexts(
-    rawSeries.map(series => series.name as string).reverse(),
+    rawSeries.map(series => series.name as string),
   );
   const isAreaExpand = stack === StackControlsValue.Expand;
   const xAxisDataType = dataTypes?.[xAxisLabel] ?? dataTypes?.[xAxisOrig];
@@ -353,7 +353,9 @@ export default function transformProps(
       } else {
         series.push(transformedSeries);
       }
-      series.reverse();
+      if (series.length === 2) {
+        [series[0], series[1]] = [series[1], series[0]];
+      }
     }
   });
 
@@ -546,7 +548,7 @@ export default function transformProps(
       ...padding,
       left: 20,
       right: 0,
-      bottom: 30,
+      bottom: 10,
       top: 10,
       containLabel: false,
     },
@@ -613,7 +615,6 @@ export default function transformProps(
               seriesName: key,
               formatter,
             });
-            // console.log('row', row);
             if (showPercentage && value.observation !== undefined) {
               row.push(
                 percentFormatter.format(value.observation / (total || 1)),
@@ -625,7 +626,6 @@ export default function transformProps(
             }
           });
         if (stack) {
-          rows.reverse();
           if (focusedRow !== undefined) {
             focusedRow = rows.length - focusedRow - 1;
           }
@@ -655,7 +655,7 @@ export default function transformProps(
       ),
       data: legendData as string[],
     },
-    series: customDedupSeries(series),
+    series: customDedupSeries(series)[0],
     toolbox: {
       show: zoomable,
       top: TIMESERIES_CONSTANTS.toolboxTop,
@@ -693,6 +693,7 @@ export default function transformProps(
           },
         ]
       : [],
+    yoyData: customDedupSeries(series)[1],
   };
 
   const onFocusedSeries = (seriesName: string | null) => {

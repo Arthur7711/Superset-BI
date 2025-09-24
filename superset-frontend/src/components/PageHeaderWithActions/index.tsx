@@ -31,6 +31,7 @@ import Icons from '../Icons';
 import Button from '../Button';
 import ConfluenceImage from './icons/confluence.png';
 import MetadataImage from './icons/metadata.png';
+import { GetUserData } from '../../features/serviceRating/hooks/GetUserData';
 
 export const menuTriggerStyles = (theme: SupersetTheme) => css`
   width: ${theme.gridUnit * 8}px;
@@ -163,6 +164,8 @@ export const PageHeaderWithActions = ({
   const { pathname } = useLocation();
 
   const showLinks = pathname.includes('superset/dashboard');
+  const { user } = GetUserData();
+
   return (
     <div css={headerStyles} className="header-with-actions">
       <div className="title-panel">
@@ -197,6 +200,11 @@ export const PageHeaderWithActions = ({
         ) : null}
       </div>
       <div className="right-button-panel">
+        {showLinks ? (
+          <span style={{ fontSize: 12, fontWeight: 600, marginRight: 4 }}>
+            {user?.email}
+          </span>
+        ) : null}
         {rightPanelAdditionalItems}
         <div css={additionalActionsContainerStyles}>
           {showMenuDropdown && (

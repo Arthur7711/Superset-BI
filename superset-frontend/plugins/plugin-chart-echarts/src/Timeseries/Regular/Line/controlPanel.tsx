@@ -20,6 +20,7 @@ import { t } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlPanelsContainerProps,
+  ControlSetItem,
   ControlSubSectionHeader,
   D3_TIME_FORMAT_DOCS,
   getStandardizedControls,
@@ -42,6 +43,17 @@ import {
   xAxisBounds,
   xAxisLabelRotation,
 } from '../../../controls';
+
+const yAxisShow: ControlSetItem = {
+  name: 'y_axis_show',
+  config: {
+    type: 'CheckboxControl',
+    label: t('Show Y Axis Values'),
+    renderTrigger: true,
+    default: true,
+    description: t('Show or hide Y axis tick labels'),
+  },
+};
 
 const {
   area,
@@ -185,6 +197,7 @@ const config: ControlPanelConfig = {
         ...richTooltipSection,
         // eslint-disable-next-line react/jsx-key
         [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
+        [yAxisShow],
         ['y_axis_format'],
         ['currency_format'],
         [

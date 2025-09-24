@@ -538,7 +538,10 @@ export default function transformProps(
       ...padding,
     },
     xAxis,
-    yAxis,
+    yAxis: {
+      ...yAxis,
+      axisLabel: { show: formData.yAxisShow },
+    },
     tooltip: {
       ...getDefaultTooltip(refs),
       show: !inContextMenu,

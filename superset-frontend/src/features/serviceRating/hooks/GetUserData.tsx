@@ -7,6 +7,7 @@ interface SupersetUser {
   last_name: string;
   roles: string[];
   is_anonymous: boolean;
+  email: string;
 }
 
 export const GetUserData = () => {

@@ -61,6 +61,7 @@ import { ForecastSeriesEnum, ForecastValue, Refs } from '../types';
 import { parseAxisBound } from '../utils/controls';
 import {
   calculateLowerLogTick,
+  dedupLineChartSeries,
   dedupSeries,
   extractDataTotalValues,
   extractSeries,
@@ -122,6 +123,7 @@ export default function transformProps(
     inContextMenu,
     emitCrossFilters,
   } = chartProps;
+  console.log('chartProps', chartProps);
 
   let focusedSeries: string | null = null;
 
@@ -299,7 +301,6 @@ export default function transformProps(
     const entryName = String(entry.name || '');
     const seriesName = inverted[entryName] || entryName;
     const colorScaleKey = getOriginalSeries(seriesName, array);
-
     const transformedSeries = transformSeries(
       entry,
       colorScale,
@@ -630,7 +631,10 @@ export default function transformProps(
       ),
       data: legendData as string[],
     },
-    series: dedupSeries(series),
+    series:
+      formData?.seriesType === 'line'
+        ? dedupLineChartSeries(series, showValue)
+        : dedupSeries(series),
     toolbox: {
       show: zoomable,
       top: TIMESERIES_CONSTANTS.toolboxTop,

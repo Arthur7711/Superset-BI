@@ -123,7 +123,6 @@ export default function transformProps(
     inContextMenu,
     emitCrossFilters,
   } = chartProps;
-  console.log('chartProps', chartProps);
 
   let focusedSeries: string | null = null;
 
@@ -531,7 +530,6 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-
   const echartOptions: EChartsCoreOption = {
     useUTC: true,
     grid: {

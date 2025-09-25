@@ -17,6 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import {
   AxisType,
   ChartDataResponseResult,
@@ -531,11 +532,22 @@ export function dedupLineChartSeries(
         ? {
             show: true,
             formatter: ({ data }: { data: number[] }) => {
-              // @ts-ignore
-              const index = series[i].data.findIndex(
+              const seriesData = series as { data: any }[];
+              const index = seriesData[i].data.findIndex(
                 (el: number[]) => el[0] === data[0],
               );
-              return index % 5 === 0 ? data[1] : '';
+              const length = seriesData[i].data.length as number;
+              if (length <= 10) {
+                return data[1];
+              } else if (length > 10 && length <= 30) {
+                return index % 3 === 0 ? data[1] : '';
+              } else if (length > 30 && length <= 50) {
+                return index % 5 === 0 ? data[1] : '';
+              } else if (length > 50 && (index === 0 || index === length - 1)) {
+                return data[1];
+              }
+
+              return '';
             },
           }
         : { show: false },
@@ -545,7 +557,7 @@ export function dedupLineChartSeries(
 
 export function dedupSeries(series: SeriesOption[]): SeriesOption[] {
   const counter = new Map<string, number>();
-  return series.map(row => {
+  return series.map((row, i) => {
     let { id } = row;
     if (id === undefined) return row;
     id = String(id);

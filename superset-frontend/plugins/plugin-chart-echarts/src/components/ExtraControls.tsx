@@ -69,9 +69,12 @@ export function useExtraControl<
     },
     [area, setControlValue],
   );
+  const neededExtraControlsOptions = extraControlsOptions.filter(
+    el => el[1] !== 'Stream',
+  );
 
   return {
-    extraControlsOptions,
+    extraControlsOptions: neededExtraControlsOptions,
     extraControlsHandler,
     extraValue,
   };
@@ -95,7 +98,11 @@ export function ExtraControls<
       formData,
       setControlValue,
     });
-
+  // console.log(
+  //   'formData.showExtraControls',
+  //   formData,
+  //   formData.showExtraControls,
+  // );
   if (!formData.showExtraControls) {
     return null;
   }

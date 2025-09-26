@@ -98,12 +98,8 @@ export function ExtraControls<
       formData,
       setControlValue,
     });
-  // console.log(
-  //   'formData.showExtraControls',
-  //   formData,
-  //   formData.showExtraControls,
-  // );
-  if (!formData.showExtraControls) {
+
+    if (!formData.showExtraControls) {
     return null;
   }
 

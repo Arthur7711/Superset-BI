@@ -41,6 +41,11 @@ import {
   CategoricalBlueToGreen,
   CategoricalRedToYellow,
   CategoricalWavesOfBlue,
+  CategoricalUzumSpectrum,
+  CategoricalUzumLines,
+  CategoricalUzumIndigo,
+  CategoricalUzumBerry,
+  CategoricalUzumSerenity,
 } from '@superset-ui/core';
 
 function registerColorSchemes<T extends ColorScheme>(
@@ -86,6 +91,11 @@ export default function setupColors(
       ...CategoricalRedToYellow,
       ...CategoricalWavesOfBlue,
       ...extraCategoricalColorSchemes,
+      ...CategoricalUzumSpectrum,
+      ...CategoricalUzumLines,
+      ...CategoricalUzumIndigo,
+      ...CategoricalUzumBerry,
+      ...CategoricalUzumSerenity,
     ],
     'supersetColors',
   );

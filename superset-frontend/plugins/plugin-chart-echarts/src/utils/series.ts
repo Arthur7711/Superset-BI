@@ -55,7 +55,7 @@ import { defaultLegendPadding } from '../defaults';
 function isDefined<T>(value: T | undefined | null): boolean {
   return value !== undefined && value !== null;
 }
-
+const BORDER_COLOR = '#FFF';
 export function extractDataTotalValues(
   data: DataRecord[],
   opts: {
@@ -550,6 +550,11 @@ export function dedupLineChartSeries(
           }
           return '';
         },
+      },
+      itemStyle: {
+        ...row.itemStyle,
+        borderColor: BORDER_COLOR,
+        borderWidth: 0.2,
       },
     };
   });

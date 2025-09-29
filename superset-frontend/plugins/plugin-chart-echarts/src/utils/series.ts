@@ -525,32 +525,32 @@ export function dedupLineChartSeries(
     const count = counter.get(id) || 0;
     const suffix = count > 0 ? ` (${count})` : '';
     counter.set(id, count + 1);
+
     return {
       ...row,
       id: `${id}${suffix}`,
-      label: showValue
-        ? {
-            show: true,
-            formatter: ({ data }: { data: number[] }) => {
-              const seriesData = series as { data: any }[];
-              const index = seriesData[i].data.findIndex(
-                (el: number[]) => el[0] === data[0],
-              );
-              const length = seriesData[i].data.length as number;
-              if (length <= 10) {
-                return data[1];
-              } else if (length > 10 && length <= 30) {
-                return index % 3 === 0 ? data[1] : '';
-              } else if (length > 30 && length <= 50) {
-                return index % 5 === 0 ? data[1] : '';
-              } else if (length > 50 && (index === 0 || index === length - 1)) {
-                return data[1];
-              }
-
-              return '';
-            },
+      label: {
+        show: showValue,
+        position: 'top',
+        formatter: ({ data }: { data: number[] }) => {
+          const seriesData = series as { data: any }[];
+          const index = seriesData[i].data.findIndex(
+            (el: number[]) => el[0] === data[0],
+          );
+          const length = seriesData[i].data.length as number;
+          if (index === 0 || index === length - 1) {
+            return data[1];
           }
-        : { show: false },
+          if (length <= 10) {
+            return data[1];
+          } else if (length > 10 && length <= 30) {
+            return index % 3 === 0 ? data[1] : '';
+          } else if (length > 30 && length <= 50) {
+            return index % 5 === 0 ? data[1] : '';
+          }
+          return '';
+        },
+      },
     };
   });
 }
@@ -567,6 +567,18 @@ export function dedupSeries(series: SeriesOption[]): SeriesOption[] {
     return {
       ...row,
       id: `${id}${suffix}`,
+      // itemStyle: {
+      //   borderColor: '#fff',
+      //   borderWidth: 0.2,
+      //   borderType: 'solid',
+      //   borderRadius: 0,
+      // },
+      // emphasis: {
+      //   itemStyle: {
+      //     borderWidth: [0, 0, 1, 0], // only bottom border
+      //     borderColor: 'red', // border color for bottom
+      //   },
+      // },
     };
   });
 }

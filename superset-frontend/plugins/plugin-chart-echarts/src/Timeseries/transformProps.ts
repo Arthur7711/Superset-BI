@@ -530,6 +530,7 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
+
   const echartOptions: EChartsCoreOption = {
     useUTC: true,
     grid: {
@@ -630,9 +631,9 @@ export default function transformProps(
       data: legendData as string[],
     },
     series:
-      formData?.seriesType === 'line'
-        ? dedupLineChartSeries(series, showValue)
-        : dedupSeries(series),
+      // formData?.seriesType === 'line'? :
+      // dedupSeries(series),
+      dedupLineChartSeries(series, showValue),
     toolbox: {
       show: zoomable,
       top: TIMESERIES_CONSTANTS.toolboxTop,

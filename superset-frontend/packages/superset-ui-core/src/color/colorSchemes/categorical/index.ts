@@ -31,7 +31,6 @@ export { default as CategoricalBlueToGreen } from './blueToGreen';
 export { default as CategoricalRedToYellow } from './redToYellow';
 export { default as CategoricalWavesOfBlue } from './wavesOfBlue';
 export { default as CategoricalUzumSpectrum } from './uzumSpectrum';
-export { default as CategoricalUzumLines } from './uzumLines';
 export { default as CategoricalUzumIndigo } from './uzumIndigo';
 export { default as CategoricalUzumBerry } from './uzumBerry';
 export { default as CategoricalUzumSerenity } from './uzumSerenity';

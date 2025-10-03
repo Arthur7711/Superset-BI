@@ -61,6 +61,7 @@ import { parseAxisBound } from '../utils/controls';
 import {
   calculateLowerLogTick,
   extractDataTotalValues,
+  extractSeries,
   extractShowValueIndexes,
   extractTooltipKeys,
   getAxisType,
@@ -77,6 +78,7 @@ import {
   extractForecastSeriesContexts,
   extractForecastValuesFromTooltipParams,
   mixedBarFormatForecastTooltipSeries,
+  rebaseForecastDatum,
 } from '../utils/forecast';
 import { convertInteger } from '../utils/convertInteger';
 import { defaultGrid, defaultYAxis } from '../defaults';
@@ -101,7 +103,8 @@ import {
   getXAxisFormatter,
   getYAxisFormatter,
 } from '../utils/formatters';
-import { customDedupSeries, extractSeries } from './helpers';
+// extractSeries removed from helpers as it returning error
+import { customDedupSeries } from './helpers';
 import { tooltipHtml } from './components/tooltip';
 
 export default function transformProps(
@@ -207,7 +210,7 @@ export default function transformProps(
     return { ...acc, [entry[0]]: entry[1] };
   }, {});
   const colorScale = CategoricalColorNamespace.getScale(colorScheme as string);
-  const rebasedData = data;
+  const rebasedData = rebaseForecastDatum(data, verboseMap);
 
   let xAxisLabel = getXAxisLabel(chartProps.rawFormData) as string;
   if (
@@ -232,11 +235,11 @@ export default function transformProps(
 
   const isMultiSeries = groupBy.length || metrics?.length > 1;
 
-  const getMetricsOrders = () => metrics.map(metric => getMetricLabel(metric));
+  // const getMetricsOrders = () => metrics.map(metric => getMetricLabel(metric));
 
   const [rawSeries, sortedTotalValues, minPositiveValue] = extractSeries(
     rebasedData,
-    getMetricsOrders(),
+    // getMetricsOrders(),
     {
       fillNeighborValue: stack && !forecastEnabled ? 0 : undefined,
       xAxis: xAxisLabel,

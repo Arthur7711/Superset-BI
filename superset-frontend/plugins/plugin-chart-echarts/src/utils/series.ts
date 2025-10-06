@@ -518,46 +518,65 @@ export function dedupLineChartSeries(
 ): SeriesOption[] {
   const counter = new Map<string, number>();
   // @ts-ignore
-  return series.map((row, i) => {
-    let { id } = row;
-    if (id === undefined) return row;
-    id = String(id);
-    const count = counter.get(id) || 0;
-    const suffix = count > 0 ? ` (${count})` : '';
-    counter.set(id, count + 1);
+  return series.map(
+    (
+      row: SeriesOption & {
+        stack: string | undefined;
+        itemStyle: { [key: string]: number | string };
+        label: { [key: string]: number | string };
+      },
+      i,
+    ) => {
+      let { id } = row;
+      if (id === undefined) return row;
+      id = String(id);
+      const count = counter.get(id) || 0;
+      const suffix = count > 0 ? ` (${count})` : '';
+      counter.set(id, count + 1);
+      const formatterFn = () => {
+        if (row.stack) {
+          return {};
+        }
+        return {
+          formatter: ({ data }: { data: number[] }) => {
+            const seriesData = series as { data: any }[];
+            const index = seriesData[i].data.findIndex(
+              (el: number[]) => el[0] === data[0],
+            );
+            const length = seriesData[i].data.length as number;
+            if (index === 0 || index === length - 1) {
+              return data[1];
+            }
+            if (length <= 10) {
+              return data[1];
+            } else if (length > 10 && length <= 30) {
+              return index % 3 === 0 ? data[1] : '';
+            } else if (length > 30 && length <= 50) {
+              return index % 5 === 0 ? data[1] : '';
+            }
+            return '';
+          },
+        };
+      };
 
-    return {
-      ...row,
-      id: `${id}${suffix}`,
-      label: {
+      const labelOptions = {
+        ...row.label,
         show: showValue,
         position: 'top',
-        formatter: ({ data }: { data: number[] }) => {
-          const seriesData = series as { data: any }[];
-          const index = seriesData[i].data.findIndex(
-            (el: number[]) => el[0] === data[0],
-          );
-          const length = seriesData[i].data.length as number;
-          if (index === 0 || index === length - 1) {
-            return data[1];
-          }
-          if (length <= 10) {
-            return data[1];
-          } else if (length > 10 && length <= 30) {
-            return index % 3 === 0 ? data[1] : '';
-          } else if (length > 30 && length <= 50) {
-            return index % 5 === 0 ? data[1] : '';
-          }
-          return '';
+        ...formatterFn(),
+      };
+      return {
+        ...row,
+        id: `${id}${suffix}`,
+        label: labelOptions,
+        itemStyle: {
+          ...row.itemStyle,
+          borderColor: BORDER_COLOR,
+          borderWidth: 0.2,
         },
-      },
-      itemStyle: {
-        ...row.itemStyle,
-        borderColor: BORDER_COLOR,
-        borderWidth: 0.2,
-      },
-    };
-  });
+      };
+    },
+  );
 }
 
 export function dedupSeries(series: SeriesOption[]): SeriesOption[] {
@@ -572,18 +591,6 @@ export function dedupSeries(series: SeriesOption[]): SeriesOption[] {
     return {
       ...row,
       id: `${id}${suffix}`,
-      // itemStyle: {
-      //   borderColor: '#fff',
-      //   borderWidth: 0.2,
-      //   borderType: 'solid',
-      //   borderRadius: 0,
-      // },
-      // emphasis: {
-      //   itemStyle: {
-      //     borderWidth: [0, 0, 1, 0], // only bottom border
-      //     borderColor: 'red', // border color for bottom
-      //   },
-      // },
     };
   });
 }

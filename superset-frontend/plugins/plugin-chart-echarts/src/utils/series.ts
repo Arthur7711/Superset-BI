@@ -33,6 +33,7 @@ import {
   SupersetTheme,
   TimeFormatter,
   ValueFormatter,
+  getNumberFormatter,
 } from '@superset-ui/core';
 import { SortSeriesType } from '@superset-ui/chart-controls';
 import { format } from 'echarts/core';
@@ -51,6 +52,8 @@ import {
   StackType,
 } from '../types';
 import { defaultLegendPadding } from '../defaults';
+
+const numbersFormatter = getNumberFormatter(NumberFormats.SMART_NUMBER);
 
 function isDefined<T>(value: T | undefined | null): boolean {
   return value !== undefined && value !== null;
@@ -545,20 +548,19 @@ export function dedupLineChartSeries(
             );
             const length = seriesData[i].data.length as number;
             if (index === 0 || index === length - 1) {
-              return data[1];
+              return numbersFormatter(data[1]);
             }
             if (length <= 10) {
-              return data[1];
+              return numbersFormatter(data[1]);
             } else if (length > 10 && length <= 30) {
-              return index % 3 === 0 ? data[1] : '';
+              return index % 3 === 0 ? numbersFormatter(data[1]) : '';
             } else if (length > 30 && length <= 50) {
-              return index % 5 === 0 ? data[1] : '';
+              return index % 5 === 0 ? numbersFormatter(data[1]) : '';
             }
             return '';
           },
         };
       };
-
       const labelOptions = {
         ...row.label,
         show: showValue,

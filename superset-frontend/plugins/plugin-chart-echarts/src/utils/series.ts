@@ -537,7 +537,7 @@ export function dedupLineChartSeries(
       const suffix = count > 0 ? ` (${count})` : '';
       counter.set(id, count + 1);
       const formatterFn = () => {
-        if (row.stack) {
+        if (row.stack === 'obs' && row.type === 'bar') {
           return {};
         }
         return {

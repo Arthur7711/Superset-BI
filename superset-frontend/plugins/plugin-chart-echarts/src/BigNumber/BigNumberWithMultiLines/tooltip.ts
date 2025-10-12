@@ -16,6 +16,7 @@ export const tooltipCustomHtml = (
   metric: QueryFormMetric,
   timeGrainSqla: string,
 ) => {
+  console.log('params', params, metric, allData);
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
   const plan = params[1]?.data?.[1];
@@ -47,35 +48,35 @@ export const tooltipCustomHtml = (
     prcent < 90 ? redDot : prcent >= 90 && prcent < 98 ? orangeDot : greenDot;
   const greenArrow = `<span style="color:#02FB02;">▲</span>`;
   const redArrow = `<span style="color:red;">▼</span>`;
-  let resultTimeText: string | number = '';
-  switch (timeGrainSqla) {
-    case 'P1D': {
-      const weekDayIndex = new Date(date).getDay();
+  // let resultTimeText: string | number = '';
+  // switch (timeGrainSqla) {
+  //   case 'P1D': {
+  //     const weekDayIndex = new Date(date).getDay();
 
-      resultTimeText = `(${weekDays[weekDayIndex]})`;
-      break;
-    }
-    case 'P1W': {
-      resultTimeText = `(WEEK: ${getWeekFromRange(date)})`;
-      break;
-    }
-    default:
-      break;
-  }
-  //return back if still need week number 
+  //     resultTimeText = `(${weekDays[weekDayIndex]})`;
+  //     break;
+  //   }
+  //   case 'P1W': {
+  //     resultTimeText = `(WEEK: ${getWeekFromRange(date)})`;
+  //     break;
+  //   }
+  //   default:
+  //     break;
+  // }
+
   // <strong>${date} ${resultTimeText}</strong><br/><br/>
   return `
       <div style="line-height: 1.6;">
         <strong>${date}</strong><br/><br/>
-        <strong>Fact:</strong> $ ${headerFormatter.format(current)}<br/><br/>
-        <strong>Plan:</strong> $ ${headerFormatter.format(plan)}<br/>
+        <strong>Fact:</strong>${headerFormatter.format(current)}<br/><br/>
+        <strong>Plan:</strong>${headerFormatter.format(plan)}<br/>
         <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
           isOkDiff ? '+' : ''
-        }${headerFormatter.format(planDiff)}$)<br/><br/>
-        <strong>Last period:</strong> $  ${headerFormatter.format(last)}<br/>
+        }${headerFormatter.format(planDiff)})<br/><br/>
+        <strong>Last period:</strong> ${headerFormatter.format(last)}<br/>
        <strong>WoW:</strong> ${isOkLast ? greenArrow : redArrow} ${wowPrc}% (${
          isOkLast ? '+' : ''
-       }${headerFormatter.format(wowText)}$)<br/><br/>
+       }${headerFormatter.format(wowText)})<br/><br/>
       </div>
     `;
 };

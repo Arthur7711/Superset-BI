@@ -62,10 +62,11 @@ export const tooltipCustomHtml = (
     default:
       break;
   }
-
+  //return back if still need week number 
+  // <strong>${date} ${resultTimeText}</strong><br/><br/>
   return `
       <div style="line-height: 1.6;">
-        <strong>${date} ${resultTimeText}</strong><br/><br/>
+        <strong>${date}</strong><br/><br/>
         <strong>Fact:</strong> $ ${headerFormatter.format(current)}<br/><br/>
         <strong>Plan:</strong> $ ${headerFormatter.format(plan)}<br/>
         <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${

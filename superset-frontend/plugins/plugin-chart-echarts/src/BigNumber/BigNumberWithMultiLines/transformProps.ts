@@ -74,8 +74,8 @@ export default function transformProps(
     timeRangeFixed,
     secondMetric = 'value',
     timeGrainSqla,
+    secondaryColorPicker,
   } = formData;
-
   const granularity = extractTimegrain(rawFormData);
   const {
     data = [],
@@ -90,7 +90,9 @@ export default function transformProps(
   let formattedSubheader = subheader;
 
   const { r, g, b } = colorPicker;
+  const { r: sr, g: sg, b: sb } = secondaryColorPicker;
   const mainColor = `rgb(${r}, ${g}, ${b})`;
+  const secondaryColor = `rgb(${sr}, ${sg}, ${sb})`;
 
   const xAxisLabel = getXAxisLabel(rawFormData) as string;
   let trendLineData: TimeSeriesDatum[] | undefined;
@@ -227,7 +229,7 @@ export default function transformProps(
                   symbol: 'diamond',
                   symbolSize: 8,
                   showSymbol: false,
-                  color: theme.colors.info.dark2,
+                  color: secondaryColor,
                 },
               ]
             : []),
@@ -286,6 +288,7 @@ export default function transformProps(
     headerFontSize,
     subheaderFontSize,
     mainColor,
+    secondaryColor,
     showTimestamp,
     showTrendLine,
     startYAxisAtZero,

@@ -526,7 +526,9 @@ export function dedupLineChartSeries(
       row: SeriesOption & {
         stack: string | undefined;
         itemStyle: { [key: string]: number | string };
-        label: { [key: string]: number | string };
+        label: {
+          [key: string]: number | string;
+        };
       },
       i,
     ) => {
@@ -542,20 +544,45 @@ export function dedupLineChartSeries(
         }
         return {
           formatter: ({ data }: { data: number[] }) => {
-            const seriesData = series as { data: any }[];
+            const seriesData = series as { data: any[]; name: string }[];
             const index = seriesData[i].data.findIndex(
               (el: number[]) => el[0] === data[0],
             );
             const length = seriesData[i].data.length as number;
             if (index === 0 || index === length - 1) {
-              return numbersFormatter(data[1]);
+              // return data[1];
+              return row?.label?.formatter({
+                value: data,
+                dataIndex: index,
+                seriesIndex: i,
+                seriesName: seriesData[i].name,
+              });
             }
             if (length <= 10) {
-              return numbersFormatter(data[1]);
+              return row?.label?.formatter({
+                value: data,
+                dataIndex: index,
+                seriesIndex: i,
+                seriesName: seriesData[i].name,
+              });
             } else if (length > 10 && length <= 30) {
-              return index % 3 === 0 ? numbersFormatter(data[1]) : '';
+              return index % 3 === 0
+                ? row?.label?.formatter({
+                    value: data,
+                    dataIndex: index,
+                    seriesIndex: i,
+                    seriesName: seriesData[i].name,
+                  })
+                : '';
             } else if (length > 30 && length <= 50) {
-              return index % 5 === 0 ? numbersFormatter(data[1]) : '';
+              return index % 5 === 0
+                ? row?.label?.formatter({
+                    value: data,
+                    dataIndex: index,
+                    seriesIndex: i,
+                    seriesName: seriesData[i].name,
+                  })
+                : '';
             }
             return '';
           },

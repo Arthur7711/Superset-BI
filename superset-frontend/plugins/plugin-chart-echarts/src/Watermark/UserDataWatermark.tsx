@@ -11,7 +11,11 @@ interface SupersetUser {
   email: string;
 }
 
-export const UserDataWatermark = () => {
+export const UserDataWatermark = ({
+  styles,
+}: {
+  styles?: React.CSSProperties;
+}) => {
   const [user, setUser] = useState<SupersetUser | null>(null);
 
   useEffect(() => {
@@ -29,5 +33,5 @@ export const UserDataWatermark = () => {
       })
       .then(data => setUser(data.result));
   }, []);
-  return <Watermark>{user?.email}</Watermark>;
+  return <Watermark style={styles}>{user?.email}</Watermark>;
 };

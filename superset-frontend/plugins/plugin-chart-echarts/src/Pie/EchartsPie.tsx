@@ -20,6 +20,7 @@ import { PieChartTransformedProps } from './types';
 import Echart from '../components/Echart';
 import { allEventHandlers } from '../utils/eventHandlers';
 import { MainBlock } from '../UIWatermark';
+import { UserDataWatermark } from '../Watermark/UserDataWatermark';
 
 export default function EchartsPie(props: PieChartTransformedProps) {
   const { height, width, echartOptions, selectedValues, refs } = props;
@@ -28,6 +29,7 @@ export default function EchartsPie(props: PieChartTransformedProps) {
 
   return (
     <MainBlock>
+      <UserDataWatermark styles={{ top: '10%' }} />
       <Echart
         refs={refs}
         height={height}

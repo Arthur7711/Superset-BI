@@ -35,8 +35,8 @@ import Echart from '../components/Echart';
 import { TimeseriesChartTransformedProps } from './types';
 import { formatSeriesName } from '../utils/series';
 import { ExtraControls } from '../components/ExtraControls';
-import { GetUserData } from '../helpers/GetUserData';
-import { MainBlock, Watermark } from '../UIWatermark';
+import { MainBlock } from '../UIWatermark';
+import { UserDataWatermark } from '../Watermark/UserDataWatermark';
 
 const TIMER_DURATION = 300;
 
@@ -259,13 +259,13 @@ export default function EchartsTimeseries({
       }
     },
   };
-  const { user } = GetUserData();
+
   return (
     <MainBlock>
       <div ref={extraControlRef}>
         <ExtraControls formData={formData} setControlValue={setControlValue} />
       </div>
-      {user ? <Watermark>{user.email}</Watermark> : null}
+      <UserDataWatermark />
       <Echart
         ref={echartRef}
         refs={refs}

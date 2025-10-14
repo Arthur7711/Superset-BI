@@ -30,6 +30,8 @@ import {
 import Echart from '../components/Echart';
 import { BigNumberVizProps } from './types';
 import { EventHandlers } from '../types';
+import { MainBlock } from '../UIWatermark';
+import UserDataWatermark from '../Watermark/ClassUserDataWatermark';
 
 const defaultNumberFormatter = getNumberFormatter();
 
@@ -366,13 +368,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       subheaderFontSize,
     } = this.props;
     const className = this.getClassName();
+    // const email = await this.getUserData();
 
     if (showTrendLine) {
       const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
       const allTextHeight = height - chartHeight;
 
       return (
-        <div className={className}>
+        <MainBlock className={`${className}`}>
           <div className="text-container" style={{ height: allTextHeight }}>
             {this.renderFallbackWarning()}
             {this.renderKicker(
@@ -390,7 +393,8 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
             )}
           </div>
           {this.renderTrendline(chartHeight)}
-        </div>
+          <UserDataWatermark />
+        </MainBlock>
       );
     }
 

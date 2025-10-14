@@ -79,6 +79,7 @@ import { formatColumnValue } from './utils/formatValue';
 import { PAGE_SIZE_OPTIONS } from './consts';
 import { updateExternalFormData } from './DataTable/utils/externalAPIs';
 import getScrollBarSize from './DataTable/utils/getScrollBarSize';
+import { UserDataWatermark } from './components/UserDataWatermark';
 
 type ValueRange = [number, number];
 
@@ -1066,6 +1067,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
 
   return (
     <Styles>
+      <UserDataWatermark />
       <DataTable<D>
         columns={columns}
         data={data}

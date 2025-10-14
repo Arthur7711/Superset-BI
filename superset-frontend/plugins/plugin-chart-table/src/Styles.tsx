@@ -21,6 +21,7 @@ import { css, styled } from '@superset-ui/core';
 
 export default styled.div`
   ${({ theme }) => css`
+    position: relative;
     table {
       width: 100%;
       min-width: auto;

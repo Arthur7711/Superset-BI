@@ -30,6 +30,7 @@ import sortNumericValues from 'src/utils/sortNumericValues';
 
 import FormattedNumber from './FormattedNumber';
 import SparklineCell from './SparklineCell';
+import { UserDataWatermark } from './components/UserDataWatermark';
 
 const ACCESSIBLE_COLOR_BOUNDS = ['#ca0020', '#0571b0'];
 
@@ -101,6 +102,7 @@ const defaultProps = {
 const TimeTableStyles = styled.div`
   height: ${props => props.height}px;
   overflow: auto;
+  position: relative;
 
   th {
     z-index: 11 !important; // to cover sparkline
@@ -323,6 +325,7 @@ const TimeTable = ({
       className={className}
       height={height}
     >
+      <UserDataWatermark />
       <TableView
         className="table-no-hover"
         columns={memoizedColumns}

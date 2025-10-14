@@ -518,6 +518,7 @@ export function getChartPadding(
 export function dedupLineChartSeries(
   series: SeriesOption[],
   showValue: boolean,
+  isHorizontal: boolean,
 ): SeriesOption[] {
   const counter = new Map<string, number>();
   // @ts-ignore
@@ -591,7 +592,7 @@ export function dedupLineChartSeries(
       const labelOptions = {
         ...row.label,
         show: showValue,
-        position: 'top',
+        position: isHorizontal ? row.label.position : 'top',
         ...formatterFn(),
       };
       return {

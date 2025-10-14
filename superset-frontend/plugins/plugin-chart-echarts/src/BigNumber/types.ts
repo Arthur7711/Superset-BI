@@ -93,6 +93,7 @@ export type BigNumberVizProps = {
   timestamp?: DataRecordValue;
   trendLineData?: TimeSeriesDatum[];
   mainColor?: string;
+  secondaryColor?: string;
   echartOptions?: EChartsCoreOption;
   onContextMenu?: (
     clientX: number,

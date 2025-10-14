@@ -16,7 +16,7 @@ export const tooltipCustomHtml = (
   metric: QueryFormMetric,
   timeGrainSqla: string,
 ) => {
-  console.log('params', params, metric, allData);
+  // console.log('params', params, metric, allData);
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
   const plan = params[1]?.data?.[1];
@@ -65,6 +65,18 @@ export const tooltipCustomHtml = (
   // }
 
   // <strong>${date} ${resultTimeText}</strong><br/><br/>
+  // <div style="line-height: 1.6;">
+  //       <strong>${date}</strong><br/><br/>
+  //       <strong>Fact:</strong>${headerFormatter.format(current)}<br/><br/>
+  //       <strong>Plan:</strong>${headerFormatter.format(plan)}<br/>
+  //       <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
+  //         isOkDiff ? '+' : ''
+  //       }${headerFormatter.format(planDiff)})<br/><br/>
+  //       <strong>Last period:</strong> ${headerFormatter.format(last)}<br/>
+  //      <strong>WoW:</strong> ${isOkLast ? greenArrow : redArrow} ${wowPrc}% (${
+  //        isOkLast ? '+' : ''
+  //      }${headerFormatter.format(wowText)})<br/><br/>
+  //     </div>
   return `
       <div style="line-height: 1.6;">
         <strong>${date}</strong><br/><br/>

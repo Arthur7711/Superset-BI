@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// @ts-nocheck
 import {
   GenericDataType,
   NumberFormats,
@@ -178,9 +179,9 @@ export default function transformProps(
           yAxisLabel,
           metricLabel,
         );
-        const x = params.value[0];
-        const y = params.value[1];
-        const value = params.value[2];
+        const x = params?.value?.[0];
+        const y = params?.value?.[1];
+        const value = params?.value?.[2];
         const formattedX = xAxisFormatter(x);
         const formattedY = yAxisFormatter(y);
         const formattedValue = valueFormatter(value);

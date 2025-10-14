@@ -98,8 +98,7 @@ export function ExtraControls<
       formData,
       setControlValue,
     });
-
-    if (!formData.showExtraControls) {
+  if (!formData.showExtraControls) {
     return null;
   }
 

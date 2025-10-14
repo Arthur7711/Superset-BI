@@ -131,6 +131,7 @@ const config: ControlPanelConfig = {
       expanded: true,
       controlSetRows: [
         ['color_picker', null],
+        ['secondary_color_picker', null],
         [headerFontSize],
         [subheaderFontSize],
         ['y_axis_format'],

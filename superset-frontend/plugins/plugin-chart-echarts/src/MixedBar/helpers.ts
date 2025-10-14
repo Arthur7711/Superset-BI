@@ -63,6 +63,7 @@ export function extractSeries(
     xAxisSortSeriesAscending?: boolean;
   } = {},
 ): [SeriesOption[], number[], number | undefined] {
+  console.log('extractSeries', data);
   const {
     fillNeighborValue,
     xAxis = DTTM_ALIAS,
@@ -93,11 +94,11 @@ export function extractSeries(
         }));
 
   let minPositiveValue: number | undefined;
-  const finalSeries = metrics.map(name => ({
+  const finalSeries = metrics?.map(name => ({
     id: name,
     name,
     data: sortedRows
-      .map(({ row, totalStackedValue }, idx) => {
+      ?.map(({ row, totalStackedValue }, idx) => {
         const currentValue = row[name];
         if (
           typeof currentValue === 'number' &&

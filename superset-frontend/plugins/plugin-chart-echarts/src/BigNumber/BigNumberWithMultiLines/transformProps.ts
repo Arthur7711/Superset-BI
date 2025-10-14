@@ -37,6 +37,8 @@ import { getDateFormatter, parseMetricValue } from '../utils';
 import { getDefaultTooltip } from '../../utils/tooltip';
 import { Refs } from '../../types';
 import { tooltipCustomHtml } from './tooltip';
+import { extractSeries } from '../../utils/series';
+import { rebaseForecastDatum } from '../../utils/forecast';
 
 const formatPercentChange = getNumberFormatter(
   NumberFormats.PERCENT_SIGNED_1_POINT,
@@ -76,6 +78,7 @@ export default function transformProps(
     timeGrainSqla,
     secondaryColorPicker,
   } = formData;
+  console.log('formData', formData);
   const granularity = extractTimegrain(rawFormData);
   const {
     data = [],
@@ -201,7 +204,24 @@ export default function transformProps(
       trendLineData.push([toDatetimeOrToday, null]);
     }
   }
-
+  // const rebasedData = rebaseForecastDatum(data, {});
+  // const [rawSeries, sortedTotalValues, minPositiveValue] = extractSeries(
+  //   rebasedData,
+  //   {
+  //     fillNeighborValue: undefined,
+  //     xAxis: xAxisLabel,
+  //     extraMetricLabels: [],
+  //     isHorizontal: false,
+  //     sortSeriesAscending: undefined,
+  //     sortSeriesType: 'sum',
+  //     stack: undefined,
+  //     totalStackedValues: [],
+  //     xAxis: 'order_date',
+  //     xAxisSortSeries: undefined,
+  //     xAxisSortSeriesAscending: undefined,
+  //   },
+  // );
+  // console.log('secondTrendLineData', rawSeries);
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [

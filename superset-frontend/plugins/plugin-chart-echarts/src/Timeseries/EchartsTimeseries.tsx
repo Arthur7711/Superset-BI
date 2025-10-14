@@ -35,6 +35,8 @@ import Echart from '../components/Echart';
 import { TimeseriesChartTransformedProps } from './types';
 import { formatSeriesName } from '../utils/series';
 import { ExtraControls } from '../components/ExtraControls';
+import { GetUserData } from '../helpers/GetUserData';
+import { MainBlock, Watermark } from '../UIWatermark';
 
 const TIMER_DURATION = 300;
 
@@ -257,12 +259,13 @@ export default function EchartsTimeseries({
       }
     },
   };
-
+  const { user } = GetUserData();
   return (
-    <>
+    <MainBlock>
       <div ref={extraControlRef}>
         <ExtraControls formData={formData} setControlValue={setControlValue} />
       </div>
+      {user ? <Watermark>{user.email}</Watermark> : null}
       <Echart
         ref={echartRef}
         refs={refs}
@@ -273,6 +276,6 @@ export default function EchartsTimeseries({
         zrEventHandlers={zrEventHandlers}
         selectedValues={selectedValues}
       />
-    </>
+    </MainBlock>
   );
 }

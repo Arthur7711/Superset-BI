@@ -227,7 +227,6 @@ export default function transformProps(
   const extraMetricLabels = extractExtraMetrics(chartProps.rawFormData).map(
     getMetricLabel,
   );
-
   const isMultiSeries = groupBy.length || metrics?.length > 1;
 
   const [rawSeries, sortedTotalValues, minPositiveValue] = extractSeries(
@@ -247,6 +246,7 @@ export default function transformProps(
         : undefined,
     },
   );
+
   const showValueIndexes = extractShowValueIndexes(rawSeries, {
     stack,
     onlyTotal,
@@ -530,7 +530,6 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-
   const echartOptions: EChartsCoreOption = {
     useUTC: true,
     grid: {
@@ -560,7 +559,6 @@ export default function transformProps(
         );
         const forecastValues: Record<string, ForecastValue> =
           extractForecastValuesFromTooltipParams(forecastValue, isHorizontal);
-
         const isForecast = Object.values(forecastValues).some(
           value =>
             value.forecastTrend || value.forecastLower || value.forecastUpper,
@@ -633,7 +631,11 @@ export default function transformProps(
     series:
       // formData?.seriesType === 'line'? :
       // dedupSeries(series),
-      dedupLineChartSeries(series, showValue),
+      dedupLineChartSeries(
+        series,
+        showValue,
+        formData.orientation === 'horizontal',
+      ),
     toolbox: {
       show: zoomable,
       top: TIMESERIES_CONSTANTS.toolboxTop,

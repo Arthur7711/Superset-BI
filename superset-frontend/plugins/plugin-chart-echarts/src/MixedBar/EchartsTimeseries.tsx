@@ -36,6 +36,8 @@ import { TimeseriesChartTransformedProps } from '../Timeseries/types';
 import { formatSeriesName } from '../utils/series';
 // import { ExtraControls } from '../components/ExtraControls';
 import { Header } from './components/header';
+import { MainBlock } from '../UIWatermark';
+import { UserDataWatermark } from '../Watermark/UserDataWatermark';
 
 const TIMER_DURATION = 300;
 
@@ -299,7 +301,8 @@ export default function EchartsTimeseries({
     YoYData,
   );
   return (
-    <>
+    <MainBlock>
+      <UserDataWatermark />
       <div ref={extraControlRef}>
         <Header
           total={plannedSummary}
@@ -307,7 +310,6 @@ export default function EchartsTimeseries({
           yoySum={YoYSummary}
           currencyFormat={formData?.currencyFormat}
         />
-        {/* <ExtraControls formData={formData} setControlValue={setControlValue} /> */}
       </div>
       <Echart
         ref={echartRef}
@@ -319,6 +321,6 @@ export default function EchartsTimeseries({
         zrEventHandlers={zrEventHandlers}
         selectedValues={selectedValues}
       />
-    </>
+    </MainBlock>
   );
 }

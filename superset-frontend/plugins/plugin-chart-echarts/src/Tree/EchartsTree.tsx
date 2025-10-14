@@ -16,8 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { EchartsProps } from '../types';
-import Echart from '../components/Echart';
+import { EchartsProps } from "../types";
+import Echart from "../components/Echart";
+import { MainBlock } from "../UIWatermark";
+import { UserDataWatermark } from "../Watermark/UserDataWatermark";
 
 export default function EchartsGraph({
   echartOptions,
@@ -26,11 +28,14 @@ export default function EchartsGraph({
   width,
 }: EchartsProps) {
   return (
-    <Echart
-      refs={refs}
-      height={height}
-      width={width}
-      echartOptions={echartOptions}
-    />
+    <MainBlock>
+      <UserDataWatermark />
+      <Echart
+        refs={refs}
+        height={height}
+        width={width}
+        echartOptions={echartOptions}
+      />
+    </MainBlock>
   );
 }

@@ -30,6 +30,8 @@ import { EventHandlers } from '../types';
 import { extractTreePathInfo } from './constants';
 import { TreemapTransformedProps } from './types';
 import { formatSeriesName } from '../utils/series';
+import { MainBlock } from '../UIWatermark';
+import { UserDataWatermark } from '../Watermark/UserDataWatermark';
 
 export default function EchartsTreemap({
   echartOptions,
@@ -156,13 +158,16 @@ export default function EchartsTreemap({
   };
 
   return (
-    <Echart
-      refs={refs}
-      height={height}
-      width={width}
-      echartOptions={echartOptions}
-      eventHandlers={eventHandlers}
-      selectedValues={selectedValues}
-    />
+    <MainBlock>
+      <UserDataWatermark />
+      <Echart
+        refs={refs}
+        height={height}
+        width={width}
+        echartOptions={echartOptions}
+        eventHandlers={eventHandlers}
+        selectedValues={selectedValues}
+      />
+    </MainBlock>
   );
 }

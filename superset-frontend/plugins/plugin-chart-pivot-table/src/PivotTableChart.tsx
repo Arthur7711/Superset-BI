@@ -43,6 +43,7 @@ import {
   PivotTableStylesProps,
   SelectedFiltersType,
 } from './types';
+import { UserDataWatermark } from './components/UserDataWatermark';
 
 const Styles = styled.div<PivotTableStylesProps>`
   ${({ height, width, margin }) => `
@@ -52,6 +53,7 @@ const Styles = styled.div<PivotTableStylesProps>`
         typeof width === 'string' ? parseInt(width, 10) : width - margin * 2
       }px;
       white-space: nowrap;
+      position: relative;
  `}
 `;
 
@@ -539,6 +541,7 @@ export default function PivotTableChart(props: PivotTableProps) {
 
   return (
     <Styles height={height} width={width} margin={theme.gridUnit * 4}>
+      <UserDataWatermark />
       <PivotTableWrapper>
         <PivotTable
           data={unpivotedData}

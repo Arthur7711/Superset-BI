@@ -9,4 +9,5 @@ export const Watermark = styled.h3`
   opacity: 0.05;
   top: 20%;
   left: 30%;
+  z-index: 10000;
 `;

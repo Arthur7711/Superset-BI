@@ -20,6 +20,8 @@ import { reactify, styled } from '@superset-ui/core';
 import PropTypes from 'prop-types';
 import Component from './NVD3Vis';
 import { hideTooltips, removeTooltip } from './utils';
+import { UserDataWatermark } from './components/UserDataWatermark';
+import { MainBlock } from './components/UIWatermark';
 
 function componentWillUnmount() {
   const { id } = this.props;
@@ -33,9 +35,10 @@ function componentWillUnmount() {
 const ReactNVD3 = reactify(Component, { componentWillUnmount });
 
 const NVD3 = ({ className, ...otherProps }) => (
-  <div className={className}>
+  <MainBlock className={className}>
+    <UserDataWatermark />
     <ReactNVD3 {...otherProps} />
-  </div>
+  </MainBlock>
 );
 
 NVD3.propTypes = {

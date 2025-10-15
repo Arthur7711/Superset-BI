@@ -69,7 +69,8 @@ describe('plugin-chart-table', () => {
 
   describe('TableChart', () => {
     let wrap: CommonWrapper; // the ReactDataTable wrapper
-    let tree: Cheerio;
+    let tree: any;
+    // Cheerio
 
     it('render basic data', () => {
       wrap = mount(

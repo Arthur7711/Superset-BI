@@ -5,6 +5,7 @@ import { Stars } from './Stars';
 import { commentText, nextText, questions, submitText } from './constants';
 import { DetailsContainer } from './stylesContants';
 import { GetUserData } from './hooks/GetUserData';
+import { GetRatingInfo } from './hooks/GetRatingInfo';
 
 const { TextArea } = Input;
 
@@ -15,7 +16,7 @@ export function ServiceRating() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const { user } = GetUserData();
-
+  const { data } = GetRatingInfo();
   const nextQuestion = () => {
     if (activeQuestionIndex < questions.length - 1) {
       setActiveQuestionIndex(activeQuestionIndex + 1);

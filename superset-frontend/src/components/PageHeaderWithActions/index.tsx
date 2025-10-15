@@ -31,7 +31,8 @@ import Icons from '../Icons';
 import Button from '../Button';
 import ConfluenceImage from './icons/confluence.png';
 import MetadataImage from './icons/metadata.png';
-import { GetUserData } from '../../features/serviceRating/hooks/GetUserData';
+// import { GetUserData } from '../../features/serviceRating/hooks/GetUserData';
+import { GetUserData } from './GetUserData';
 
 export const menuTriggerStyles = (theme: SupersetTheme) => css`
   width: ${theme.gridUnit * 8}px;
@@ -181,7 +182,7 @@ export const PageHeaderWithActions = ({
         )}
         {showLinks ? (
           <div css={buttonsBlockStyles(theme)}>
-            {/* need real href here to paste */}
+            {/* need real href here to paste confluence */}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -192,7 +193,7 @@ export const PageHeaderWithActions = ({
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href={`https://open-metadata.org/${faveStarProps.itemId}`}
+              href={`https://data-catalog.infra2.internal.daymarket.uz/dashboard/BI.${faveStarProps.itemId}`}
             >
               <img src={MetadataImage} alt="Docks" height="28px" />
             </a>

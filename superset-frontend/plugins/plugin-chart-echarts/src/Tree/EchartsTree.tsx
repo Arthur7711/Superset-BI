@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { EchartsProps } from "../types";
-import Echart from "../components/Echart";
-import { MainBlock } from "../UIWatermark";
-import { UserDataWatermark } from "../Watermark/UserDataWatermark";
+import { EchartsProps } from '../types';
+import Echart from '../components/Echart';
+import { MainBlock } from '../UIWatermark';
+import { UserDataWatermark } from '../Watermark/UserDataWatermark';
 
 export default function EchartsGraph({
   echartOptions,

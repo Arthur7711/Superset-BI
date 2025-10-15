@@ -10,15 +10,16 @@ interface SupersetUser {
   email: string;
 }
 
-export const GetUserData = () => {
-  const [user, setUser] = useState<SupersetUser | null>(null);
+export const GetRatingInfo = () => {
+  const [data, setData] = useState<SupersetUser | null>(null);
 
   useEffect(() => {
-    fetch('/api/v1/me/', {
+    fetch('https://api.example.com/data', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      mode: 'no-cors',
     })
       .then(async res => {
         if (!res.ok) {
@@ -26,8 +27,8 @@ export const GetUserData = () => {
         }
         return res.json();
       })
-      .then(data => setUser(data.result));
+      .then(data => setData(data.result));
   }, []);
-  // console.log('user', user);
-  return { user };
+  console.log('data is', data);
+  return { data };
 };

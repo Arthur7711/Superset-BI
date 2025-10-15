@@ -27,7 +27,6 @@
     "access": "public"
   },
   "dependencies": {
-    "currency-formatter": "^2.2.0",
     "handlebars": "^4.7.7",
     "just-handlebars-helpers": "^1.0.19"
   },

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Watermark } from '../UIWatermark';
+import { SmallWatermark, Watermark } from '../UIWatermark';
 
 interface SupersetUser {
   username: string;
@@ -33,5 +33,15 @@ export const UserDataWatermark = ({
       })
       .then(data => setUser(data.result));
   }, []);
-  return <Watermark style={styles}>{user?.email}</Watermark>;
+  return (
+    <>
+      <Watermark style={styles}>{user?.email}</Watermark>
+      <SmallWatermark leftOrigin="10%" topOrigin="5%">
+        {user?.email}
+      </SmallWatermark>
+      <SmallWatermark rightOrigin="10%" topOrigin="5%">
+        {user?.email}
+      </SmallWatermark>
+    </>
+  );
 };

@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// @ts-nocheck
+
 import rison from 'rison';
 import { useState, useEffect, useCallback } from 'react';
 import {

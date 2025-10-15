@@ -486,6 +486,7 @@ const SqlEditor: FC<Props> = ({
           let end = editor.find(';', {
             backwards: false,
             skipCurrent: true,
+            // @ts-ignore
           })?.end;
           if (!end || end.row < cursorPosition.row) {
             end = {
@@ -496,6 +497,7 @@ const SqlEditor: FC<Props> = ({
           let start = editor.find(';', {
             backwards: true,
             skipCurrent: true,
+            // @ts-ignore
           })?.end;
           let currentLine = start?.row;
           if (

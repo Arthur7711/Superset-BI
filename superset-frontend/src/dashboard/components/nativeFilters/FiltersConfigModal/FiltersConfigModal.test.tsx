@@ -30,6 +30,7 @@ import {
   TimeColumnFilterPlugin,
   TimeFilterPlugin,
   TimeGrainFilterPlugin,
+  TimeGrainLongFilterPlugin,
 } from 'src/filters/components';
 import FiltersConfigModal, {
   FiltersConfigModalProps,
@@ -45,6 +46,7 @@ class MainPreset extends Preset {
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
         new TimeColumnFilterPlugin().configure({ key: 'filter_timecolumn' }),
         new TimeGrainFilterPlugin().configure({ key: 'filter_timegrain' }),
+        new TimeGrainLongFilterPlugin().configure({ key: 'filter_timegrainlong' }),
       ],
     });
   }

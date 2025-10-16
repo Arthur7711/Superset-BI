@@ -519,6 +519,7 @@ export function dedupLineChartSeries(
   series: SeriesOption[],
   showValue: boolean,
   isHorizontal: boolean,
+  width: number,
 ): SeriesOption[] {
   const counter = new Map<string, number>();
   // @ts-ignore
@@ -567,6 +568,16 @@ export function dedupLineChartSeries(
                 seriesName: seriesData[i].name,
               });
             } else if (length > 10 && length <= 30) {
+              if (width > 650) {
+                return index % 2 === 0
+                  ? row?.label?.formatter({
+                      value: data,
+                      dataIndex: index,
+                      seriesIndex: i,
+                      seriesName: seriesData[i].name,
+                    })
+                  : '';
+              }
               return index % 3 === 0
                 ? row?.label?.formatter({
                     value: data,
@@ -576,7 +587,36 @@ export function dedupLineChartSeries(
                   })
                 : '';
             } else if (length > 30 && length <= 50) {
+              if (width > 650) {
+                return index % 3 === 0
+                  ? row?.label?.formatter({
+                      value: data,
+                      dataIndex: index,
+                      seriesIndex: i,
+                      seriesName: seriesData[i].name,
+                    })
+                  : '';
+              }
               return index % 5 === 0
+                ? row?.label?.formatter({
+                    value: data,
+                    dataIndex: index,
+                    seriesIndex: i,
+                    seriesName: seriesData[i].name,
+                  })
+                : '';
+            } else if (length > 50 && length <= 100) {
+              return index % 10 === 0
+                ? row?.label?.formatter({
+                    value: data,
+                    dataIndex: index,
+                    seriesIndex: i,
+                    seriesName: seriesData[i].name,
+                  })
+                : '';
+            } else if (length > 100) {
+              const detectedPercentIndex = Math.floor((length / width) * 100);
+              return index % detectedPercentIndex === 0
                 ? row?.label?.formatter({
                     value: data,
                     dataIndex: index,
@@ -608,6 +648,7 @@ export function dedupLineChartSeries(
     },
   );
 }
+
 
 export function dedupSeries(series: SeriesOption[]): SeriesOption[] {
   const counter = new Map<string, number>();

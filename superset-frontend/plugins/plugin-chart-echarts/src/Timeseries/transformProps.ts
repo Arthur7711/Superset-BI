@@ -635,6 +635,7 @@ export default function transformProps(
         series,
         showValue,
         formData.orientation === 'horizontal',
+        width,
       ),
     toolbox: {
       show: zoomable,

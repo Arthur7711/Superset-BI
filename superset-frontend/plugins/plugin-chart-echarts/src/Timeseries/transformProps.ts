@@ -137,7 +137,6 @@ export default function transformProps(
 
   const dataTypes = getColtypesMapping(queryData);
   const annotationData = getAnnotationData(chartProps);
-
   const {
     area,
     annotationLayers,
@@ -503,7 +502,7 @@ export default function transformProps(
       seriesType,
     ),
   };
-
+  console.log('yAxisFormat', yAxisFormat);
   let yAxis: any = {
     ...defaultYAxis,
     type: logAxis ? AxisType.Log : AxisType.Value,
@@ -539,7 +538,7 @@ export default function transformProps(
     xAxis,
     yAxis: {
       ...yAxis,
-      axisLabel: { show: formData.yAxisShow },
+      axisLabel: { show: formData.yAxisShow, ...yAxis.axisLabel },
     },
     tooltip: {
       ...getDefaultTooltip(refs),

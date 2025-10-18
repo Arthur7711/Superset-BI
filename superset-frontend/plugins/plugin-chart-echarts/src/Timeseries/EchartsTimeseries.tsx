@@ -259,7 +259,6 @@ export default function EchartsTimeseries({
       }
     },
   };
-
   return (
     <MainBlock>
       <div ref={extraControlRef}>

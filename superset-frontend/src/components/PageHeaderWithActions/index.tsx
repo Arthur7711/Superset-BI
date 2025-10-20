@@ -167,6 +167,8 @@ export const PageHeaderWithActions = ({
   const showLinks = pathname.includes('superset/dashboard');
   const { user } = GetUserData();
 
+  const titleData = editableTitleProps.title.split(' ');
+  const joinedTitle = titleData.length ? titleData.join('+') : titleData[0];
   return (
     <div css={headerStyles} className="header-with-actions">
       <div className="title-panel">
@@ -182,11 +184,10 @@ export const PageHeaderWithActions = ({
         )}
         {showLinks ? (
           <div css={buttonsBlockStyles(theme)}>
-            {/* need real href here to paste confluence */}
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href={`https://confluence.uzum.com/${faveStarProps.itemId}`}
+              href={`https://confluence.uzum.com/display/MAD/${joinedTitle}`}
             >
               <img src={ConfluenceImage} alt="Docks" height="28px" />
             </a>

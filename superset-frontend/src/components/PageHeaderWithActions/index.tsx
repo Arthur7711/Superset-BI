@@ -167,7 +167,7 @@ export const PageHeaderWithActions = ({
   const showLinks = pathname.includes('superset/dashboard');
   const { user } = GetUserData();
 
-  const titleData = editableTitleProps.title.split(' ');
+  const titleData = editableTitleProps?.title?.split(' ') || [];
   const joinedTitle = titleData.length ? titleData.join('+') : titleData[0];
   return (
     <div css={headerStyles} className="header-with-actions">

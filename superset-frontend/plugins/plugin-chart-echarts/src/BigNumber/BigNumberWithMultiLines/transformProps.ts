@@ -78,7 +78,6 @@ export default function transformProps(
     timeGrainSqla,
     secondaryColorPicker,
   } = formData;
-  console.log('formData', formData);
   const granularity = extractTimegrain(rawFormData);
   const {
     data = [],
@@ -221,7 +220,8 @@ export default function transformProps(
   //     xAxisSortSeriesAscending: undefined,
   //   },
   // );
-  // console.log('secondTrendLineData', rawSeries);
+  console.log('formData', secondMetricName);
+
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
@@ -280,7 +280,8 @@ export default function transformProps(
               formatTime,
               headerFormatter,
               data,
-              metric,
+              metricName,
+              secondMetricName,
               timeGrainSqla,
             ),
         },

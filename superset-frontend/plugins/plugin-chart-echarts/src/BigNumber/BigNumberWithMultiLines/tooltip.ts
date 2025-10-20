@@ -5,21 +5,22 @@ import {
   TimeFormatter,
   ValueFormatter,
 } from '@superset-ui/core';
-import { getWeekFromRange } from './helpers/getWeekFromRange';
+// import { getWeekFromRange } from './helpers/getWeekFromRange';
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const tooltipCustomHtml = (
   params: any[],
   formatTime: TimeFormatter,
   headerFormatter: TimeFormatter | ValueFormatter,
   allData: DataRecord[],
   metric: QueryFormMetric,
+  secondMetric: QueryFormMetric,
   timeGrainSqla: string,
 ) => {
-  // console.log('params', params, metric, allData);
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
   const plan = params[1]?.data?.[1];
+  console.log('params', metric, secondMetric);
 
   const currentItemId = params[0].axisValue;
   const currentItemIndex = allData.findIndex(
@@ -77,11 +78,16 @@ export const tooltipCustomHtml = (
   //        isOkLast ? '+' : ''
   //      }${headerFormatter.format(wowText)})<br/><br/>
   //     </div>
+
   return `
       <div style="line-height: 1.6;">
         <strong>${date}</strong><br/><br/>
-        <strong>Fact:</strong>${headerFormatter.format(current)}<br/><br/>
-        <strong>Plan:</strong>${headerFormatter.format(plan)}<br/>
+        <p><strong>Fact:</strong><span style="font-size:12px">(${metric})</span> ${headerFormatter.format(
+          current,
+        )}</p><br/>
+        <p><strong>Plan:</strong><span style="font-size:12px">(${secondMetric})</span> ${headerFormatter.format(
+          plan,
+        )}</p><br/>
         <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
           isOkDiff ? '+' : ''
         }${headerFormatter.format(planDiff)})<br/><br/>

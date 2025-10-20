@@ -183,7 +183,14 @@ export const PageHeaderWithActions = ({
           </div>
         )}
         {showLinks ? (
-          <div css={buttonsBlockStyles(theme)}>
+          <div
+            css={buttonsBlockStyles(theme)}
+            style={{
+              display: ' flex',
+              alignItems: 'center',
+              marginLeft: '12px',
+            }}
+          >
             <a
               target="_blank"
               rel="noopener noreferrer"

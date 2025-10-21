@@ -37,8 +37,8 @@ import { getDateFormatter, parseMetricValue } from '../utils';
 import { getDefaultTooltip } from '../../utils/tooltip';
 import { Refs } from '../../types';
 import { tooltipCustomHtml } from './tooltip';
-import { extractSeries } from '../../utils/series';
-import { rebaseForecastDatum } from '../../utils/forecast';
+// import { extractSeries } from '../../utils/series';
+// import { rebaseForecastDatum } from '../../utils/forecast';
 
 const formatPercentChange = getNumberFormatter(
   NumberFormats.PERCENT_SIGNED_1_POINT,
@@ -220,8 +220,7 @@ export default function transformProps(
   //     xAxisSortSeriesAscending: undefined,
   //   },
   // );
-  console.log('formData', secondMetricName);
-
+  console.log('formdata', formData);
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
@@ -275,15 +274,17 @@ export default function transformProps(
           show: !inContextMenu,
           trigger: 'axis',
           formatter: (params: any) =>
-            tooltipCustomHtml(
+            tooltipCustomHtml({
               params,
               formatTime,
               headerFormatter,
-              data,
-              metricName,
-              secondMetricName,
+              allData: data,
+              metric: metricName,
+              secondMetric: secondMetricName,
+              showPlanExac: formData.showPlanExac,
+              showTooltipWow: formData.showTooltipMetricWow,
               timeGrainSqla,
-            ),
+            }),
         },
         aria: {
           enabled: true,

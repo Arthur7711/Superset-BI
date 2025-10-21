@@ -8,20 +8,32 @@ import {
 // import { getWeekFromRange } from './helpers/getWeekFromRange';
 
 // const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-export const tooltipCustomHtml = (
-  params: any[],
-  formatTime: TimeFormatter,
-  headerFormatter: TimeFormatter | ValueFormatter,
-  allData: DataRecord[],
-  metric: QueryFormMetric,
-  secondMetric: QueryFormMetric,
-  timeGrainSqla: string,
-) => {
+export const tooltipCustomHtml = (props: {
+  params: any[];
+  formatTime: TimeFormatter;
+  headerFormatter: TimeFormatter | ValueFormatter;
+  allData: DataRecord[];
+  metric: QueryFormMetric;
+  secondMetric: QueryFormMetric;
+  showPlanExac: boolean;
+  showTooltipWow: boolean;
+  timeGrainSqla: string;
+}) => {
+  const {
+    params,
+    formatTime,
+    headerFormatter,
+    allData,
+    metric,
+    secondMetric,
+    showPlanExac,
+    showTooltipWow,
+    timeGrainSqla,
+  } = props;
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
   const plan = params[1]?.data?.[1];
-  console.log('params', metric, secondMetric);
-
+  console.log('params', params);
   const currentItemId = params[0].axisValue;
   const currentItemIndex = allData.findIndex(
     el => el.order_date === currentItemId,
@@ -82,19 +94,26 @@ export const tooltipCustomHtml = (
   return `
       <div style="line-height: 1.6;">
         <strong>${date}</strong><br/><br/>
-        <p><strong>Fact:</strong><span style="font-size:12px">(${metric})</span> ${headerFormatter.format(
+        <span><strong>${metric}:</strong> ${headerFormatter.format(
           current,
-        )}</p><br/>
-        <p><strong>Plan:</strong><span style="font-size:12px">(${secondMetric})</span> ${headerFormatter.format(
+        )}</span><br/>
+        <span><strong>${secondMetric}:</strong> ${headerFormatter.format(
           plan,
-        )}</p><br/>
-        <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
-          isOkDiff ? '+' : ''
-        }${headerFormatter.format(planDiff)})<br/><br/>
+        )}</span><br/><br />
+        <div style="display: ${showPlanExac ? 'block' : 'none'}">
+          <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
+            isOkDiff ? '+' : ''
+          }${headerFormatter.format(planDiff)})<br/><br/>
+        </div>
         <strong>Last period:</strong> ${headerFormatter.format(last)}<br/>
-       <strong>WoW:</strong> ${isOkLast ? greenArrow : redArrow} ${wowPrc}% (${
-         isOkLast ? '+' : ''
-       }${headerFormatter.format(wowText)})<br/><br/>
+        <div style="display: ${showTooltipWow ? 'block' : 'none'}">
+          <strong>WoW:</strong> ${
+            isOkLast ? greenArrow : redArrow
+          } ${wowPrc}% (${isOkLast ? '+' : ''}${headerFormatter.format(
+            wowText,
+          )})
+          <br/><br/>
+        </div>
       </div>
     `;
 };

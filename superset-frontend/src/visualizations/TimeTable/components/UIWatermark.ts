@@ -6,6 +6,7 @@ export const Watermark = styled.h3`
   top: 20%;
   left: 30%;
   z-index: 10000;
+  pointer-events: none;
 `;
 export const SmallWatermark = styled.h5`
   ${({
@@ -28,5 +29,6 @@ export const SmallWatermark = styled.h5`
   bottom: ${bottomOrigin};
   z-index: 10000;
   font-size: 12px;
+  pointer-events: none;
 `}
 `;

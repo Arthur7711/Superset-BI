@@ -33,11 +33,15 @@ export const tooltipCustomHtml = (props: {
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
   const plan = params[1]?.data?.[1];
-  console.log('params', params);
   const currentItemId = params[0].axisValue;
-  const currentItemIndex = allData.findIndex(
-    el => el.order_date === currentItemId,
-  );
+  const currentItemIndex = allData.findIndex(el => {
+    const nonMetricKey = Object.keys(el).find(
+      key =>
+        key !== getMetricLabel(metric) && key !== getMetricLabel(secondMetric),
+    );
+    return el[nonMetricKey] === currentItemId;
+  });
+
   const prevItem =
     currentItemIndex > 0
       ? allData[currentItemIndex - 1]

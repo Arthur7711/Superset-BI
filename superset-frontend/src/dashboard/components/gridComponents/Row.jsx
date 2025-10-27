@@ -80,9 +80,10 @@ const GridRow = styled.div`
     align-items: flex-start;
     width: 100%;
     height: fit-content;
+    justify-content: space-between;
 
     & > :not(:last-child):not(.hover-menu) {
-      ${!editMode && `margin-right: ${theme.gridUnit * 4}px;`}
+      ${!editMode && `margin-right: ${theme.gridUnit * 2}px;`}
     }
 
     & .empty-droptarget {

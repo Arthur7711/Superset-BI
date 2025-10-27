@@ -243,7 +243,7 @@ const ChartHolder: React.FC<ChartHolderProps> = ({
       [name]: value,
     }));
   }, []);
-
+  console.log('availableColumnCount', availableColumnCount, widthMultiple);
   return (
     <Draggable
       component={component}
@@ -275,7 +275,7 @@ const ChartHolder: React.FC<ChartHolderProps> = ({
           <div
             ref={dragSourceRef}
             data-test="dashboard-component-chart-holder"
-            style={focusHighlightStyles}
+            // style={focusHighlightStyles}
             css={isFullSize ? fullSizeStyle : undefined}
             className={cx(
               'dashboard-component',

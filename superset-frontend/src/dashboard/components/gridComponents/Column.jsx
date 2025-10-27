@@ -70,7 +70,7 @@ const ColumnStyles = styled.div`
       position: relative;
 
       & > :not(.hover-menu):not(:last-child) {
-        ${!editMode && `margin-bottom: ${theme.gridUnit * 4}px;`}
+        ${!editMode && `margin-bottom: ${theme.gridUnit * 2}px;`}
       }
     }
 

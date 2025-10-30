@@ -5,13 +5,17 @@ interface ModalProps {
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  buttonTitle: string;
-  onHandledPrimaryAction: () => void;
+  // buttonTitle: string;
+  // onHandledPrimaryAction: () => void;
 }
 
+// .ant-modal-body {
+//     min-height: 500px;
+//   }
 const StyledModal = styled(Modal)`
   .ant-modal-body {
-    min-height: 500px;
+    min-height: 300px;
+    z-index: 10000;
   }
 
   .ant-collapse > .ant-collapse-item {
@@ -41,21 +45,19 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-export function ServiceModal({
-  children,
-  isOpen,
-  onClose,
-  buttonTitle,
-  onHandledPrimaryAction,
-}: ModalProps) {
+// buttonTitle,
+// onHandledPrimaryAction,
+export function ServiceModal({ children, isOpen, onClose }: ModalProps) {
   return (
     <StyledModal
       show={isOpen}
       onHide={onClose}
       title=""
       maskClosable={false}
-      primaryButtonName={buttonTitle}
-      onHandledPrimaryAction={onHandledPrimaryAction}
+      disablePrimaryButton // remove primary button
+      hideFooter // remove footer
+      // primaryButtonName={buttonTitle}
+      // onHandledPrimaryAction={onHandledPrimaryAction}
     >
       {children}
     </StyledModal>

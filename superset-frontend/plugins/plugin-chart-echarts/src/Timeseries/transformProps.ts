@@ -189,6 +189,7 @@ export default function transformProps(
     yAxisTitleMargin,
     yAxisTitlePosition,
     zoomable,
+    labelPosition,
   }: EchartsTimeseriesFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const refs: Refs = {};
   const groupBy = ensureIsArray(groupby);
@@ -502,7 +503,6 @@ export default function transformProps(
       seriesType,
     ),
   };
-  console.log('yAxisFormat', yAxisFormat);
   let yAxis: any = {
     ...defaultYAxis,
     type: logAxis ? AxisType.Log : AxisType.Value,
@@ -635,6 +635,8 @@ export default function transformProps(
         showValue,
         formData.orientation === 'horizontal',
         width,
+        seriesType === 'bar',
+        labelPosition,
       ),
     toolbox: {
       show: zoomable,

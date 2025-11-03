@@ -47,6 +47,7 @@ import {
 } from '../constants';
 import {
   EchartsTimeseriesSeriesType,
+  LabelPositionEnum,
   LegendOrientation,
   LegendType,
   StackType,
@@ -520,6 +521,8 @@ export function dedupLineChartSeries(
   showValue: boolean,
   isHorizontal: boolean,
   width: number,
+  isBarChart?: boolean,
+  labelPosition?: LabelPositionEnum,
 ): SeriesOption[] {
   const counter = new Map<string, number>();
   // @ts-ignore
@@ -632,7 +635,11 @@ export function dedupLineChartSeries(
       const labelOptions = {
         ...row.label,
         show: showValue,
-        position: isHorizontal ? row.label.position : 'top',
+        position: isHorizontal
+          ? row.label.position
+          : isBarChart
+            ? labelPosition
+            : 'top',
         ...formatterFn(),
       };
       return {
@@ -648,7 +655,6 @@ export function dedupLineChartSeries(
     },
   );
 }
-
 
 export function dedupSeries(series: SeriesOption[]): SeriesOption[] {
   const counter = new Map<string, number>();

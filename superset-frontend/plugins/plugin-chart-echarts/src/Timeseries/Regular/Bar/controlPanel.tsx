@@ -20,6 +20,7 @@ import { t } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlPanelsContainerProps,
+  ControlSetItem,
   ControlSetRow,
   ControlStateMapping,
   ControlSubSectionHeader,
@@ -29,6 +30,8 @@ import {
   sections,
   sharedControls,
 } from '@superset-ui/chart-controls';
+import { LABEL_POSITION } from 'plugins/plugin-chart-echarts/src/constants';
+
 import {
   legendSection,
   minorTicks,
@@ -54,6 +57,21 @@ const {
   zoomable,
   orientation,
 } = DEFAULT_FORM_DATA;
+
+const labelPositionControl: ControlSetItem = {
+  name: 'labelPosition',
+  config: {
+    type: 'SelectControl',
+    freeForm: false,
+    label: t('Label Position'),
+    choices: Array.from(new Map(LABEL_POSITION).entries()),
+    default: LABEL_POSITION[0][0],
+    renderTrigger: true,
+    description: t('Label position'),
+    visibility: ({ controls }: ControlPanelsContainerProps) =>
+      Boolean(controls?.show_legend?.value),
+  },
+};
 
 function createAxisTitleControl(axis: 'x' | 'y'): ControlSetRow[] {
   const isXAxis = axis === 'x';
@@ -335,6 +353,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [labelPositionControl],
         ...legendSection,
         [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
         ...createAxisControl('x'),

@@ -77,6 +77,7 @@ export default function transformProps(
     secondMetric = 'value',
     timeGrainSqla,
     secondaryColorPicker,
+    showFillingArea,
   } = formData;
   const granularity = extractTimegrain(rawFormData);
   const {
@@ -232,12 +233,14 @@ export default function transformProps(
             symbolSize: 10,
             showSymbol: false,
             color: mainColor,
-            areaStyle: {
-              color: new graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: mainColor },
-                { offset: 1, color: theme.colors.grayscale.light5 },
-              ]),
-            },
+            areaStyle: showFillingArea
+              ? {
+                  color: new graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: mainColor },
+                    { offset: 1, color: theme.colors.grayscale.light5 },
+                  ]),
+                }
+              : undefined,
           },
           ...(secondTrendLineData
             ? [

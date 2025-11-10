@@ -94,6 +94,34 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'show_plan_exac',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show Plan Exac'),
+              renderTrigger: true,
+              default: true,
+              description: t(
+                'Whether to display in tooltip the plan execution',
+              ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'show_tooltip_metric_wow',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show metric WoW in tooltip'),
+              renderTrigger: true,
+              default: true,
+              description: t(
+                'Whether to display in tooltip the WoW comparison',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'start_y_axis_at_zero',
             config: {
               type: 'CheckboxControl',
@@ -132,6 +160,18 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         ['color_picker', null],
         ['secondary_color_picker', null],
+        [
+          {
+            name: 'show filling area',
+            config: {
+              type: 'CheckboxControl',
+              label: t('show filling area'),
+              description: t('Use this to show or hide filling area'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
         [headerFontSize],
         [subheaderFontSize],
         ['y_axis_format'],

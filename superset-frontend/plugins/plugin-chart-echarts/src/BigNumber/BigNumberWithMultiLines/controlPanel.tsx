@@ -69,6 +69,11 @@ const config: ControlPanelConfig = {
           },
         ],
         [
+          <ControlSubSectionHeader>
+            {t('Show options')}
+          </ControlSubSectionHeader>,
+        ],
+        [
           {
             name: 'show_timestamp',
             config: {
@@ -94,7 +99,7 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'show_plan_exac',
+            name: 'show_plan_exec',
             config: {
               type: 'CheckboxControl',
               label: t('Show Plan Exac'),

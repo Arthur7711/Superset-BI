@@ -45,13 +45,13 @@ export default function buildQuery(formData: QueryFormData) {
       post_processing: [
         pivotOperator(formData, {
           ...baseQueryObject,
-          metrics: [metric, second_metric],
+          metrics: [metric, second_metric].filter(Boolean),
         }),
         rollingWindowOperator(formData, baseQueryObject),
         resampleOperator(formData, baseQueryObject),
         flattenOperator(formData, {
           ...baseQueryObject,
-          metrics: [metric, second_metric],
+          metrics: [metric, second_metric].filter(Boolean),
         }),
       ],
     },

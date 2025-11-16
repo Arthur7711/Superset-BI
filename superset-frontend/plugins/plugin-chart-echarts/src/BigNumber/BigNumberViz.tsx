@@ -32,16 +32,17 @@ import { BigNumberVizProps } from './types';
 import { EventHandlers } from '../types';
 import { MainBlock } from '../UIWatermark';
 import UserDataWatermark from '../Watermark/ClassUserDataWatermark';
+import { TriangleComponent } from './BigNumberWithMultiLines/TriangleComponent';
 
 const defaultNumberFormatter = getNumberFormatter();
 
 const PROPORTION = {
   // text size: proportion of the chart container sans trendline
   KICKER: 0.1,
-  HEADER: 0.3,
+  HEADER: 0.25,
   SUBHEADER: 0.125,
   // trendline size: proportion of the whole chart container
-  TRENDLINE: 0.3,
+  TRENDLINE: 0.35,
 };
 
 class BigNumberVis extends PureComponent<BigNumberVizProps> {
@@ -136,7 +137,10 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       this.props;
     // @ts-ignore
     const text = bigNumber === null ? t('No data') : headerFormatter(bigNumber);
-
+    const data = this.props.trendLineData;
+    const resultSum = data?.reduce((sum, [x, y]) => sum + (y || 0), 0);
+    const resultSumFormatter = headerFormatter(resultSum);
+    const showCustomizeVersion = this.props.formData?.showCustomizeVersion;
     const hasThresholdColorFormatter =
       Array.isArray(colorThresholdFormatters) &&
       colorThresholdFormatters.length > 0;
@@ -172,7 +176,6 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         this.props.onContextMenu(e.nativeEvent.clientX, e.nativeEvent.clientY);
       }
     };
-
     return (
       <div
         className="header-line"
@@ -185,7 +188,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         }}
         onContextMenu={onContextMenu}
       >
-        {text}
+        {showCustomizeVersion ? resultSumFormatter : text}
       </div>
     );
   }
@@ -226,7 +229,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       'Try applying different filters or ensuring your datasource has data',
     );
     let text = subheader;
-
+    let triangleDirection: 'up' | 'down' | 'none' = 'none';
     if (subheader) {
       const [value, writtenTimeGrainText] = subheader.split(' ');
       if (writtenTimeGrainText) {
@@ -252,14 +255,17 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
                   Number(lastWeekData[0])) /
                   Number(lastWeekData[0])) *
                 100;
-              text = `${
-                effectivePrcent > 0 ? '+' : '-'
-              }${effectivePrcent.toFixed(1)}% ${t('DoD')}`;
+              triangleDirection =
+                effectivePrcent > 0
+                  ? 'up'
+                  : effectivePrcent < 0
+                    ? 'down'
+                    : 'none';
+              text = `${effectivePrcent.toFixed(1)}% ${t('DoD')}`;
             } else {
               text = `${value} ${t('DoD')}`;
             }
             break;
-
           default:
             text = subheader;
             break;
@@ -280,20 +286,23 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         container,
       });
       container.remove();
-
+      const showCustomizeVersion = this.props.formData?.showCustomizeVersion;
       return (
         <div
           className="subheader-line"
           style={{
             fontSize,
             height: maxHeight,
-            display: 'flex',
+            display: showCustomizeVersion ? 'none' : 'flex',
             alignItems: 'center',
             gap: '3rem',
           }}
         >
-          {text}
-          {showSecondarySubHeader ? (
+          <span>
+            {/* <TriangleComponent direction={triangleDirection} /> */}
+            {text}
+          </span>
+          {showSecondarySubHeader && subHeaderProcentText ? (
             <span>
               <span
                 style={{
@@ -347,15 +356,17 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     };
 
     return (
-      echartOptions && (
-        <Echart
-          refs={refs}
-          width={Math.floor(width)}
-          height={maxHeight}
-          echartOptions={echartOptions}
-          eventHandlers={eventHandlers}
-        />
-      )
+      <div style={{ paddingTop: '30px' }}>
+        {echartOptions && (
+          <Echart
+            refs={refs}
+            width={Math.floor(width)}
+            height={maxHeight}
+            echartOptions={echartOptions}
+            eventHandlers={eventHandlers}
+          />
+        )}
+      </div>
     );
   }
 
@@ -373,10 +384,15 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     if (showTrendLine) {
       const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
       const allTextHeight = height - chartHeight;
-
+      console.log('allTextHeight', PROPORTION.TRENDLINE, height);
       return (
         <MainBlock className={`${className}`}>
-          <div className="text-container" style={{ height: allTextHeight }}>
+          <div
+            className="text-container"
+            style={{
+              height: allTextHeight,
+            }}
+          >
             {this.renderFallbackWarning()}
             {this.renderKicker(
               Math.ceil(

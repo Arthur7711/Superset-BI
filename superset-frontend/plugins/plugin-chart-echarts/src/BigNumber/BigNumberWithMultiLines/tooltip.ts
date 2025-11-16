@@ -5,9 +5,10 @@ import {
   TimeFormatter,
   ValueFormatter,
 } from '@superset-ui/core';
-// import { getWeekFromRange } from './helpers/getWeekFromRange';
+import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
+import { getWeekFromRange } from './helpers/getWeekFromRange';
 
-// const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const tooltipCustomHtml = (props: {
   params: any[];
   formatTime: TimeFormatter;
@@ -15,9 +16,10 @@ export const tooltipCustomHtml = (props: {
   allData: DataRecord[];
   metric: QueryFormMetric;
   secondMetric: QueryFormMetric;
-  showPlanExac: boolean;
+  showPlanExec: boolean;
   showTooltipWow: boolean;
   timeGrainSqla: string;
+  showCustomizeVersion: boolean;
 }) => {
   const {
     params,
@@ -26,9 +28,10 @@ export const tooltipCustomHtml = (props: {
     allData,
     metric,
     secondMetric,
-    showPlanExac,
+    showPlanExec,
     showTooltipWow,
     timeGrainSqla,
+    showCustomizeVersion,
   } = props;
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
@@ -41,6 +44,7 @@ export const tooltipCustomHtml = (props: {
     );
     return el[nonMetricKey] === currentItemId;
   });
+  const timeFormatterName = getTimeGrainSqlaFormatter(timeGrainSqla);
 
   const prevItem =
     currentItemIndex > 0
@@ -65,21 +69,26 @@ export const tooltipCustomHtml = (props: {
     prcent < 90 ? redDot : prcent >= 90 && prcent < 98 ? orangeDot : greenDot;
   const greenArrow = `<span style="color:#02FB02;">▲</span>`;
   const redArrow = `<span style="color:red;">▼</span>`;
-  // let resultTimeText: string | number = '';
-  // switch (timeGrainSqla) {
-  //   case 'P1D': {
-  //     const weekDayIndex = new Date(date).getDay();
+  let resultTimeText: string | number = '';
+  switch (timeGrainSqla) {
+    case 'P1D': {
+      const weekDayIndex = new Date(date).getDay();
 
-  //     resultTimeText = `(${weekDays[weekDayIndex]})`;
-  //     break;
-  //   }
-  //   case 'P1W': {
-  //     resultTimeText = `(WEEK: ${getWeekFromRange(date)})`;
-  //     break;
-  //   }
-  //   default:
-  //     break;
-  // }
+      resultTimeText = `(${weekDays[weekDayIndex]})`;
+      break;
+    }
+    case 'P1W': {
+      resultTimeText = `(WEEK: ${getWeekFromRange(date)})`;
+      break;
+    }
+    default:
+      break;
+  }
+
+  const sumCount = allData.reduce((acc, item) => {
+    const value = Number(item[getMetricLabel(metric)]) || 0;
+    return acc + value;
+  }, 0);
 
   // <strong>${date} ${resultTimeText}</strong><br/><br/>
   // <div style="line-height: 1.6;">
@@ -97,21 +106,33 @@ export const tooltipCustomHtml = (props: {
 
   return `
       <div style="line-height: 1.6;">
-        <strong>${date}</strong><br/><br/>
+        <strong>${date}${resultTimeText}</strong><br/><br/>
         <span><strong>${metric}:</strong> ${headerFormatter.format(
           current,
         )}</span><br/>
-        <span><strong>${secondMetric}:</strong> ${headerFormatter.format(
-          plan,
-        )}</span><br/><br />
-        <div style="display: ${showPlanExac ? 'block' : 'none'}">
+        ${
+          plan
+            ? `<span><strong>${secondMetric}:</strong> ${headerFormatter.format(
+                plan,
+              )}</span><br/>`
+            : ''
+        }
+        <br/>
+        <div style="display: ${showPlanExec && plan ? 'block' : 'none'}">
           <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
             isOkDiff ? '+' : ''
           }${headerFormatter.format(planDiff)})<br/><br/>
         </div>
-        <strong>Last period:</strong> ${headerFormatter.format(last)}<br/>
+        <div style="display: ${showCustomizeVersion ? 'none' : 'block'}">
+          <strong>Last period:</strong> ${headerFormatter.format(last)}
+          <br/>
+        </div>
+         <div style="display: ${showCustomizeVersion ? 'block' : 'none'}">
+          <strong>SUM:</strong> ${headerFormatter.format(sumCount)}
+          <br/>
+        </div>
         <div style="display: ${showTooltipWow ? 'block' : 'none'}">
-          <strong>WoW:</strong> ${
+          <strong>${timeFormatterName}:</strong> ${
             isOkLast ? greenArrow : redArrow
           } ${wowPrc}% (${isOkLast ? '+' : ''}${headerFormatter.format(
             wowText,

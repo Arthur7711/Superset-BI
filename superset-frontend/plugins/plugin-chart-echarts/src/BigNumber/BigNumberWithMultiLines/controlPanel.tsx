@@ -37,7 +37,7 @@ const config: ControlPanelConfig = {
         ['time_grain_sqla'],
         ['metric'],
         ['adhoc_filters'],
-        ['second_metric'], // here
+        ['second_metric'],
       ],
     },
     {
@@ -72,6 +72,20 @@ const config: ControlPanelConfig = {
           <ControlSubSectionHeader>
             {t('Show options')}
           </ControlSubSectionHeader>,
+        ],
+        [
+          {
+            name: 'show_customize_version',
+            config: {
+              type: 'CheckboxControl',
+              label: t('show advanced version'),
+              renderTrigger: true,
+              default: true,
+              description: t(
+                'change custom version of big number with multi lines',
+              ),
+            },
+          },
         ],
         [
           {
@@ -205,6 +219,20 @@ const config: ControlPanelConfig = {
               default: false,
               description: t(
                 'Use date formatting even when metric value is not a timestamp',
+              ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'make_revert_deviations',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Make revert deviations'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Make revert deviations for big number with multi lines last item',
               ),
             },
           },

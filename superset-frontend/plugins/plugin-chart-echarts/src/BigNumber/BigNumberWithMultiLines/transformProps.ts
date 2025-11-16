@@ -37,6 +37,7 @@ import { getDateFormatter, parseMetricValue } from '../utils';
 import { getDefaultTooltip } from '../../utils/tooltip';
 import { Refs } from '../../types';
 import { tooltipCustomHtml } from './tooltip';
+import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
 // import { extractSeries } from '../../utils/series';
 // import { rebaseForecastDatum } from '../../utils/forecast';
 
@@ -130,7 +131,6 @@ export default function transformProps(
 
     bigNumber = sortedData[0][1];
     timestamp = sortedData[0][0];
-
     if (bigNumber === null) {
       bigNumberFallback = sortedData.find(d => d[1] !== null);
       bigNumber = bigNumberFallback ? bigNumberFallback[1] : null;
@@ -153,6 +153,7 @@ export default function transformProps(
       }
     }
     sortedData.reverse();
+
     // @ts-ignore
     trendLineData = showTrendLine ? sortedData : undefined;
   }
@@ -204,44 +205,102 @@ export default function transformProps(
       trendLineData.push([toDatetimeOrToday, null]);
     }
   }
-  // const rebasedData = rebaseForecastDatum(data, {});
-  // const [rawSeries, sortedTotalValues, minPositiveValue] = extractSeries(
-  //   rebasedData,
-  //   {
-  //     fillNeighborValue: undefined,
-  //     xAxis: xAxisLabel,
-  //     extraMetricLabels: [],
-  //     isHorizontal: false,
-  //     sortSeriesAscending: undefined,
-  //     sortSeriesType: 'sum',
-  //     stack: undefined,
-  //     totalStackedValues: [],
-  //     xAxis: 'order_date',
-  //     xAxisSortSeries: undefined,
-  //     xAxisSortSeriesAscending: undefined,
-  //   },
-  // );
-  console.log('formdata', formData);
+  const lastTwoPoints = trendLineData?.slice(-2);
+  const isOkDiff =
+    lastTwoPoints?.length === 2
+      ? lastTwoPoints[1][1]! >= lastTwoPoints[0][1]!
+      : true;
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
-          {
-            data: trendLineData,
-            type: 'line',
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 10,
-            showSymbol: false,
-            color: mainColor,
-            areaStyle: showFillingArea
-              ? {
-                  color: new graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: mainColor },
-                    { offset: 1, color: theme.colors.grayscale.light5 },
-                  ]),
-                }
-              : undefined,
-          },
+          formData.showCustomizeVersion
+            ? {
+                data: trendLineData,
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: (_: unknown, params: any) =>
+                  params.dataIndex === trendLineData.length - 1 ? 10 : 0,
+                showSymbol: true,
+                color: mainColor,
+                areaStyle: showFillingArea
+                  ? {
+                      color: new graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: mainColor },
+                        { offset: 1, color: theme.colors.grayscale.light5 },
+                      ]),
+                    }
+                  : undefined,
+                label: {
+                  show: true,
+                  position: 'top',
+                  fontSize: 12,
+                  formatter: (params: any) => {
+                    // Show label only for the last point
+                    const dataLength =
+                      params.seriesData?.[0]?.data?.length ??
+                      trendLineData.length;
+                    let prevValue = 0;
+                    if (params.dataIndex === dataLength - 1) {
+                      if (dataLength >= 2) {
+                        prevValue = trendLineData[dataLength - 2][1] || 0;
+                      }
+                      const currentValue = params.data[1];
+                      const percentChangeValue =
+                        (currentValue / prevValue - 1) * 100;
+                      const showingPercent = `${
+                        percentChange >= 0 ? '+' : ''
+                      }${percentChangeValue.toFixed(
+                        1,
+                      )}% ${getTimeGrainSqlaFormatter(formData.timeGrainSqla)}`;
+
+                      // using rich text style
+                      return `{header|${headerFormatter(
+                        currentValue,
+                      )}} \n {subheader|${showingPercent}}`;
+                    }
+                    return '';
+                  },
+                  rich: {
+                    header: {
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                      align: 'center',
+                      padding: [0, 0, 0, -40],
+                    },
+                    subheader: {
+                      color: formData.makeRevertDeviations
+                        ? isOkDiff
+                          ? 'red'
+                          : 'green'
+                        : isOkDiff
+                          ? 'green'
+                          : 'red',
+                      fontSize: 10,
+                      fontWeight: 'bold',
+                      align: 'center',
+                      padding: [0, 0, 0, -90],
+                    },
+                  },
+                },
+              }
+            : {
+                data: trendLineData,
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 10,
+                showSymbol: false,
+                color: mainColor,
+                areaStyle: showFillingArea
+                  ? {
+                      color: new graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: mainColor },
+                        { offset: 1, color: theme.colors.grayscale.light5 },
+                      ]),
+                    }
+                  : undefined,
+              },
           ...(secondTrendLineData
             ? [
                 {
@@ -284,9 +343,10 @@ export default function transformProps(
               allData: data,
               metric: metricName,
               secondMetric: secondMetricName,
-              showPlanExac: formData.showPlanExac,
+              showPlanExec: formData.showPlanExec,
               showTooltipWow: formData.showTooltipMetricWow,
               timeGrainSqla,
+              showCustomizeVersion: formData.showCustomizeVersion,
             }),
         },
         aria: {

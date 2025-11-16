@@ -233,7 +233,7 @@ export default function transformProps(
                   : undefined,
                 label: {
                   show: true,
-                  position: 'top',
+                  position: formData.showCustomizeVersion ? 'bottom' : 'top',
                   fontSize: 12,
                   formatter: (params: any) => {
                     // Show label only for the last point
@@ -328,7 +328,7 @@ export default function transformProps(
         grid: {
           left: 0,
           right: 0,
-          top: 0,
+          top: 10,
           bottom: 0,
         },
         tooltip: {

@@ -356,7 +356,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     };
 
     return (
-      <div style={{ paddingTop: '30px' }}>
+      <div>
         {echartOptions && (
           <Echart
             refs={refs}

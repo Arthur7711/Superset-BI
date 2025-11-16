@@ -230,13 +230,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     );
     let text = subheader;
     let triangleDirection: 'up' | 'down' | 'none' = 'none';
+    console.log('subheader', subheader);
     if (subheader) {
       const [value, writtenTimeGrainText] = subheader.split(' ');
       if (writtenTimeGrainText) {
         text = subheader;
       } else {
         // @ts-ignore
-        switch (formData.timeGrainSqla) {
+        switch (formData?.timeGrainSqla) {
           case 'P1M':
             text = `${value} ${t('MoM')}`;
             break;
@@ -384,7 +385,6 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     if (showTrendLine) {
       const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
       const allTextHeight = height - chartHeight;
-      console.log('allTextHeight', PROPORTION.TRENDLINE, height);
       return (
         <MainBlock className={`${className}`}>
           <div

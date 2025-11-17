@@ -43,7 +43,7 @@ const metadata = {
     t('Report'),
     t('Trend'),
   ],
-  thumbnail: example,
+  thumbnail,
   behaviors: [Behavior.DrillToDetail],
 };
 

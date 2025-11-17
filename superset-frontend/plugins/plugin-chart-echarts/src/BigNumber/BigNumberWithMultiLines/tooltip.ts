@@ -20,6 +20,8 @@ export const tooltipCustomHtml = (props: {
   showTooltipWow: boolean;
   timeGrainSqla: string;
   showCustomizeVersion: boolean;
+  metricShowName?: string;
+  secondMetricShowName?: string;
 }) => {
   const {
     params,
@@ -32,7 +34,10 @@ export const tooltipCustomHtml = (props: {
     showTooltipWow,
     timeGrainSqla,
     showCustomizeVersion,
+    metricShowName,
+    secondMetricShowName,
   } = props;
+
   const date = formatTime(params[0]?.data?.[0]);
   const current = params[0]?.data?.[1];
   const plan = params[1]?.data?.[1];
@@ -103,18 +108,17 @@ export const tooltipCustomHtml = (props: {
   //        isOkLast ? '+' : ''
   //      }${headerFormatter.format(wowText)})<br/><br/>
   //     </div>
-
   return `
       <div style="line-height: 1.6;">
         <strong>${date}${resultTimeText}</strong><br/><br/>
-        <span><strong>${metric}:</strong> ${headerFormatter.format(
-          current,
-        )}</span><br/>
+        <span><strong>${
+          metricShowName || secondMetricShowName || metric
+        }:</strong> ${headerFormatter.format(current)}</span><br/>
         ${
           plan
-            ? `<span><strong>${secondMetric}:</strong> ${headerFormatter.format(
-                plan,
-              )}</span><br/>`
+            ? `<span><strong>${
+                secondMetricShowName || secondMetric
+              }:</strong> ${headerFormatter.format(plan)}</span><br/>`
             : ''
         }
         <br/>

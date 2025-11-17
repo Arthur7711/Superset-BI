@@ -38,6 +38,7 @@ import {
 import { getDateFormatter, parseMetricValue } from '../utils';
 import { getDefaultTooltip } from '../../utils/tooltip';
 import { Refs } from '../../types';
+import { rebaseForecastDatum } from '../../utils/forecast';
 
 const formatPercentChange = getNumberFormatter(
   NumberFormats.PERCENT_SIGNED_1_POINT,
@@ -55,7 +56,7 @@ export default function transformProps(
     theme,
     hooks,
     inContextMenu,
-    datasource: { currencyFormats = {}, columnFormats = {} },
+    datasource: { currencyFormats = {}, columnFormats = {}, verboseMap = {} },
   } = chartProps;
   const {
     colorPicker,
@@ -183,7 +184,8 @@ export default function transformProps(
       trendLineData.push([toDatetimeOrToday, null]);
     }
   }
-
+  const rebasedData = rebaseForecastDatum(data, verboseMap);
+  const [_, metricShowName] = Object.keys(rebasedData[0]);
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
@@ -233,7 +235,7 @@ export default function transformProps(
             tooltipHtml(
               [
                 [
-                  metricName,
+                  metricShowName,
                   params[0].data[1] === null
                     ? t('N/A')
                     : headerFormatter.format(params[0].data[1]),

@@ -38,6 +38,7 @@ import { getDefaultTooltip } from '../../utils/tooltip';
 import { Refs } from '../../types';
 import { tooltipCustomHtml } from './tooltip';
 import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
+import { rebaseForecastDatum } from '../../utils/forecast';
 // import { extractSeries } from '../../utils/series';
 // import { rebaseForecastDatum } from '../../utils/forecast';
 
@@ -57,7 +58,7 @@ export default function transformProps(
     theme,
     hooks,
     inContextMenu,
-    datasource: { currencyFormats = {}, columnFormats = {} },
+    datasource: { currencyFormats = {}, columnFormats = {}, verboseMap = {} },
   } = chartProps;
   const {
     colorPicker,
@@ -112,6 +113,8 @@ export default function transformProps(
 
   const metricColtype =
     metricColtypeIndex > -1 ? coltypes[metricColtypeIndex] : null;
+
+  const rebasedData = rebaseForecastDatum(data, verboseMap);
 
   if (data.length > 0) {
     // const hasSecondMetricInData = colnames.includes(secondMetricName);
@@ -210,6 +213,19 @@ export default function transformProps(
     lastTwoPoints?.length === 2
       ? lastTwoPoints[1][1]! >= lastTwoPoints[0][1]!
       : true;
+  const maxItem =
+    trendLineData?.length && trendLineData.length > 1
+      ? trendLineData?.reduce((max, item) => (item[1] > max[1] ? item : max))
+      : [0, 0];
+  const makeLeftAlign =
+    lastTwoPoints &&
+    maxItem &&
+    (maxItem[0] === lastTwoPoints[1][0] ||
+      maxItem[1] * 0.8 <= lastTwoPoints[1][1]);
+  const [_, secondMetricShowName, firstMetricShowName] = Object.keys(
+    rebasedData[0],
+  );
+
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
@@ -233,7 +249,7 @@ export default function transformProps(
                   : undefined,
                 label: {
                   show: true,
-                  position: formData.showCustomizeVersion ? 'bottom' : 'top',
+                  position: 'left',
                   fontSize: 12,
                   formatter: (params: any) => {
                     // Show label only for the last point
@@ -347,6 +363,8 @@ export default function transformProps(
               showTooltipWow: formData.showTooltipMetricWow,
               timeGrainSqla,
               showCustomizeVersion: formData.showCustomizeVersion,
+              metricShowName: firstMetricShowName,
+              secondMetricShowName,
             }),
         },
         aria: {

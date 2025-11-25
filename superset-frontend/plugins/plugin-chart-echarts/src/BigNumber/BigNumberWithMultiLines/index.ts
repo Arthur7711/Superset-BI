@@ -21,7 +21,7 @@ import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import buildQuery from './buildQuery';
 import example from './images/Big_Number_Trendline.jpg';
-import thumbnail from './images/thumbnail.png';
+import thumbnail from './images/thumbnail.jpg';
 import {
   BigNumberWithTrendlineChartProps,
   BigNumberWithTrendlineFormData,

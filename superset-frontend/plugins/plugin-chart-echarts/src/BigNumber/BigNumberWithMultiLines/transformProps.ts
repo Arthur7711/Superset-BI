@@ -39,6 +39,7 @@ import { Refs } from '../../types';
 import { tooltipCustomHtml } from './tooltip';
 import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
 import { rebaseForecastDatum } from '../../utils/forecast';
+import { size } from 'lodash';
 // import { extractSeries } from '../../utils/series';
 // import { rebaseForecastDatum } from '../../utils/forecast';
 
@@ -220,23 +221,39 @@ export default function transformProps(
   const makeLeftAlign =
     lastTwoPoints &&
     maxItem &&
-    (maxItem[0] === lastTwoPoints[1][0] ||
-      maxItem[1] * 0.8 <= lastTwoPoints[1][1]);
-  const [_, secondMetricShowName, firstMetricShowName] = Object.keys(
-    rebasedData[0],
+    (maxItem?.[0] === lastTwoPoints?.[1]?.[0] ||
+      maxItem?.[1] * 0.5 <= lastTwoPoints?.[1]?.[1]);
+  const metricNames = Object.keys(rebasedData[0]);
+  const firstMetricShowName = metricNames.includes(metricName)
+    ? metricName
+    : chartProps.datasource?.metrics.length
+      ? chartProps.datasource?.metrics.find(el => el.metric_name === metricName)
+          ?.verbose_name
+      : metricName;
+  const timeMetricName = chartProps.datasource?.mainDttmCol;
+  const secondMetricShowName = metricNames.includes(secondMetricName)
+    ? secondMetricName
+    : metricNames.find(
+        el => el !== timeMetricName && el !== firstMetricShowName,
+      );
+  console.log(
+    'data',
+    formData.showCustomizeVersion,
+    formData,
+    trendLineData,
+    timeGrainSqla,
   );
-
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
-          formData.showCustomizeVersion
+          formData.showCustomizeVersion && trendLineData.length > 1
             ? {
                 data: trendLineData,
                 type: 'line',
                 smooth: true,
                 symbol: 'circle',
                 symbolSize: (_: unknown, params: any) =>
-                  params.dataIndex === trendLineData.length - 1 ? 10 : 0,
+                  params.dataIndex === trendLineData.length - 1 ? 8 : 0.1,
                 showSymbol: true,
                 color: mainColor,
                 areaStyle: showFillingArea
@@ -249,7 +266,7 @@ export default function transformProps(
                   : undefined,
                 label: {
                   show: true,
-                  position: 'left',
+                  position: makeLeftAlign ? 'left' : 'top',
                   fontSize: 12,
                   formatter: (params: any) => {
                     // Show label only for the last point
@@ -258,17 +275,21 @@ export default function transformProps(
                       trendLineData.length;
                     let prevValue = 0;
                     if (params.dataIndex === dataLength - 1) {
-                      if (dataLength >= 2) {
+                      if (timeGrainSqla === 'P1D') {
+                        prevValue = trendLineData[dataLength - 7]?.[1] || 1;
+                      } else if (dataLength >= 2) {
                         prevValue = trendLineData[dataLength - 2][1] || 0;
                       }
                       const currentValue = params.data[1];
                       const percentChangeValue =
                         (currentValue / prevValue - 1) * 100;
                       const showingPercent = `${
-                        percentChange >= 0 ? '+' : ''
-                      }${percentChangeValue.toFixed(
-                        1,
-                      )}% ${getTimeGrainSqlaFormatter(formData.timeGrainSqla)}`;
+                        percentChangeValue >= 0 ? '+' : ''
+                      }${percentChangeValue.toFixed(1)}% ${
+                        timeGrainSqla === 'P1D'
+                          ? 'WoW'
+                          : getTimeGrainSqlaFormatter(formData.timeGrainSqla)
+                      }`;
 
                       // using rich text style
                       return `{header|${headerFormatter(
@@ -279,7 +300,7 @@ export default function transformProps(
                   },
                   rich: {
                     header: {
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: 'bold',
                       align: 'center',
                       padding: [0, 0, 0, -40],
@@ -293,11 +314,16 @@ export default function transformProps(
                           ? 'green'
                           : 'red',
                       fontSize: 10,
+                      // 10cqw
                       fontWeight: 'bold',
                       align: 'center',
                       padding: [0, 0, 0, -90],
                     },
                   },
+                },
+                emphasis: {
+                  scale: true,
+                  scaleSize: 20,
                 },
               }
             : {
@@ -365,6 +391,7 @@ export default function transformProps(
               showCustomizeVersion: formData.showCustomizeVersion,
               metricShowName: firstMetricShowName,
               secondMetricShowName,
+              timeMetricName,
             }),
         },
         aria: {

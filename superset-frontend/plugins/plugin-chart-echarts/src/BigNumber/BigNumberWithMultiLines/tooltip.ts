@@ -22,6 +22,7 @@ export const tooltipCustomHtml = (props: {
   showCustomizeVersion: boolean;
   metricShowName?: string;
   secondMetricShowName?: string;
+  timeMetricName: string;
 }) => {
   const {
     params,
@@ -36,6 +37,7 @@ export const tooltipCustomHtml = (props: {
     showCustomizeVersion,
     metricShowName,
     secondMetricShowName,
+    timeMetricName,
   } = props;
 
   const date = formatTime(params[0]?.data?.[0]);
@@ -52,13 +54,17 @@ export const tooltipCustomHtml = (props: {
   const timeFormatterName = getTimeGrainSqlaFormatter(timeGrainSqla);
 
   const prevItem =
-    currentItemIndex > 0
-      ? allData[currentItemIndex - 1]
-      : { [getMetricLabel(metric)]: 0 };
+    timeGrainSqla === 'P1D' && currentItemIndex >= 7
+      ? allData[currentItemIndex - 7]
+      : timeGrainSqla === 'P1D' && currentItemIndex < 7
+        ? { [getMetricLabel(metric)]: 0 }
+        : currentItemIndex > 0
+          ? allData[currentItemIndex - 1]
+          : { [getMetricLabel(metric)]: 0 };
 
   const last = Number(prevItem[getMetricLabel(metric)]);
   const planDiff = current - plan;
-  const prcent = (current / plan) * 100;
+  const prcent = (current / plan - 1) * 100;
   const planExecPct = plan ? prcent.toFixed(1) : 'N/A';
   const prevValue = Number(prevItem[getMetricLabel(metric)]) ?? 0;
   const wowNum = prevValue !== 0 ? current / prevValue : current;
@@ -95,54 +101,45 @@ export const tooltipCustomHtml = (props: {
     return acc + value;
   }, 0);
 
-  // <strong>${date} ${resultTimeText}</strong><br/><br/>
-  // <div style="line-height: 1.6;">
-  //       <strong>${date}</strong><br/><br/>
-  //       <strong>Fact:</strong>${headerFormatter.format(current)}<br/><br/>
-  //       <strong>Plan:</strong>${headerFormatter.format(plan)}<br/>
-  //       <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
-  //         isOkDiff ? '+' : ''
-  //       }${headerFormatter.format(planDiff)})<br/><br/>
-  //       <strong>Last period:</strong> ${headerFormatter.format(last)}<br/>
-  //      <strong>WoW:</strong> ${isOkLast ? greenArrow : redArrow} ${wowPrc}% (${
-  //        isOkLast ? '+' : ''
-  //      }${headerFormatter.format(wowText)})<br/><br/>
-  //     </div>
+  const dateData = Object.keys(allData[0]).find(el => el === timeMetricName);
+  const firstDate = formatTime(Number(allData[0][dateData]));
+  const lastDate = formatTime(Number(allData[allData.length - 1][dateData]));
+  const metricCurrentName = metricShowName || metric;
+  const secondaryCurrentName = secondMetricShowName || secondMetric;
+  const isPositiveDiffSymbol = isOkDiff ? '+' : '';
+
   return `
       <div style="line-height: 1.6;">
         <strong>${date}${resultTimeText}</strong><br/><br/>
-        <span><strong>${
-          metricShowName || secondMetricShowName || metric
-        }:</strong> ${headerFormatter.format(current)}</span><br/>
-        ${
-          plan
-            ? `<span><strong>${
-                secondMetricShowName || secondMetric
-              }:</strong> ${headerFormatter.format(plan)}</span><br/>`
-            : ''
-        }
-        <br/>
-        <div style="display: ${showPlanExec && plan ? 'block' : 'none'}">
-          <strong>Plan exec:</strong> ${dotController} ${planExecPct}% (${
-            isOkDiff ? '+' : ''
-          }${headerFormatter.format(planDiff)})<br/><br/>
-        </div>
-        <div style="display: ${showCustomizeVersion ? 'none' : 'block'}">
-          <strong>Last period:</strong> ${headerFormatter.format(last)}
-          <br/>
-        </div>
-         <div style="display: ${showCustomizeVersion ? 'block' : 'none'}">
-          <strong>SUM:</strong> ${headerFormatter.format(sumCount)}
-          <br/>
-        </div>
+        <span><strong>${metricCurrentName}:</strong> ${current}</span><br/>
         <div style="display: ${showTooltipWow ? 'block' : 'none'}">
-          <strong>${timeFormatterName}:</strong> ${
+          <strong>PoP:</strong> ${
             isOkLast ? greenArrow : redArrow
           } ${wowPrc}% (${isOkLast ? '+' : ''}${headerFormatter.format(
             wowText,
           )})
-          <br/><br/>
+          <br/>
+        </div>
+        ${
+          plan
+            ? `<span><strong>${secondaryCurrentName}:</strong> ${plan}</span><br/>`
+            : ''
+        }
+         <div style="display: ${showPlanExec && plan ? 'block' : 'none'}">
+          <strong> ${metricCurrentName} vs ${secondaryCurrentName}: </strong> ${dotController} ${planExecPct}% (${isPositiveDiffSymbol}${headerFormatter.format(
+            planDiff,
+          )})<br/>
+        </div>
+        <br/>
+        <strong>Дата: ${firstDate} - ${lastDate}</strong><br />
+        <div style="display: ${showCustomizeVersion ? 'block' : 'none'}">
+          <strong>${metricCurrentName}:</strong> ${sumCount}
+          <br/>
         </div>
       </div>
     `;
 };
+// <div style="display: ${showCustomizeVersion ? 'none' : 'block'}">
+//           <strong>Last period:</strong> ${headerFormatter.format(last)}
+//           <br/>
+//         </div>

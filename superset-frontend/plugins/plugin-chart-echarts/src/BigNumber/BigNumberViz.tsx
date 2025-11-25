@@ -39,10 +39,10 @@ const defaultNumberFormatter = getNumberFormatter();
 const PROPORTION = {
   // text size: proportion of the chart container sans trendline
   KICKER: 0.1,
-  HEADER: 0.25,
+  HEADER: 0.2,
   SUBHEADER: 0.125,
   // trendline size: proportion of the whole chart container
-  TRENDLINE: 0.35,
+  TRENDLINE: 0.4,
 };
 
 class BigNumberVis extends PureComponent<BigNumberVizProps> {
@@ -203,7 +203,46 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       formData,
       trendLineData,
     } = this.props;
+    // const { compareWeekDay } = formData;
+    const lastSevenData =
+      trendLineData?.length && trendLineData?.length >= 7
+        ? trendLineData?.slice(-7).map(d => d[1])
+        : null;
     // @ts-ignore
+    if (
+      lastSevenData &&
+      formData?.compareWeekDay &&
+      formData?.timeGrainSqla === 'P1D'
+    ) {
+      const lastItem = Number(lastSevenData[lastSevenData.length - 1]);
+      const firstItem = Number(lastSevenData[0]);
+      const percentValue = (lastItem / firstItem - 1) * 100;
+      const text = `${percentValue.toFixed(1)}% ${t('WoW')}`;
+      const container = this.createTemporaryContainer();
+      document.body.append(container);
+      const fontSize = computeMaxFontSize({
+        text,
+        maxWidth: width * 0.9, // max width reduced
+        maxHeight,
+        className: 'subheader-line',
+        container,
+      });
+      container.remove();
+      return (
+        <div
+          className="subheader-line"
+          style={{
+            fontSize,
+            height: maxHeight,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3rem',
+          }}
+        >
+          {text}
+        </div>
+      );
+    }
     const planningData = echartOptions?.series?.[1]?.data?.slice(-1)?.[0]?.[1];
     let fontSize = 0;
     let subHeaderProcentText = '';
@@ -230,7 +269,6 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     );
     let text = subheader;
     let triangleDirection: 'up' | 'down' | 'none' = 'none';
-    console.log('subheader', subheader);
     if (subheader) {
       const [value, writtenTimeGrainText] = subheader.split(' ');
       if (writtenTimeGrainText) {
@@ -383,8 +421,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     // const email = await this.getUserData();
 
     if (showTrendLine) {
-      const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
+      const chartMinHeight = 40;
+      const currentChartHeight = Math.floor(PROPORTION.TRENDLINE * height);
+      const chartHeight =
+        currentChartHeight > chartMinHeight
+          ? currentChartHeight
+          : chartMinHeight;
       const allTextHeight = height - chartHeight;
+      console.log('allTextHeight', allTextHeight, height, chartHeight);
       return (
         <MainBlock className={`${className}`}>
           <div

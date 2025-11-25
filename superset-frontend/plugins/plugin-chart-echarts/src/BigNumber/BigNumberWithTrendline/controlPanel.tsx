@@ -46,6 +46,18 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
+            name: 'compare_week_day',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Comparison with prev week day'),
+              renderTrigger: true,
+              default: true,
+              description: t('This option working only with time grain Day'),
+            },
+          },
+        ],
+        [
+          {
             name: 'compare_lag',
             config: {
               type: 'TextControl',

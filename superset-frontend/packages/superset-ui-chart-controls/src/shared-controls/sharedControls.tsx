@@ -88,9 +88,12 @@ import {
 const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
 const sequentialSchemeRegistry = getSequentialSchemeRegistry();
 
-export const PRIMARY_COLOR = { r: 0, g: 122, b: 135, a: 1 };
+export const PRIMARY_COLOR = { r: 149, g: 138, b: 255, a: 1 };
+export const SECONDARY_COLOR = { r: 68, g: 68, b: 68, a: 1 };
 
-const ROW_LIMIT_OPTIONS = [10, 50, 100, 250, 500, 1000, 5000, 10000, 50000];
+const ROW_LIMIT_OPTIONS = [
+  10, 15, 20, 50, 100, 250, 500, 1000, 5000, 10000, 50000,
+];
 const SERIES_LIMITS = [5, 10, 25, 50, 100, 500];
 
 const appContainer = document.getElementById('app');
@@ -127,6 +130,14 @@ const color_picker: SharedControlConfig<'ColorPickerControl'> = {
   label: t('Fixed Color'),
   description: t('Use this to define a static color for all circles'),
   default: PRIMARY_COLOR,
+  renderTrigger: true,
+};
+
+const secondary_color_picker: SharedControlConfig<'ColorPickerControl'> = {
+  type: 'ColorPickerControl',
+  label: t('Secondary Fixed Color'),
+  description: t('Use this to define a static color for all circles'),
+  default: SECONDARY_COLOR,
   renderTrigger: true,
 };
 
@@ -304,6 +315,36 @@ const y_axis_format: SharedControlConfig<'SelectControl', SelectDefaultOption> =
     },
   };
 
+const inner_tooltip_format: SharedControlConfig<
+  'SelectControl',
+  SelectDefaultOption
+> = {
+  type: 'SelectControl',
+  freeForm: true,
+  label: t('Inner Tooltip Format'),
+  renderTrigger: true,
+  default: DEFAULT_NUMBER_FORMAT,
+  choices: D3_FORMAT_OPTIONS,
+  description: D3_FORMAT_DOCS,
+  tokenSeparators: ['\n', '\t', ';'],
+  filterOption: ({ data: option }, search) =>
+    option.label.includes(search) || option.value.includes(search),
+  mapStateToProps: state => {
+    const isPercentage =
+      state.controls?.comparison_type?.value === ComparisonType.Percentage;
+    return {
+      choices: isPercentage
+        ? D3_FORMAT_OPTIONS.filter(option => option[0].includes('%'))
+        : D3_FORMAT_OPTIONS,
+    };
+  },
+};
+
+const tooltip_currency_format: SharedControlConfig<'CurrencyControl'> = {
+  type: 'CurrencyControl',
+  label: t('Tooltip Currency format'),
+  renderTrigger: true,
+};
 const currency_format: SharedControlConfig<'CurrencyControl'> = {
   type: 'CurrencyControl',
   label: t('Currency format'),
@@ -375,6 +416,7 @@ export default {
   second_metric: dndAdhocSecondMetricControl, // here Alias for second_metric
   viz_type,
   color_picker,
+  secondary_color_picker,
   metric_2: dndAdhocMetricControl2,
   linear_color_scheme,
   secondary_metric: dndSecondaryMetricControl,
@@ -395,6 +437,7 @@ export default {
   y: dndYControl,
   size: dndSizeControl,
   y_axis_format,
+  inner_tooltip_format,
   x_axis_time_format,
   adhoc_filters: dndAdhocFilterControl,
   color_scheme,
@@ -407,5 +450,6 @@ export default {
   show_empty_columns,
   temporal_columns_lookup,
   currency_format,
+  tooltip_currency_format,
   sort_by_metric,
 };

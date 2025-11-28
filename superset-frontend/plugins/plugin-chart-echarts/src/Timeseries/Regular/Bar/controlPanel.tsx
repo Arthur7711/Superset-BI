@@ -58,6 +58,21 @@ const {
   orientation,
 } = DEFAULT_FORM_DATA;
 
+const yAxisShow: ControlSetItem = {
+  name: 'y_axis_show',
+  config: {
+    type: 'CheckboxControl',
+    label: t('Show Y Axis Values'),
+    renderTrigger: true,
+    default: true,
+    description: t('Show or hide Y axis tick labels'),
+  },
+};
+const labelColors = [
+  ['black', 'Black'],
+  ['white', 'White'],
+  ['gray', 'Gray'],
+];
 const labelPositionControl: ControlSetItem = {
   name: 'labelPosition',
   config: {
@@ -68,6 +83,21 @@ const labelPositionControl: ControlSetItem = {
     default: LABEL_POSITION[0][0],
     renderTrigger: true,
     description: t('Label position'),
+    visibility: ({ controls }: ControlPanelsContainerProps) =>
+      Boolean(controls?.show_legend?.value),
+  },
+};
+
+const labelColorControl: ControlSetItem = {
+  name: 'labelColor',
+  config: {
+    type: 'SelectControl',
+    freeForm: false,
+    label: t('Label Color'),
+    choices: labelColors,
+    default: labelColors[0][0],
+    renderTrigger: true,
+    description: t('Label Color'),
     visibility: ({ controls }: ControlPanelsContainerProps) =>
       Boolean(controls?.show_legend?.value),
   },
@@ -354,11 +384,13 @@ const config: ControlPanelConfig = {
           },
         ],
         [labelPositionControl],
+        [labelColorControl],
         ...legendSection,
         [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
         ...createAxisControl('x'),
         ...richTooltipSection,
         [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
+        [yAxisShow],
         ...createAxisControl('y'),
       ],
     },

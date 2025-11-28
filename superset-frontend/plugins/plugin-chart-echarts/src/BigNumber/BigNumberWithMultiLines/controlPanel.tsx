@@ -75,6 +75,20 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'make_revert_deviations',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Make revert deviations'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Make revert deviations for big number with multi lines last item',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'show_customize_version',
             config: {
               type: 'CheckboxControl',
@@ -209,6 +223,9 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        // for tooltip format control
+        ['inner_tooltip_format'],
+        ['tooltip_currency_format'],
         [
           {
             name: 'force_timestamp_formatting',

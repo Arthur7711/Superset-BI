@@ -24,6 +24,7 @@ export const tooltipCustomHtml = (props: {
   secondMetricShowName?: string;
   timeMetricName: string;
   tooltipFormatter: TimeFormatter | ValueFormatter;
+  isReversed?: boolean;
 }) => {
   const {
     params,
@@ -40,6 +41,7 @@ export const tooltipCustomHtml = (props: {
     secondMetricShowName,
     timeMetricName,
     tooltipFormatter,
+    isReversed,
   } = props;
 
   const date = formatTime(params[0]?.data?.[0]);
@@ -118,7 +120,13 @@ export const tooltipCustomHtml = (props: {
         )}</span><br/>
         <div style="display: ${showTooltipWow ? 'block' : 'none'}">
           <strong>PoP:</strong> ${
-            isOkLast ? greenArrow : redArrow
+            isReversed
+              ? isOkLast
+                ? redArrow
+                : greenArrow
+              : isOkLast
+                ? greenArrow
+                : redArrow
           } ${wowPrc}% (${isOkLast ? '+' : ''}${headerFormatter.format(
             wowText,
           )})

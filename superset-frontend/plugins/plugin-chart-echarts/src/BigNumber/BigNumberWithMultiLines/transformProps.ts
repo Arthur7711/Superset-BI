@@ -403,6 +403,7 @@ export default function transformProps(
               secondMetricShowName,
               timeMetricName,
               tooltipFormatter,
+              isReversed: formData.makeRevertDeviations,
             }),
         },
         aria: {

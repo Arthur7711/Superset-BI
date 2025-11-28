@@ -204,20 +204,20 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       trendLineData,
     } = this.props;
     // const { compareWeekDay } = formData;
-    const lastSevenData =
-      trendLineData?.length && trendLineData?.length >= 7
-        ? trendLineData?.slice(-7).map(d => d[1])
+    const lastItemsData =
+      trendLineData?.length && trendLineData?.length >= 8
+        ? trendLineData?.slice(-8).map(d => d[1])
         : null;
     // @ts-ignore
-    if (
-      lastSevenData &&
-      formData?.compareWeekDay &&
-      formData?.timeGrainSqla === 'P1D'
-    ) {
-      const lastItem = Number(lastSevenData[lastSevenData.length - 1]);
-      const firstItem = Number(lastSevenData[0]);
+    const timeGrain =
+      formData?.extraFormData?.time_grain_sqla || formData?.timeGrainSqla;
+    if (lastItemsData && formData?.compareWeekDay && timeGrain === 'P1D') {
+      const lastItem = Number(lastItemsData[lastItemsData.length - 1]);
+      const firstItem = Number(lastItemsData[0]);
       const percentValue = (lastItem / firstItem - 1) * 100;
-      const text = `${percentValue.toFixed(1)}% ${t('WoW')}`;
+      const text = `${percentValue > 0 ? '+' : ''}${percentValue.toFixed(
+        1,
+      )}% ${t('WoW')}`;
       const container = this.createTemporaryContainer();
       document.body.append(container);
       const fontSize = computeMaxFontSize({
@@ -228,6 +228,13 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         container,
       });
       container.remove();
+      const textColor = formData?.makeRevertDeviations
+        ? percentValue <= 0
+          ? 'green'
+          : 'red'
+        : percentValue >= 0
+          ? 'green'
+          : 'red';
       return (
         <div
           className="subheader-line"
@@ -237,6 +244,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
             display: 'flex',
             alignItems: 'center',
             gap: '3rem',
+            color: textColor,
           }}
         >
           {text}
@@ -268,6 +276,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       'Try applying different filters or ensuring your datasource has data',
     );
     let text = subheader;
+
     let triangleDirection: 'up' | 'down' | 'none' = 'none';
     if (subheader) {
       const [value, writtenTimeGrainText] = subheader.split(' ');
@@ -275,7 +284,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         text = subheader;
       } else {
         // @ts-ignore
-        switch (formData?.timeGrainSqla) {
+        switch (timeGrain) {
           case 'P1M':
             text = `${value} ${t('MoM')}`;
             break;
@@ -300,7 +309,9 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
                   : effectivePrcent < 0
                     ? 'down'
                     : 'none';
-              text = `${effectivePrcent.toFixed(1)}% ${t('DoD')}`;
+              text = `${
+                effectivePrcent >= 0 ? '+' : ''
+              }${effectivePrcent.toFixed(1)}% ${t('DoD')}`;
             } else {
               text = `${value} ${t('DoD')}`;
             }
@@ -326,6 +337,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       });
       container.remove();
       const showCustomizeVersion = this.props.formData?.showCustomizeVersion;
+      const isTextValueMinus = text[0] === '-';
+      const changeColor = formData?.makeRevertDeviations
+        ? isTextValueMinus
+          ? 'green'
+          : 'red'
+        : isTextValueMinus
+          ? 'red'
+          : 'green';
       return (
         <div
           className="subheader-line"
@@ -335,6 +354,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
             display: showCustomizeVersion ? 'none' : 'flex',
             alignItems: 'center',
             gap: '3rem',
+            color: changeColor,
           }}
         >
           <span>
@@ -428,7 +448,6 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
           ? currentChartHeight
           : chartMinHeight;
       const allTextHeight = height - chartHeight;
-      console.log('allTextHeight', allTextHeight, height, chartHeight);
       return (
         <MainBlock className={`${className}`}>
           <div

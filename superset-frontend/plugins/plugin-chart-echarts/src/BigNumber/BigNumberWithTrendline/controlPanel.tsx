@@ -46,6 +46,20 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
+            name: 'make_revert_deviations',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Make revert deviations'),
+              renderTrigger: true,
+              default: true,
+              description: t(
+                'Make revert deviations for big number with multi lines last item',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'compare_week_day',
             config: {
               type: 'CheckboxControl',

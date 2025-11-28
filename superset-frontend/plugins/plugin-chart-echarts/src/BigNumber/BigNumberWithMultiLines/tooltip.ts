@@ -23,6 +23,7 @@ export const tooltipCustomHtml = (props: {
   metricShowName?: string;
   secondMetricShowName?: string;
   timeMetricName: string;
+  tooltipFormatter: TimeFormatter | ValueFormatter;
 }) => {
   const {
     params,
@@ -38,6 +39,7 @@ export const tooltipCustomHtml = (props: {
     metricShowName,
     secondMetricShowName,
     timeMetricName,
+    tooltipFormatter,
   } = props;
 
   const date = formatTime(params[0]?.data?.[0]);
@@ -111,7 +113,9 @@ export const tooltipCustomHtml = (props: {
   return `
       <div style="line-height: 1.6;">
         <strong>${date}${resultTimeText}</strong><br/><br/>
-        <span><strong>${metricCurrentName}:</strong> ${current}</span><br/>
+        <span><strong>${metricCurrentName}:</strong> ${tooltipFormatter.format(
+          current,
+        )}</span><br/>
         <div style="display: ${showTooltipWow ? 'block' : 'none'}">
           <strong>PoP:</strong> ${
             isOkLast ? greenArrow : redArrow
@@ -122,7 +126,9 @@ export const tooltipCustomHtml = (props: {
         </div>
         ${
           plan
-            ? `<span><strong>${secondaryCurrentName}:</strong> ${plan}</span><br/>`
+            ? `<span><strong>${secondaryCurrentName}:</strong> ${tooltipFormatter.format(
+                plan,
+              )}</span><br/>`
             : ''
         }
          <div style="display: ${showPlanExec && plan ? 'block' : 'none'}">
@@ -132,14 +138,12 @@ export const tooltipCustomHtml = (props: {
         </div>
         <br/>
         <strong>Дата: ${firstDate} - ${lastDate}</strong><br />
-        <div style="display: ${showCustomizeVersion ? 'block' : 'none'}">
-          <strong>${metricCurrentName}:</strong> ${sumCount}
+        <div>
+          <strong>${metricCurrentName}:</strong> ${tooltipFormatter.format(
+            sumCount,
+          )}
           <br/>
         </div>
       </div>
     `;
 };
-// <div style="display: ${showCustomizeVersion ? 'none' : 'block'}">
-//           <strong>Last period:</strong> ${headerFormatter.format(last)}
-//           <br/>
-//         </div>

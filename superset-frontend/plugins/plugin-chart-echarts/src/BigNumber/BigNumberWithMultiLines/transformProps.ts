@@ -39,7 +39,6 @@ import { Refs } from '../../types';
 import { tooltipCustomHtml } from './tooltip';
 import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
 import { rebaseForecastDatum } from '../../utils/forecast';
-import { size } from 'lodash';
 // import { extractSeries } from '../../utils/series';
 // import { rebaseForecastDatum } from '../../utils/forecast';
 
@@ -79,6 +78,7 @@ export default function transformProps(
     timeRangeFixed,
     secondMetric = 'value',
     timeGrainSqla,
+    extraFormData,
     secondaryColorPicker,
     showFillingArea,
   } = formData;
@@ -90,6 +90,7 @@ export default function transformProps(
     from_dttm: fromDatetime,
     to_dttm: toDatetime,
   } = queriesData[0];
+  const timeGrain = extraFormData?.time_grain_sqla || timeGrainSqla;
   const refs: Refs = {};
   const metricName = getMetricLabel(metric);
   const compareLag = Number(compareLag_) || 0;
@@ -190,6 +191,21 @@ export default function transformProps(
     currencyFormat,
   );
 
+  const tooltipNumberFormatter = getValueFormatter(
+    metric,
+    currencyFormats,
+    columnFormats,
+    formData.innerTooltipFormat,
+    formData.tooltipCurrencyFormat,
+  );
+
+  const tooltipFormatter =
+    metricColtype === GenericDataType.Temporal ||
+    metricColtype === GenericDataType.String ||
+    forceTimestampFormatting
+      ? formatTime
+      : tooltipNumberFormatter;
+
   const headerFormatter =
     metricColtype === GenericDataType.Temporal ||
     metricColtype === GenericDataType.String ||
@@ -236,13 +252,7 @@ export default function transformProps(
     : metricNames.find(
         el => el !== timeMetricName && el !== firstMetricShowName,
       );
-  console.log(
-    'data',
-    formData.showCustomizeVersion,
-    formData,
-    trendLineData,
-    timeGrainSqla,
-  );
+  // console.log('data', formData);
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
@@ -275,8 +285,8 @@ export default function transformProps(
                       trendLineData.length;
                     let prevValue = 0;
                     if (params.dataIndex === dataLength - 1) {
-                      if (timeGrainSqla === 'P1D') {
-                        prevValue = trendLineData[dataLength - 7]?.[1] || 1;
+                      if (timeGrain === 'P1D') {
+                        prevValue = trendLineData[dataLength - 8]?.[1] || 1;
                       } else if (dataLength >= 2) {
                         prevValue = trendLineData[dataLength - 2][1] || 0;
                       }
@@ -286,9 +296,9 @@ export default function transformProps(
                       const showingPercent = `${
                         percentChangeValue >= 0 ? '+' : ''
                       }${percentChangeValue.toFixed(1)}% ${
-                        timeGrainSqla === 'P1D'
+                        timeGrain === 'P1D'
                           ? 'WoW'
-                          : getTimeGrainSqlaFormatter(formData.timeGrainSqla)
+                          : getTimeGrainSqlaFormatter(timeGrain)
                       }`;
 
                       // using rich text style
@@ -387,11 +397,12 @@ export default function transformProps(
               secondMetric: secondMetricName,
               showPlanExec: formData.showPlanExec,
               showTooltipWow: formData.showTooltipMetricWow,
-              timeGrainSqla,
+              timeGrainSqla: timeGrain,
               showCustomizeVersion: formData.showCustomizeVersion,
               metricShowName: firstMetricShowName,
               secondMetricShowName,
               timeMetricName,
+              tooltipFormatter,
             }),
         },
         aria: {

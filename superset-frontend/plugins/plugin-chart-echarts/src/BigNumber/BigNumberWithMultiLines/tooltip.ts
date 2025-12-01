@@ -7,6 +7,7 @@ import {
 } from '@superset-ui/core';
 import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
 import { getWeekFromRange } from './helpers/getWeekFromRange';
+import { getFormattedDate } from './helpers/getFormattedDate';
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const tooltipCustomHtml = (props: {
@@ -106,12 +107,16 @@ export const tooltipCustomHtml = (props: {
   }, 0);
 
   const dateData = Object.keys(allData[0]).find(el => el === timeMetricName);
+  // change from formatTime to getFormattedDate
   const firstDate = formatTime(Number(allData[0][dateData]));
   const lastDate = formatTime(Number(allData[allData.length - 1][dateData]));
   const metricCurrentName = metricShowName || metric;
   const secondaryCurrentName = secondMetricShowName || secondMetric;
   const isPositiveDiffSymbol = isOkDiff ? '+' : '';
-
+  const wowFormattedText = headerFormatter.format(wowText);
+  const popValue = wowFormattedText.includes('%')
+    ? `${wowFormattedText.split('%')[0]}pp`
+    : wowFormattedText;
   return `
       <div style="line-height: 1.6;">
         <strong>${date}${resultTimeText}</strong><br/><br/>
@@ -127,9 +132,7 @@ export const tooltipCustomHtml = (props: {
               : isOkLast
                 ? greenArrow
                 : redArrow
-          } ${wowPrc}% (${isOkLast ? '+' : ''}${headerFormatter.format(
-            wowText,
-          )})
+          } ${wowPrc}% (${isOkLast ? '+' : ''}${popValue})
           <br/>
         </div>
         ${

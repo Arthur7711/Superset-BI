@@ -252,7 +252,6 @@ export default function transformProps(
     : metricNames.find(
         el => el !== timeMetricName && el !== firstMetricShowName,
       );
-  // console.log('data', formData);
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [

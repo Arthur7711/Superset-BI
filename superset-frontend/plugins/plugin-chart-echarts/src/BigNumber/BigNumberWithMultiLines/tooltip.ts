@@ -6,8 +6,7 @@ import {
   ValueFormatter,
 } from '@superset-ui/core';
 import { getTimeGrainSqlaFormatter } from './helpers/getTimeGrainSqla';
-import { getWeekFromRange } from './helpers/getWeekFromRange';
-import { getFormattedDate } from './helpers/getFormattedDate';
+import { getWeekNumber } from './helpers/getWeekFromRange';
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const tooltipCustomHtml = (props: {
@@ -94,7 +93,7 @@ export const tooltipCustomHtml = (props: {
       break;
     }
     case 'P1W': {
-      resultTimeText = `(WEEK: ${getWeekFromRange(date)})`;
+      resultTimeText = `(WEEK: ${getWeekNumber(new Date(currentItemId))})`;
       break;
     }
     default:
@@ -115,7 +114,7 @@ export const tooltipCustomHtml = (props: {
   const isPositiveDiffSymbol = isOkDiff ? '+' : '';
   const wowFormattedText = headerFormatter.format(wowText);
   const popValue = wowFormattedText.includes('%')
-    ? `${wowFormattedText.split('%')[0]}pp`
+    ? `${wowFormattedText.split('%')[0]} pp`
     : wowFormattedText;
   return `
       <div style="line-height: 1.6;">

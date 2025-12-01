@@ -1,4 +1,4 @@
-function getWeekNumber(date: Date): number {
+export function getWeekNumber(date: Date): number {
   const tempDate = new Date(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
   );
@@ -13,7 +13,6 @@ function getWeekNumber(date: Date): number {
 
 export function getWeekFromRange(rangeStr: string): number {
   const [startStr, endStr] = rangeStr.split('—').map(s => s.trim());
-
   const startDate = new Date(startStr);
   const endDate = new Date(endStr);
 

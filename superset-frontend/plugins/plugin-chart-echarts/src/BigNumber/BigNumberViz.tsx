@@ -96,7 +96,8 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderKicker(maxHeight: number) {
-    const { timestamp, showTimestamp, formatTime, width } = this.props;
+    const { timestamp, showTimestamp, formatTime, width, trendLineData } =
+      this.props;
 
     if (
       !formatTime ||
@@ -106,12 +107,18 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     )
       return null;
 
+    const subText =
+      trendLineData?.length && trendLineData?.length >= 2
+        ? `${formatTime(trendLineData[0][0])} - ${formatTime(
+            trendLineData[trendLineData.length - 1][0],
+          )}`
+        : '';
     const text = timestamp === null ? '' : formatTime(timestamp);
 
     const container = this.createTemporaryContainer();
     document.body.append(container);
     const fontSize = computeMaxFontSize({
-      text,
+      text: subText || text,
       maxWidth: width,
       maxHeight,
       className: 'kicker',
@@ -127,7 +134,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
           height: 'auto',
         }}
       >
-        {text}
+        {subText || text}
       </div>
     );
   }

@@ -225,11 +225,14 @@ export default function transformProps(
       trendLineData.push([toDatetimeOrToday, null]);
     }
   }
+  const lastItems = trendLineData?.slice(-8);
   const lastTwoPoints = trendLineData?.slice(-2);
   const isOkDiff =
-    lastTwoPoints?.length === 2
-      ? lastTwoPoints[1][1]! >= lastTwoPoints[0][1]!
-      : true;
+    lastItems?.length === 8
+      ? lastItems[7][1]! >= lastItems[0][1]!
+      : lastTwoPoints?.length === 2
+        ? lastTwoPoints[1][1]! >= lastTwoPoints[0][1]!
+        : true;
   const maxItem =
     trendLineData?.length && trendLineData.length > 1
       ? trendLineData?.reduce((max, item) => (item[1] > max[1] ? item : max))

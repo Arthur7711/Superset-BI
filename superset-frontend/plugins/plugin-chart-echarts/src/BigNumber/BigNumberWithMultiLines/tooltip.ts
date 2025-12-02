@@ -56,11 +56,10 @@ export const tooltipCustomHtml = (props: {
     return el[nonMetricKey] === currentItemId;
   });
   const timeFormatterName = getTimeGrainSqlaFormatter(timeGrainSqla);
-
   const prevItem =
-    timeGrainSqla === 'P1D' && currentItemIndex >= 8
-      ? allData[currentItemIndex - 8]
-      : timeGrainSqla === 'P1D' && currentItemIndex < 8
+    timeGrainSqla === 'P1D' && currentItemIndex >= 7
+      ? allData[currentItemIndex - 7]
+      : timeGrainSqla === 'P1D' && currentItemIndex < 7
         ? { [getMetricLabel(metric)]: 0 }
         : currentItemIndex > 0
           ? allData[currentItemIndex - 1]

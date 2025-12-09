@@ -73,6 +73,7 @@ import {
   BigNumberWithMultiLinesChartPlugin,
   EchartsMixedBarChartPlugin,
   EchartsProfileTimelineChartPlugin,
+  BigNumberCustom,
 } from '@superset-ui/plugin-chart-echarts';
 import {
   SelectFilterPlugin,
@@ -115,6 +116,7 @@ export default class MainPreset extends Preset {
         new EchartsProfileTimelineChartPlugin().configure({
           key: 'profile_timeline',
         }),
+        new BigNumberCustom().configure({ key: 'big_number_custom' }),
         new BigNumberTotalChartPlugin().configure({ key: 'big_number_total' }),
         new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),
         new BubbleChartPlugin().configure({ key: 'bubble' }),

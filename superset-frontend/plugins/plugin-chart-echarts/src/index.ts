@@ -63,6 +63,7 @@ export { default as BubbleTransformProps } from './Bubble/transformProps';
 export { default as WaterfallTransformProps } from './Waterfall/transformProps';
 export { default as HistogramTransformProps } from './Histogram/transformProps';
 export { default as SankeyTransformProps } from './Sankey/transformProps';
+export { default as BigNumberCustom } from './BigNumberCustom';
 
 export { DEFAULT_FORM_DATA as TimeseriesDefaultFormData } from './Timeseries/constants';
 

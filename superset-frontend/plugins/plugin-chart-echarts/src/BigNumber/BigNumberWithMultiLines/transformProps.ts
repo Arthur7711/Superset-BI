@@ -255,6 +255,7 @@ export default function transformProps(
     : metricNames.find(
         el => el !== timeMetricName && el !== firstMetricShowName,
       );
+
   const echartOptions: EChartsCoreOption = trendLineData
     ? {
         series: [
@@ -299,7 +300,7 @@ export default function transformProps(
                         percentChangeValue >= 0 ? '+' : ''
                       }${percentChangeValue.toFixed(1)}% ${
                         timeGrain === 'P1D'
-                          ? 'WoW'
+                          ? '7D ago'
                           : getTimeGrainSqlaFormatter(timeGrain)
                       }`;
 
@@ -406,6 +407,7 @@ export default function transformProps(
               timeMetricName,
               tooltipFormatter,
               isReversed: formData.makeRevertDeviations,
+              timeFormat,
             }),
         },
         aria: {

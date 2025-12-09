@@ -25,6 +25,7 @@ export const tooltipCustomHtml = (props: {
   timeMetricName: string;
   tooltipFormatter: TimeFormatter | ValueFormatter;
   isReversed?: boolean;
+  timeFormat: string;
 }) => {
   const {
     params,
@@ -42,6 +43,7 @@ export const tooltipCustomHtml = (props: {
     timeMetricName,
     tooltipFormatter,
     isReversed,
+    timeFormat,
   } = props;
 
   const date = formatTime(params[0]?.data?.[0]);
@@ -107,7 +109,15 @@ export const tooltipCustomHtml = (props: {
   const dateData = Object.keys(allData[0]).find(el => el === timeMetricName);
   // change from formatTime to getFormattedDate
   const firstDate = formatTime(Number(allData[0][dateData]));
+  const firstDateLabel =
+    timeFormat === 'smart_date' && timeGrainSqla === 'P1W'
+      ? firstDate.split('—')[0]
+      : firstDate;
   const lastDate = formatTime(Number(allData[allData.length - 1][dateData]));
+  const lastDateLabel =
+    timeFormat === 'smart_date' && timeGrainSqla === 'P1W'
+      ? lastDate.split('—')[0]
+      : lastDate;
   const metricCurrentName = metricShowName || metric;
   const secondaryCurrentName = secondMetricShowName || secondMetric;
   const isPositiveDiffSymbol = isOkDiff ? '+' : '';
@@ -117,7 +127,7 @@ export const tooltipCustomHtml = (props: {
     : wowFormattedText;
   return `
       <div style="line-height: 1.6;">
-        <strong>${date}${resultTimeText}</strong><br/><br/>
+        <strong>${date} ${resultTimeText}</strong><br/><br/>
         <span><strong>${metricCurrentName}:</strong> ${tooltipFormatter.format(
           current,
         )}</span><br/>
@@ -146,8 +156,10 @@ export const tooltipCustomHtml = (props: {
           )})<br/>
         </div>
         <br/>
-        <strong>Дата: ${firstDate} - ${lastDate}</strong><br />
-        <div>
+        <strong style="display: ${
+          showCustomizeVersion ? 'block' : 'none'
+        }>Дата: ${firstDateLabel} — ${lastDateLabel}</strong><br />
+        <div style="display: ${showCustomizeVersion ? 'block' : 'none'}>
           <strong>${metricCurrentName}:</strong> ${tooltipFormatter.format(
             sumCount,
           )}

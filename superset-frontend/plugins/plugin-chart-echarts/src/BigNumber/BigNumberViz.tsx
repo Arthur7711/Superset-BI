@@ -96,9 +96,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderKicker(maxHeight: number) {
-    const { timestamp, showTimestamp, formatTime, width, trendLineData } =
-      this.props;
-
+    const {
+      timestamp,
+      showTimestamp,
+      formatTime,
+      width,
+      trendLineData,
+      formData,
+    } = this.props;
     if (
       !formatTime ||
       !showTimestamp ||
@@ -106,13 +111,25 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       typeof timestamp === 'boolean'
     )
       return null;
-
-    const subText =
-      trendLineData?.length && trendLineData?.length >= 2
-        ? `${formatTime(trendLineData[0][0])} - ${formatTime(
-            trendLineData[trendLineData.length - 1][0],
-          )}`
-        : '';
+    let subText = '';
+    if (trendLineData?.length && trendLineData?.length >= 2) {
+      const firstData =
+        formData?.timeFormat === 'smart_date' &&
+        formData?.timeGrainSqla === 'P1W'
+          ? formatTime(trendLineData[0][0]).split('—')[0]
+          : formatTime(trendLineData[0][0]);
+      const lastData =
+        formData?.timeFormat === 'smart_date' &&
+        formData?.timeGrainSqla === 'P1W'
+          ? formatTime(trendLineData[trendLineData.length - 1][0]).split('—')[0]
+          : formatTime(trendLineData[trendLineData.length - 1][0]);
+      subText =
+        trendLineData?.length &&
+        trendLineData?.length >= 2 &&
+        formData?.vizType === 'big_number_with_multi-lines'
+          ? `${firstData} — ${lastData}`
+          : '';
+    }
     const text = timestamp === null ? '' : formatTime(timestamp);
 
     const container = this.createTemporaryContainer();
@@ -151,7 +168,6 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const hasThresholdColorFormatter =
       Array.isArray(colorThresholdFormatters) &&
       colorThresholdFormatters.length > 0;
-
     let numberColor;
     if (hasThresholdColorFormatter) {
       colorThresholdFormatters!.forEach(formatter => {
@@ -210,7 +226,6 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       formData,
       trendLineData,
     } = this.props;
-    // const { compareWeekDay } = formData;
     const lastItemsData =
       trendLineData?.length && trendLineData?.length >= 8
         ? trendLineData?.slice(-8).map(d => d[1])
@@ -224,7 +239,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       const percentValue = (lastItem / firstItem - 1) * 100;
       const text = `${percentValue > 0 ? '+' : ''}${percentValue.toFixed(
         1,
-      )}% ${t('WoW')}`;
+      )}% ${t('vs 7D ago')}`;
       const container = this.createTemporaryContainer();
       document.body.append(container);
       const fontSize = computeMaxFontSize({
@@ -318,7 +333,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
                     : 'none';
               text = `${
                 effectivePrcent >= 0 ? '+' : ''
-              }${effectivePrcent.toFixed(1)}% ${t('DoD')}`;
+              }${effectivePrcent.toFixed(1)}% ${t('vs 7D ago')}`;
             } else {
               text = `${value} ${t('DoD')}`;
             }

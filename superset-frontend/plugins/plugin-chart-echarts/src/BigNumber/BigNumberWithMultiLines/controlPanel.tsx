@@ -96,7 +96,7 @@ const config: ControlPanelConfig = {
               renderTrigger: true,
               default: true,
               description: t(
-                'change custom version of big number with multi lines',
+                'change custom version of big number with multi lines, working only for additive metrics',
               ),
             },
           },
@@ -144,11 +144,11 @@ const config: ControlPanelConfig = {
             name: 'show_tooltip_metric_wow',
             config: {
               type: 'CheckboxControl',
-              label: t('Show metric WoW in tooltip'),
+              label: t('Show PoP in tooltip'),
               renderTrigger: true,
               default: true,
               description: t(
-                'Whether to display in tooltip the WoW comparison',
+                'Whether to display in tooltip the PoP comparison',
               ),
             },
           },

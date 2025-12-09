@@ -51,7 +51,7 @@ const config: ControlPanelConfig = {
               type: 'CheckboxControl',
               label: t('Make revert deviations'),
               renderTrigger: true,
-              default: true,
+              default: false,
               description: t(
                 'Make revert deviations for big number with multi lines last item',
               ),
@@ -63,7 +63,7 @@ const config: ControlPanelConfig = {
             name: 'compare_week_day',
             config: {
               type: 'CheckboxControl',
-              label: t('Comparison with prev week day'),
+              label: t('7 days ago comparison'),
               renderTrigger: true,
               default: true,
               description: t('This option working only with time grain Day'),

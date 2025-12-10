@@ -463,7 +463,7 @@ export default function transformProps(
     // Panel
     panelColumns = 3,
   } = formData;
-
+  const refs: any = {};
   const data = queriesData?.[0]?.data || [];
 
   // Get the x-axis column name using Superset's helper function
@@ -567,7 +567,7 @@ export default function transformProps(
   return {
     width,
     height,
-
+    refs,
     // Panel mode
     isPanelMode,
     panelColumns: parseInt(String(panelColumns), 10) || 3,

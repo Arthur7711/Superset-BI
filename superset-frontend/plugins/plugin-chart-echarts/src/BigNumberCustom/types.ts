@@ -33,32 +33,38 @@ export interface ComparisonLag {
 }
 
 // Aggregation types
-export type AggregationType = 'LAST_VALUE' | 'SUM' | 'MEAN' | 'MIN' | 'MAX' | 'MEDIAN';
+export type AggregationType =
+  | 'LAST_VALUE'
+  | 'SUM'
+  | 'MEAN'
+  | 'MIN'
+  | 'MAX'
+  | 'MEDIAN';
 
 export interface BigNumberCustomFormData extends QueryFormData {
   // Metrics - can be multiple for panel mode
   metric?: string;
   metrics?: string[];
-  
+
   // Temporal axis
   x_axis?: string;
   time_grain_sqla?: TimeGranularity;
   aggregation?: AggregationType;
-  
+
   subheader?: string;
-  
+
   // Color legend - simplified
   useColorLegend?: boolean;
   colorThresholds?: string; // Comma-separated: "0,50,80,100"
   useColorGradient?: boolean;
-  
+
   // Trend display
   showTrend?: boolean;
   trendChartType?: TrendChartType;
   showXAxis?: boolean;
   showYAxis?: boolean;
   colorOnlyLast?: boolean;
-  
+
   // Goal/Target
   showGoal?: boolean;
   goalValue?: number;
@@ -66,12 +72,12 @@ export interface BigNumberCustomFormData extends QueryFormData {
   goalAggregation?: AggregationType;
   showGoalProgress?: boolean;
   showGoalPercent?: boolean;
-  
+
   // Comparison - now supports multiple lags
   comparisonType?: ComparisonType;
   comparisonLags?: string; // JSON string of ComparisonLag[]
   compareSuffix?: string;
-  
+
   // Visual options
   showWarningDot?: boolean;
   showDateRange?: boolean;
@@ -79,21 +85,21 @@ export interface BigNumberCustomFormData extends QueryFormData {
   showAverageLine?: boolean;
   showTimestamp?: boolean;
   startYAxisAtZero?: boolean;
-  
+
   // Colors
   primaryColor?: string;
   positiveColor?: string;
   negativeColor?: string;
   warningColor?: string;
-  
+
   // Fonts
   headerFontSize?: number;
   subheaderFontSize?: number;
-  
+
   // Number formatting
   numberFormat?: string;
   comparisonSuffix?: string;
-  
+
   // Panel mode
   panelColumns?: number;
 }
@@ -142,37 +148,37 @@ export interface ComparisonResult {
 export type BigNumberCustomTransformedProps = {
   width: number;
   height: number;
-  
+  refs: any; // Added refs property
   // Panel mode - multiple metrics
   isPanelMode: boolean;
   panelColumns: number;
   metricCards: MetricCardData[];
-  
+
   // Legacy single metric (for backwards compatibility)
   bigNumber: number | null;
   formattedNumber: string;
   metricName: string;
-  
+
   // Date range
   dateRange: string;
   showDateRange: boolean;
-  
+
   // Color legend - simplified
   useColorLegend: boolean;
   valueColor: string;
   colorLegend: ColorLegend;
-  
+
   // Warning indicator
   showWarningDot: boolean;
   warningDotColor: string | null;
-  
+
   // Multiple comparisons
   comparisons: ComparisonResult[];
   comparisonType: ComparisonType;
-  
+
   // Subheader
   subheader: string;
-  
+
   // Trend chart
   showTrend: boolean;
   trendChartType: TrendChartType;
@@ -180,7 +186,7 @@ export type BigNumberCustomTransformedProps = {
   showXAxis: boolean;
   showYAxis: boolean;
   colorOnlyLast: boolean;
-  
+
   // Goal
   showGoal: boolean;
   goalValue: number | null;
@@ -188,28 +194,108 @@ export type BigNumberCustomTransformedProps = {
   showGoalProgress: boolean;
   showGoalPercent: boolean;
   totalValue: number;
-  
+
   // Statistics
   showMinMax: boolean;
   minValue: number | null;
   maxValue: number | null;
   avgValue: number | null;
   showAverageLine: boolean;
-  
+
   // Colors
   primaryColor: string;
   positiveColor: string;
   negativeColor: string;
   warningColor: string;
-  
+
   // Fonts
   headerFontSize: number;
   subheaderFontSize: number;
-  
+
   // Number formatting
   numberFormat: string;
-  
+
   // Timestamp
   timestamp: number | string | null;
   showTimestamp: boolean;
 };
+
+export interface TooltipInfo {
+  x: number;
+  y: number;
+  value: string;
+  date: string;
+  comparisons?: ComparisonResult[];
+}
+
+export interface BarChartProps {
+  data: TrendDataPoint[];
+  width: number;
+  height: number;
+  goalValue: number | null;
+  avgValue: number | null;
+  showGoal: boolean;
+  showAverageLine: boolean;
+  showXAxis: boolean;
+  showYAxis: boolean;
+  showMinMax: boolean;
+  colorOnlyLast: boolean;
+  useColorLegend: boolean;
+  colorLegend: ColorLegend;
+  positiveColor: string;
+  negativeColor: string;
+  warningColor: string;
+  numberFormat: string;
+  comparisons: ComparisonResult[];
+  useGradient: boolean;
+}
+
+export interface LineChartProps {
+  data: TrendDataPoint[];
+  width: number;
+  height: number;
+  showMinMax: boolean;
+  showAverageLine: boolean;
+  showXAxis: boolean;
+  showYAxis: boolean;
+  avgValue: number | null;
+  goalValue: number | null;
+  showGoal: boolean;
+  colorOnlyLast: boolean;
+  useColorLegend: boolean;
+  colorLegend: ColorLegend;
+  positiveColor: string;
+  negativeColor: string;
+  warningColor: string;
+  numberFormat: string;
+  comparisons: ComparisonResult[];
+  useGradient: boolean;
+}
+
+export interface MetricCardProps {
+  card: MetricCardData;
+  width: number;
+  height: number;
+  showWarningDot: boolean;
+  subheader: string;
+  dateRange: string;
+  showDateRange: boolean;
+  showTrend: boolean;
+  trendChartType: 'bar' | 'line';
+  showGoal: boolean;
+  goalValue: number | null;
+  showGoalProgress: boolean;
+  showGoalPercent: boolean;
+  showMinMax: boolean;
+  showAverageLine: boolean;
+  showXAxis: boolean;
+  showYAxis: boolean;
+  colorOnlyLast: boolean;
+  useColorLegend: boolean;
+  colorLegend: ColorLegend;
+  positiveColor: string;
+  negativeColor: string;
+  warningColor: string;
+  headerFontSize: number;
+  useGradient: boolean;
+}

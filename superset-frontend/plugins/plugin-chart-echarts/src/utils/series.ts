@@ -523,6 +523,7 @@ export function dedupLineChartSeries(
   width: number,
   isBarChart?: boolean,
   labelPosition?: LabelPositionEnum,
+  labelColor?: string,
 ): SeriesOption[] {
   const counter = new Map<string, number>();
   // @ts-ignore
@@ -641,6 +642,7 @@ export function dedupLineChartSeries(
             ? labelPosition
             : 'top',
         ...formatterFn(),
+        color: labelColor || row?.label?.color,
       };
       return {
         ...row,
@@ -650,6 +652,40 @@ export function dedupLineChartSeries(
           ...row.itemStyle,
           borderColor: BORDER_COLOR,
           borderWidth: 0.2,
+        },
+      };
+    },
+  );
+}
+
+export function dedupBigBarSeries(series: SeriesOption[]): SeriesOption[] {
+  const counter = new Map<string, number>();
+  return series.map(
+    (
+      row: SeriesOption & {
+        itemStyle: { [key: string]: number | string };
+      },
+      i,
+    ) => {
+      let { id } = row;
+      if (id === undefined) return row;
+      id = String(id);
+      const count = counter.get(id) || 0;
+      const suffix = count > 0 ? ` (${count})` : '';
+      counter.set(id, count + 1);
+      return {
+        ...row,
+        id: `${id}${suffix}`,
+        itemStyle: {
+          ...row.itemStyle,
+          color: '#ccc',
+        },
+        label: {
+          show: true,
+          position: 'top',
+          color: '#000', // optional
+          fontSize: 11, // optional
+          formatter: ({ value }) => value,
         },
       };
     },

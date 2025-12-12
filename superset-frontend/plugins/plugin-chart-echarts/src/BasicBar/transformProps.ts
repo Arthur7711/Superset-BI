@@ -537,9 +537,17 @@ export default function transformProps(
       ...padding,
     },
     xAxis,
-    yAxis: {
-      ...yAxis,
-      // axisLabel: { show: formData.yAxisShow, ...yAxis.axisLabel },
+    yAxis,
+    legend: {
+      show: true,
+      type: 'scroll',
+      orient: 'horizontal',
+      top: 0,
+    },
+    label: {
+      show: true,
+      position: 'top',
+      formatter: ({ value }) => value, // show numeric value
     },
     // tooltip: {
     //   ...getDefaultTooltip(refs),

@@ -367,6 +367,9 @@ export default function transformProps(
     name: yAxisTitle,
     nameGap: convertInteger(yAxisTitleMargin),
     nameLocation: yAxisTitlePosition === 'Left' ? 'middle' : 'end',
+    splitLine: {
+      show: false,
+    },
   };
   if (isHorizontal) {
     [xAxis, yAxis] = [yAxis, xAxis];
@@ -386,6 +389,7 @@ export default function transformProps(
       showGoal: formData.showGoal,
       goalValue: formData.goalValue,
       colorOnlyLast: formData.colorOnlyLast,
+      showMinMax: formData.showMinMax,
     }),
     tooltip: {
       trigger: 'axis',

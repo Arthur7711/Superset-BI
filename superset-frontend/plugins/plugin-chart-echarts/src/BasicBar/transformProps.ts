@@ -372,7 +372,7 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-  console.log('series, ', formData, chartProps);
+  console.log('series, ', formData);
   const isPanelMode = series.length > 1;
   const echartOptions: EChartsCoreOption[] = series.map(serie => ({
     useUTC: true,
@@ -383,6 +383,8 @@ export default function transformProps(
       positiveColor: formData.positiveColor,
       negativeColor: formData.negativeColor,
       warningColor: formData.warningColor,
+      showGoal: formData.showGoal,
+      goalValue: formData.goalValue,
     }),
   }));
 

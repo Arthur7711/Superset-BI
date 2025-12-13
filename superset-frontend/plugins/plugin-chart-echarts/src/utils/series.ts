@@ -663,11 +663,15 @@ export function dedupBigBarSeries({
   positiveColor,
   negativeColor,
   warningColor,
+  showGoal,
+  goalValue,
 }: {
   series: SeriesOption;
   positiveColor: string;
   negativeColor: string;
   warningColor: string;
+  showGoal: boolean;
+  goalValue: number;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
@@ -680,6 +684,37 @@ export function dedupBigBarSeries({
   const suffix = count > 0 ? ` (${count})` : '';
   counter.set(id, count + 1);
   const lastIndex = series.data ? series.data.length - 1 : -1;
+  if (showGoal && goalValue) {
+    return [
+      {
+        ...series,
+        id: `${id}${suffix}`,
+        itemStyle: {
+          ...series.itemStyle,
+          color: (params: any) => {
+            if (params.data[1] >= goalValue) {
+              return positiveColor;
+            } else if (params.data[1] >= goalValue * 0.8) {
+              return warningColor;
+            } else {
+              return negativeColor;
+            }
+          },
+        },
+        label: {
+          show: true,
+          position: 'top',
+          fontSize: 10,
+          color: (params: any) =>
+            params.dataIndex === lastIndex ? positiveColor : 'transparent',
+          formatter: (params: any) =>
+            params.dataIndex === lastIndex
+              ? numbersFormatter(params.value[1])
+              : '',
+        },
+      },
+    ];
+  }
   return [
     {
       ...series,
@@ -687,7 +722,6 @@ export function dedupBigBarSeries({
       itemStyle: {
         ...series.itemStyle,
         color: (params: any) => {
-          console.log('params', params, series.data.length);
           if (series.data && params.dataIndex === series.data.length - 1) {
             return positiveColor;
           }
@@ -697,7 +731,6 @@ export function dedupBigBarSeries({
       label: {
         show: true,
         position: 'top',
-        // color: textColor,
         fontSize: 10,
         color: (params: any) =>
           params.dataIndex === lastIndex ? positiveColor : 'transparent',

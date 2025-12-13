@@ -385,6 +385,7 @@ export default function transformProps(
       warningColor: formData.warningColor,
       showGoal: formData.showGoal,
       goalValue: formData.goalValue,
+      colorOnlyLast: formData.colorOnlyLast,
     }),
     tooltip: {
       trigger: 'axis',

@@ -571,7 +571,8 @@ export function dedupLineChartSeries(
                 seriesIndex: i,
                 seriesName: seriesData[i].name,
               });
-            } else if (length > 10 && length <= 30) {
+            }
+            if (length > 10 && length <= 30) {
               if (width > 650) {
                 return index % 2 === 0
                   ? row?.label?.formatter({
@@ -590,7 +591,8 @@ export function dedupLineChartSeries(
                     seriesName: seriesData[i].name,
                   })
                 : '';
-            } else if (length > 30 && length <= 50) {
+            }
+            if (length > 30 && length <= 50) {
               if (width > 650) {
                 return index % 3 === 0
                   ? row?.label?.formatter({
@@ -609,7 +611,8 @@ export function dedupLineChartSeries(
                     seriesName: seriesData[i].name,
                   })
                 : '';
-            } else if (length > 50 && length <= 100) {
+            }
+            if (length > 50 && length <= 100) {
               return index % 10 === 0
                 ? row?.label?.formatter({
                     value: data,
@@ -618,7 +621,8 @@ export function dedupLineChartSeries(
                     seriesName: seriesData[i].name,
                   })
                 : '';
-            } else if (length > 100) {
+            }
+            if (length > 100) {
               const detectedPercentIndex = Math.floor((length / width) * 100);
               return index % detectedPercentIndex === 0
                 ? row?.label?.formatter({
@@ -665,6 +669,7 @@ export function dedupBigBarSeries({
   warningColor,
   showGoal,
   goalValue,
+  colorOnlyLast,
 }: {
   series: SeriesOption;
   positiveColor: string;
@@ -672,6 +677,7 @@ export function dedupBigBarSeries({
   warningColor: string;
   showGoal: boolean;
   goalValue: number;
+  colorOnlyLast: boolean;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
@@ -684,7 +690,7 @@ export function dedupBigBarSeries({
   const suffix = count > 0 ? ` (${count})` : '';
   counter.set(id, count + 1);
   const lastIndex = series.data ? series.data.length - 1 : -1;
-  if (showGoal && goalValue) {
+  if (showGoal && goalValue && !colorOnlyLast) {
     return [
       {
         ...series,
@@ -694,11 +700,11 @@ export function dedupBigBarSeries({
           color: (params: any) => {
             if (params.data[1] >= goalValue) {
               return positiveColor;
-            } else if (params.data[1] >= goalValue * 0.8) {
-              return warningColor;
-            } else {
-              return negativeColor;
             }
+            if (params.data[1] >= goalValue * 0.8) {
+              return warningColor;
+            }
+            return negativeColor;
           },
         },
         label: {

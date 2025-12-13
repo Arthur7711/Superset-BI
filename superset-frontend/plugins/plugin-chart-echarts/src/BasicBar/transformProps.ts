@@ -386,6 +386,9 @@ export default function transformProps(
       showGoal: formData.showGoal,
       goalValue: formData.goalValue,
     }),
+    tooltip: {
+      trigger: 'axis',
+    },
   }));
 
   return {

@@ -658,38 +658,56 @@ export function dedupLineChartSeries(
   );
 }
 
-export function dedupBigBarSeries(series: SeriesOption[]): SeriesOption[] {
+export function dedupBigBarSeries({
+  series,
+  positiveColor,
+  negativeColor,
+  warningColor,
+}: {
+  series: SeriesOption;
+  positiveColor: string;
+  negativeColor: string;
+  warningColor: string;
+}): SeriesOption[] {
   const counter = new Map<string, number>();
-  return series.map(
-    (
-      row: SeriesOption & {
-        itemStyle: { [key: string]: number | string };
+  const grayColor = '#ccc';
+  const textColor = '#000';
+  // console.log('sssss', series);
+  let { id } = series;
+  if (id === undefined) return [series];
+  id = String(id);
+  const count = counter.get(id) || 0;
+  const suffix = count > 0 ? ` (${count})` : '';
+  counter.set(id, count + 1);
+  const lastIndex = series.data ? series.data.length - 1 : -1;
+  return [
+    {
+      ...series,
+      id: `${id}${suffix}`,
+      itemStyle: {
+        ...series.itemStyle,
+        color: (params: any) => {
+          console.log('params', params, series.data.length);
+          if (series.data && params.dataIndex === series.data.length - 1) {
+            return positiveColor;
+          }
+          return grayColor;
+        },
       },
-      i,
-    ) => {
-      let { id } = row;
-      if (id === undefined) return row;
-      id = String(id);
-      const count = counter.get(id) || 0;
-      const suffix = count > 0 ? ` (${count})` : '';
-      counter.set(id, count + 1);
-      return {
-        ...row,
-        id: `${id}${suffix}`,
-        itemStyle: {
-          ...row.itemStyle,
-          color: '#ccc',
-        },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#000', // optional
-          fontSize: 11, // optional
-          formatter: ({ value }) => value,
-        },
-      };
+      label: {
+        show: true,
+        position: 'top',
+        // color: textColor,
+        fontSize: 10,
+        color: (params: any) =>
+          params.dataIndex === lastIndex ? positiveColor : 'transparent',
+        formatter: (params: any) =>
+          params.dataIndex === lastIndex
+            ? numbersFormatter(params.value[1])
+            : '',
+      },
     },
-  );
+  ];
 }
 
 export function dedupSeries(series: SeriesOption[]): SeriesOption[] {

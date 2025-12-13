@@ -1,42 +1,18 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 /* eslint-disable camelcase */
 import { invert } from 'lodash';
 import {
-  AnnotationLayer,
   AxisType,
   buildCustomFormatters,
   CategoricalColorNamespace,
   CurrencyFormatter,
   ensureIsArray,
-  tooltipHtml,
   GenericDataType,
   getCustomFormatter,
   getMetricLabel,
   getNumberFormatter,
   getXAxisLabel,
   isDefined,
-  isEventAnnotationLayer,
-  isFormulaAnnotationLayer,
-  isIntervalAnnotationLayer,
   isPhysicalColumn,
-  isTimeseriesAnnotationLayer,
   t,
   TimeseriesChartDataResponseResult,
   NumberFormats,
@@ -57,52 +33,30 @@ import {
   TimeseriesChartTransformedProps,
 } from './types';
 import { DEFAULT_FORM_DATA } from '../Timeseries/constants';
-import { ForecastSeriesEnum, ForecastValue, Refs } from '../types';
+import { LegendType, Refs } from '../types';
 import { parseAxisBound } from '../utils/controls';
 import {
-  calculateLowerLogTick,
-  // dedupLineChartSeries,
-  dedupSeries,
+  dedupBigBarSeries,
   extractDataTotalValues,
   extractSeries,
   extractShowValueIndexes,
-  // extractTooltipKeys,
   getAxisType,
   getColtypesMapping,
-  // getLegendProps,
+  getLegendProps,
   getMinAndMaxFromBounds,
 } from '../utils/series';
+import { getAnnotationData } from '../utils/annotation';
 import {
-  extractAnnotationLabels,
-  getAnnotationData,
-} from '../utils/annotation';
-import {
-  extractForecastSeriesContext,
   extractForecastSeriesContexts,
-  // extractForecastValuesFromTooltipParams,
-  // formatForecastTooltipSeries,
   rebaseForecastDatum,
 } from '../utils/forecast';
 import { convertInteger } from '../utils/convertInteger';
-import { defaultGrid, defaultYAxis } from '../defaults';
-import {
-  getBaselineSeriesForStream,
-  getPadding,
-  transformEventAnnotation,
-  transformFormulaAnnotation,
-  transformIntervalAnnotation,
-  transformSeries,
-  transformTimeseriesAnnotation,
-} from '../Timeseries/transformers';
-import {
-  StackControlsValue,
-  TIMEGRAIN_TO_TIMESTAMP,
-  // TIMESERIES_CONSTANTS,
-} from '../constants';
+import { defaultYAxis } from '../defaults';
+import { getPadding, transformSeries } from '../Timeseries/transformers';
+import { StackControlsValue, TIMEGRAIN_TO_TIMESTAMP } from '../constants';
 // import { getDefaultTooltip } from '../utils/tooltip';
 import {
   getPercentFormatter,
-  getTooltipTimeFormatter,
   getXAxisFormatter,
   getYAxisFormatter,
 } from '../utils/formatters';
@@ -124,8 +78,6 @@ export default function transformProps(
     emitCrossFilters,
   } = chartProps;
 
-  // let focusedSeries: string | null = null;
-
   const {
     verboseMap = {},
     columnFormats = {},
@@ -136,10 +88,9 @@ export default function transformProps(
     queryData as TimeseriesChartDataResponseResult;
 
   const dataTypes = getColtypesMapping(queryData);
-  const annotationData = getAnnotationData(chartProps);
   const {
     area,
-    annotationLayers,
+    // annotationLayers,
     colorScheme,
     contributionMode,
     forecastEnabled,
@@ -167,7 +118,7 @@ export default function transformProps(
     timeGrainSqla,
     timeCompare,
     stack,
-    tooltipTimeFormat,
+    // tooltipTimeFormat,
     // tooltipSortByMetric,
     // showTooltipTotal,
     // showTooltipPercentage,
@@ -182,15 +133,15 @@ export default function transformProps(
     xAxisTimeFormat,
     xAxisTitle,
     xAxisTitleMargin,
-    yAxisBounds,
+    // yAxisBounds,
     yAxisFormat,
     currencyFormat,
     yAxisTitle,
     yAxisTitleMargin,
     yAxisTitlePosition,
+    // labelPosition,
+    // labelColor,
     zoomable,
-    labelPosition,
-    labelColor,
   }: EchartsTimeseriesFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const refs: Refs = {};
   const groupBy = ensureIsArray(groupby);
@@ -350,111 +301,13 @@ export default function transformProps(
     }
   });
 
-  if (stack === StackControlsValue.Stream) {
-    const baselineSeries = getBaselineSeriesForStream(
-      series.map(entry => entry.data) as [string | number, number][][],
-      seriesType,
-    );
-
-    series.unshift(baselineSeries);
-  }
-  const selectedValues = (filterState.selectedValues || []).reduce(
-    (acc: Record<string, number>, selectedValue: string) => {
-      const index = series.findIndex(({ name }) => name === selectedValue);
-      return {
-        ...acc,
-        [index]: selectedValue,
-      };
-    },
-    {},
-  );
-
-  annotationLayers
-    .filter((layer: AnnotationLayer) => layer.show)
-    .forEach((layer: AnnotationLayer) => {
-      if (isFormulaAnnotationLayer(layer))
-        series.push(
-          transformFormulaAnnotation(
-            layer,
-            data,
-            xAxisLabel,
-            xAxisType,
-            colorScale,
-            sliceId,
-            orientation,
-          ),
-        );
-      else if (isIntervalAnnotationLayer(layer)) {
-        series.push(
-          ...transformIntervalAnnotation(
-            layer,
-            data,
-            annotationData,
-            colorScale,
-            theme,
-            sliceId,
-            orientation,
-          ),
-        );
-      } else if (isEventAnnotationLayer(layer)) {
-        series.push(
-          ...transformEventAnnotation(
-            layer,
-            data,
-            annotationData,
-            colorScale,
-            theme,
-            sliceId,
-            orientation,
-          ),
-        );
-      } else if (isTimeseriesAnnotationLayer(layer)) {
-        series.push(
-          ...transformTimeseriesAnnotation(
-            layer,
-            markerSize,
-            data,
-            annotationData,
-            colorScale,
-            sliceId,
-            orientation,
-          ),
-        );
-      }
-    });
-
   // axis bounds need to be parsed to replace incompatible values with undefined
   const [xAxisMin, xAxisMax] = (xAxisBounds || []).map(parseAxisBound);
-  let [yAxisMin, yAxisMax] = (yAxisBounds || []).map(parseAxisBound);
 
-  // default to 0-100% range when doing row-level contribution chart
-  if ((contributionMode === 'row' || isAreaExpand) && stack) {
-    if (yAxisMin === undefined) yAxisMin = 0;
-    if (yAxisMax === undefined) yAxisMax = 1;
-  } else if (
-    logAxis &&
-    yAxisMin === undefined &&
-    minPositiveValue !== undefined
-  ) {
-    yAxisMin = calculateLowerLogTick(minPositiveValue);
-  }
-
-  const tooltipFormatter =
-    xAxisDataType === GenericDataType.Temporal
-      ? getTooltipTimeFormatter(tooltipTimeFormat)
-      : String;
   const xAxisFormatter =
     xAxisDataType === GenericDataType.Temporal
       ? getXAxisFormatter(xAxisTimeFormat)
       : String;
-
-  const {
-    setDataMask = () => {},
-    setControlValue = () => {},
-    onContextMenu,
-    onLegendStateChanged,
-  } = hooks;
-
   const addYAxisLabelOffset = !!yAxisTitle;
   const addXAxisLabelOffset = !!xAxisTitle;
   const padding = getPadding(
@@ -469,16 +322,6 @@ export default function transformProps(
     convertInteger(xAxisTitleMargin),
     isHorizontal,
   );
-
-  const legendData = rawSeries
-    .filter(
-      entry =>
-        extractForecastSeriesContext(entry.name || '').type ===
-        ForecastSeriesEnum.Observation,
-    )
-    .map(entry => entry.name || '')
-    .concat(extractAnnotationLabels(annotationLayers, annotationData));
-
   let xAxis: any = {
     type: xAxisType,
     name: xAxisTitle,
@@ -490,6 +333,7 @@ export default function transformProps(
       rotate: xAxisLabelRotation,
     },
     minorTick: { show: minorTicks },
+    show: formData.showXAxis,
     minInterval:
       xAxisType === AxisType.Time && timeGrainSqla
         ? TIMEGRAIN_TO_TIMESTAMP[
@@ -507,8 +351,6 @@ export default function transformProps(
   let yAxis: any = {
     ...defaultYAxis,
     type: logAxis ? AxisType.Log : AxisType.Value,
-    min: yAxisMin,
-    max: yAxisMax,
     minorTick: { show: minorTicks },
     minorSplitLine: { show: minorSplitLine },
     axisLabel: {
@@ -520,6 +362,7 @@ export default function transformProps(
         yAxisFormat,
       ),
     },
+    show: formData.showYAxis,
     scale: truncateYAxis,
     name: yAxisTitle,
     nameGap: convertInteger(yAxisTitleMargin),
@@ -529,163 +372,19 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-  console.log('series, ', dedupSeries(series), series);
-  const echartOptions: EChartsCoreOption = {
+  console.log('series, ', formData, chartProps);
+  const isPanelMode = series.length > 1;
+  const echartOptions: EChartsCoreOption[] = series.map(serie => ({
     useUTC: true,
-    grid: {
-      ...defaultGrid,
-      ...padding,
-    },
     xAxis,
     yAxis,
-    legend: {
-      show: true,
-      type: 'scroll',
-      orient: 'horizontal',
-      top: 0,
-    },
-    label: {
-      show: true,
-      position: 'top',
-      formatter: ({ value }) => value, // show numeric value
-    },
-    // tooltip: {
-    //   ...getDefaultTooltip(refs),
-    //   show: !inContextMenu,
-    //   trigger: richTooltip ? 'axis' : 'item',
-    //   formatter: (params: any) => {
-    //     const [xIndex, yIndex] = isHorizontal ? [1, 0] : [0, 1];
-    //     const xValue: number = richTooltip
-    //       ? params[0].value[xIndex]
-    //       : params.value[xIndex];
-    //     const forecastValue: any[] = richTooltip ? params : [params];
-    //     const sortedKeys = extractTooltipKeys(
-    //       forecastValue,
-    //       yIndex,
-    //       richTooltip,
-    //       tooltipSortByMetric,
-    //     );
-    //     const forecastValues: Record<string, ForecastValue> =
-    //       extractForecastValuesFromTooltipParams(forecastValue, isHorizontal);
-    //     const isForecast = Object.values(forecastValues).some(
-    //       value =>
-    //         value.forecastTrend || value.forecastLower || value.forecastUpper,
-    //     );
-
-    //     const formatter = forcePercentFormatter
-    //       ? percentFormatter
-    //       : getCustomFormatter(customFormatters, metrics) ?? defaultFormatter;
-
-    //     const rows: string[][] = [];
-    //     const total = Object.values(forecastValues).reduce(
-    //       (acc, value) =>
-    //         value.observation !== undefined ? acc + value.observation : acc,
-    //       0,
-    //     );
-    //     const allowTotal = Boolean(isMultiSeries) && richTooltip && !isForecast;
-    //     const showPercentage =
-    //       allowTotal && !forcePercentFormatter && showTooltipPercentage;
-    //     const keys = Object.keys(forecastValues);
-    //     let focusedRow;
-    //     sortedKeys
-    //       .filter(key => keys.includes(key))
-    //       .forEach(key => {
-    //         const value = forecastValues[key];
-    //         if (value.observation === 0 && stack) {
-    //           return;
-    //         }
-    //         const row = formatForecastTooltipSeries({
-    //           ...value,
-    //           seriesName: key,
-    //           formatter,
-    //         });
-    //         if (showPercentage && value.observation !== undefined) {
-    //           row.push(
-    //             percentFormatter.format(value.observation / (total || 1)),
-    //           );
-    //         }
-    //         rows.push(row);
-    //         if (key === focusedSeries) {
-    //           focusedRow = rows.length - 1;
-    //         }
-    //       });
-    //     if (stack) {
-    //       rows.reverse();
-    //       if (focusedRow !== undefined) {
-    //         focusedRow = rows.length - focusedRow - 1;
-    //       }
-    //     }
-    //     if (allowTotal && showTooltipTotal) {
-    //       const totalRow = ['Total', formatter.format(total)];
-    //       if (showPercentage) {
-    //         totalRow.push(percentFormatter.format(1));
-    //       }
-    //       rows.push(totalRow);
-    //     }
-    //     return tooltipHtml(rows, tooltipFormatter(xValue), focusedRow);
-    //   },
-    // },
-    // legend: {
-    //   ...getLegendProps(
-    //     legendType,
-    //     legendOrientation,
-    //     showLegend,
-    //     theme,
-    //     zoomable,
-    //     legendState,
-    //   ),
-    //   data: legendData as string[],
-    // },
-    series:
-      // formData?.seriesType === 'line'? :
-      dedupSeries(series),
-    // dedupLineChartSeries(
-    //   series,
-    //   showValue,
-    //   formData.orientation === 'horizontal',
-    //   width,
-    //   seriesType === 'bar',
-    //   labelPosition,
-    //   labelColor,
-    // ),
-    // toolbox: {
-    //   show: zoomable,
-    //   top: TIMESERIES_CONSTANTS.toolboxTop,
-    //   right: TIMESERIES_CONSTANTS.toolboxRight,
-    //   feature: {
-    //     dataZoom: {
-    //       ...(stack ? { yAxisIndex: false } : {}), // disable y-axis zoom for stacked charts
-    //       title: {
-    //         zoom: t('zoom area'),
-    //         back: t('restore zoom'),
-    //       },
-    //     },
-    //   },
-    // },
-    // dataZoom: zoomable
-    //   ? [
-    //       {
-    //         type: 'slider',
-    //         start: TIMESERIES_CONSTANTS.dataZoomStart,
-    //         end: TIMESERIES_CONSTANTS.dataZoomEnd,
-    //         bottom: TIMESERIES_CONSTANTS.zoomBottom,
-    //         yAxisIndex: isHorizontal ? 0 : undefined,
-    //       },
-    //       {
-    //         type: 'inside',
-    //         yAxisIndex: 0,
-    //         zoomOnMouseWheel: false,
-    //         moveOnMouseWheel: true,
-    //       },
-    //       {
-    //         type: 'inside',
-    //         xAxisIndex: 0,
-    //         zoomOnMouseWheel: false,
-    //         moveOnMouseWheel: true,
-    //       },
-    //     ]
-    //   : [],
-  };
+    series: dedupBigBarSeries({
+      series: serie,
+      positiveColor: formData.positiveColor,
+      negativeColor: formData.negativeColor,
+      warningColor: formData.warningColor,
+    }),
+  }));
 
   return {
     echartOptions,
@@ -693,5 +392,7 @@ export default function transformProps(
     height,
     width,
     refs,
+    isPanelMode,
+    panelColumns: formData.panelColumns,
   };
 }

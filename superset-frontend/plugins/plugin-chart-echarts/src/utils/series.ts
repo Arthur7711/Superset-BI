@@ -670,6 +670,7 @@ export function dedupBigBarSeries({
   showGoal,
   goalValue,
   colorOnlyLast,
+  showMinMax,
 }: {
   series: SeriesOption;
   positiveColor: string;
@@ -678,10 +679,12 @@ export function dedupBigBarSeries({
   showGoal: boolean;
   goalValue: number;
   colorOnlyLast: boolean;
+  showMinMax: boolean;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
   const textColor = '#000';
+  const dashedColor = '#666';
   // console.log('sssss', series);
   let { id } = series;
   if (id === undefined) return [series];
@@ -717,6 +720,22 @@ export function dedupBigBarSeries({
             params.dataIndex === lastIndex
               ? numbersFormatter(params.value[1])
               : '',
+        },
+        markLine: {
+          symbol: 'none',
+          lineStyle: {
+            type: 'dashed',
+            width: 1,
+            color: dashedColor,
+          },
+          label: {
+            show: false,
+          },
+          data: [
+            {
+              yAxis: Number(goalValue),
+            },
+          ],
         },
       },
     ];

@@ -698,7 +698,6 @@ export function dedupBigBarSeries({
 
   const minIndex = dataValues.indexOf(minValue);
   const maxIndex = dataValues.indexOf(maxValue);
-  const color = 'transparent';
   if (showGoal && goalValue && !colorOnlyLast) {
     return [
       {
@@ -720,12 +719,36 @@ export function dedupBigBarSeries({
           show: true,
           position: 'top',
           fontSize: 10,
-          color: (params: any) =>
-            params.dataIndex === lastIndex ? positiveColor : 'transparent',
-          formatter: (params: any) =>
-            params.dataIndex === lastIndex
-              ? numbersFormatter(params.value[1])
-              : '',
+          // color: (params: any) =>
+          //   params.dataIndex === lastIndex ? positiveColor : 'transparent',
+          // formatter: (params: any) =>
+          //   params.dataIndex === lastIndex
+          //     ? numbersFormatter(params.value[1])
+          //     : '',
+          formatter: (params: any) => {
+            if (params.dataIndex === lastIndex) {
+              return `{c0|${numbersFormatter(params.value[1])}}`;
+            }
+            if (showMinMax) {
+              if (params.dataIndex === minIndex) {
+                return `{c1|${numbersFormatter(minValue)}}`;
+              }
+              if (params.dataIndex === maxIndex) {
+                return `{c2|${numbersFormatter(maxValue)}}`;
+              }
+            }
+            return '';
+          },
+          rich: {
+            c0: {
+              color:
+                series?.length && series[lastIndex][1] >= goalValue
+                  ? positiveColor
+                  : negativeColor,
+            },
+            c1: { color: negativeColor },
+            c2: { color: positiveColor },
+          },
         },
         markLine: {
           symbol: 'none',
@@ -763,18 +786,6 @@ export function dedupBigBarSeries({
         show: true,
         position: 'top',
         fontSize: 10,
-        // color: (params: { dataIndex: number }) => {
-        //   if (params.dataIndex === minIndex && showMinMax) {
-        //     return negativeColor;
-        //   }
-        //   if (
-        //     (params.dataIndex === maxIndex && showMinMax) ||
-        //     params.dataIndex === lastIndex
-        //   ) {
-        //     return positiveColor;
-        //   }
-        //   return 'transparent';
-        // },
         formatter: (params: any) => {
           if (params.dataIndex === lastIndex) {
             return `{c0|${numbersFormatter(params.value[1])}}`;

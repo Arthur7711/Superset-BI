@@ -698,6 +698,12 @@ export function dedupBigBarSeries({
 
   const minIndex = dataValues.indexOf(minValue);
   const maxIndex = dataValues.indexOf(maxValue);
+  console.log(
+    'series[lastIndex]',
+    series,
+    lastIndex,
+    series && series.length && series[lastIndex][1],
+  );
   if (showGoal && goalValue && !colorOnlyLast) {
     return [
       {
@@ -727,7 +733,13 @@ export function dedupBigBarSeries({
           //     : '',
           formatter: (params: any) => {
             if (params.dataIndex === lastIndex) {
-              return `{c0|${numbersFormatter(params.value[1])}}`;
+              return `{c${
+                params.value[1] > goalValue
+                  ? 'green'
+                  : params.value[1] > goalValue * 0.8
+                    ? 'yellow'
+                    : 'red'
+              }|${numbersFormatter(params.value[1])}}`;
             }
             if (showMinMax) {
               if (params.dataIndex === minIndex) {
@@ -740,14 +752,11 @@ export function dedupBigBarSeries({
             return '';
           },
           rich: {
-            c0: {
-              color:
-                series?.length && series[lastIndex][1] >= goalValue
-                  ? positiveColor
-                  : negativeColor,
-            },
             c1: { color: negativeColor },
             c2: { color: positiveColor },
+            cgreen: { color: positiveColor },
+            cyellow: { color: warningColor },
+            cred: { color: negativeColor },
           },
         },
         markLine: {

@@ -39,7 +39,7 @@ import { SortSeriesType } from '@superset-ui/chart-controls';
 import { format } from 'echarts/core';
 import type { LegendComponentOption } from 'echarts/components';
 import type { SeriesOption } from 'echarts';
-import { isEmpty, maxBy, meanBy, minBy, orderBy, sumBy } from 'lodash';
+import { isEmpty, max, maxBy, meanBy, minBy, orderBy, sumBy } from 'lodash';
 import {
   NULL_STRING,
   StackControlsValue,
@@ -683,9 +683,7 @@ export function dedupBigBarSeries({
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
-  const textColor = '#000';
   const dashedColor = '#666';
-  // console.log('sssss', series);
   let { id } = series;
   if (id === undefined) return [series];
   id = String(id);
@@ -693,6 +691,14 @@ export function dedupBigBarSeries({
   const suffix = count > 0 ? ` (${count})` : '';
   counter.set(id, count + 1);
   const lastIndex = series.data ? series.data.length - 1 : -1;
+  const dataValues = series.data?.map((item: [number, number]) => item[1]);
+
+  const minValue = Math.min(...dataValues);
+  const maxValue = Math.max(...dataValues);
+
+  const minIndex = dataValues.indexOf(minValue);
+  const maxIndex = dataValues.indexOf(maxValue);
+  const color = 'transparent';
   if (showGoal && goalValue && !colorOnlyLast) {
     return [
       {
@@ -757,12 +763,37 @@ export function dedupBigBarSeries({
         show: true,
         position: 'top',
         fontSize: 10,
-        color: (params: any) =>
-          params.dataIndex === lastIndex ? positiveColor : 'transparent',
-        formatter: (params: any) =>
-          params.dataIndex === lastIndex
-            ? numbersFormatter(params.value[1])
-            : '',
+        // color: (params: { dataIndex: number }) => {
+        //   if (params.dataIndex === minIndex && showMinMax) {
+        //     return negativeColor;
+        //   }
+        //   if (
+        //     (params.dataIndex === maxIndex && showMinMax) ||
+        //     params.dataIndex === lastIndex
+        //   ) {
+        //     return positiveColor;
+        //   }
+        //   return 'transparent';
+        // },
+        formatter: (params: any) => {
+          if (params.dataIndex === lastIndex) {
+            return `{c0|${numbersFormatter(params.value[1])}}`;
+          }
+          if (showMinMax) {
+            if (params.dataIndex === minIndex) {
+              return `{c1|${numbersFormatter(minValue)}}`;
+            }
+            if (params.dataIndex === maxIndex) {
+              return `{c2|${numbersFormatter(maxValue)}}`;
+            }
+          }
+          return '';
+        },
+        rich: {
+          c0: { color: positiveColor },
+          c1: { color: negativeColor },
+          c2: { color: positiveColor },
+        },
       },
     },
   ];

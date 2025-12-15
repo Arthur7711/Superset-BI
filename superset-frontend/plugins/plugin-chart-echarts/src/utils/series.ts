@@ -673,6 +673,7 @@ export function dedupBigBarSeries({
   showMinMax,
   useColorLegend,
   colorThresholds,
+  avgValue,
 }: {
   series: SeriesOption;
   positiveColor: string;
@@ -684,10 +685,12 @@ export function dedupBigBarSeries({
   showMinMax: boolean;
   useColorLegend: boolean;
   colorThresholds?: string;
+  avgValue: number | null;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
   const dashedColor = '#666';
+  const avgColor = '#999';
   let { id } = series;
   if (id === undefined) return [series];
   id = String(id);
@@ -858,7 +861,7 @@ export function dedupBigBarSeries({
           lineStyle: {
             type: 'dashed',
             width: 1,
-            color: dashedColor,
+            // color: dashedColor,
           },
           label: {
             show: false,
@@ -866,6 +869,15 @@ export function dedupBigBarSeries({
           data: [
             {
               yAxis: Number(goalValue),
+              lineStyle: {
+                color: dashedColor,
+              },
+            },
+            {
+              yAxis: Number(avgValue),
+              lineStyle: {
+                color: avgColor,
+              },
             },
           ],
         },

@@ -375,7 +375,14 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-  console.log('series, ', formData);
+  console.log('series, ', series[0].data);
+  const chartValues = series[0].data?.map(
+    (d: [number, number]) => d[1],
+  ) as number[];
+  const avgValue =
+    chartValues.length > 0
+      ? chartValues.reduce((a, b) => a + b, 0) / chartValues.length
+      : null;
   const isPanelMode = series.length > 1;
   const echartOptions: EChartsCoreOption[] = series.map(serie => ({
     useUTC: true,
@@ -390,6 +397,9 @@ export default function transformProps(
       goalValue: formData.goalValue,
       colorOnlyLast: formData.colorOnlyLast,
       showMinMax: formData.showMinMax,
+      colorThresholds: formData.colorThresholds,
+      useColorLegend: formData.useColorLegend,
+      avgValue,
     }),
     tooltip: {
       trigger: 'axis',
@@ -404,5 +414,6 @@ export default function transformProps(
     refs,
     isPanelMode,
     panelColumns: formData.panelColumns,
+    avgValue,
   };
 }

@@ -671,6 +671,8 @@ export function dedupBigBarSeries({
   goalValue,
   colorOnlyLast,
   showMinMax,
+  useColorLegend,
+  colorThresholds,
 }: {
   series: SeriesOption;
   positiveColor: string;
@@ -680,6 +682,8 @@ export function dedupBigBarSeries({
   goalValue: number;
   colorOnlyLast: boolean;
   showMinMax: boolean;
+  useColorLegend: boolean;
+  colorThresholds?: string;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
@@ -698,12 +702,61 @@ export function dedupBigBarSeries({
 
   const minIndex = dataValues.indexOf(minValue);
   const maxIndex = dataValues.indexOf(maxValue);
-  console.log(
-    'series[lastIndex]',
-    series,
-    lastIndex,
-    series && series.length && series[lastIndex][1],
-  );
+  if (useColorLegend && colorThresholds) {
+    const thresholds = colorThresholds.split(',').map(item => Number(item));
+    const [min, max] =
+      thresholds.length >= 2
+        ? [Math.min(...thresholds), Math.max(...thresholds)]
+        : [0, 0];
+    return [
+      {
+        ...series,
+        id: `${id}${suffix}`,
+        itemStyle: {
+          ...series.itemStyle,
+          color: (params: any) => {
+            if (thresholds.length < 2) {
+              return grayColor;
+            }
+            if (params.data[1] >= max) {
+              return positiveColor;
+            }
+            if (params.data[1] >= min && params.data[1] < max) {
+              return warningColor;
+            }
+            if (params.data[1] < min) {
+              return negativeColor;
+            }
+            return grayColor;
+          },
+        },
+        label: {
+          show: true,
+          position: 'top',
+          fontSize: 6,
+          formatter: (params: any) => {
+            if (params.dataIndex === lastIndex) {
+              return `{c0|${numbersFormatter(params.value[1])}}`;
+            }
+            if (showMinMax) {
+              if (params.dataIndex === minIndex) {
+                return `{c1|${numbersFormatter(minValue)}}`;
+              }
+              if (params.dataIndex === maxIndex) {
+                return `{c2|${numbersFormatter(maxValue)}}`;
+              }
+            }
+            return '';
+          },
+          rich: {
+            c0: { color: positiveColor },
+            c1: { color: negativeColor },
+            c2: { color: positiveColor },
+          },
+        },
+      },
+    ];
+  }
   if (showGoal && goalValue && !colorOnlyLast) {
     return [
       {
@@ -724,7 +777,7 @@ export function dedupBigBarSeries({
         label: {
           show: true,
           position: 'top',
-          fontSize: 10,
+          fontSize: 6,
           // color: (params: any) =>
           //   params.dataIndex === lastIndex ? positiveColor : 'transparent',
           // formatter: (params: any) =>
@@ -794,7 +847,7 @@ export function dedupBigBarSeries({
       label: {
         show: true,
         position: 'top',
-        fontSize: 10,
+        fontSize: 6,
         formatter: (params: any) => {
           if (params.dataIndex === lastIndex) {
             return `{c0|${numbersFormatter(params.value[1])}}`;

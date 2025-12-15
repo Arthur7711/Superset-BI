@@ -38,7 +38,7 @@ import {
 import { SortSeriesType } from '@superset-ui/chart-controls';
 import { format } from 'echarts/core';
 import type { LegendComponentOption } from 'echarts/components';
-import type { SeriesOption } from 'echarts';
+import { color, type SeriesOption } from 'echarts';
 import { isEmpty, max, maxBy, meanBy, minBy, orderBy, sumBy } from 'lodash';
 import {
   NULL_STRING,
@@ -702,6 +702,47 @@ export function dedupBigBarSeries({
 
   const minIndex = dataValues.indexOf(minValue);
   const maxIndex = dataValues.indexOf(maxValue);
+  if (colorOnlyLast) {
+    return [
+      {
+        ...series,
+        id: `${id}${suffix}`,
+        itemStyle: {
+          ...series.itemStyle,
+          color: (params: any) => {
+            if (series.data && params.dataIndex === series.data.length - 1) {
+              return positiveColor;
+            }
+            return grayColor;
+          },
+        },
+        label: {
+          show: true,
+          position: 'top',
+          fontSize: 6,
+          formatter: (params: any) => {
+            if (params.dataIndex === lastIndex) {
+              return `{c0|${numbersFormatter(params.value[1])}}`;
+            }
+            if (showMinMax) {
+              if (params.dataIndex === minIndex) {
+                return `{c1|${numbersFormatter(minValue)}}`;
+              }
+              if (params.dataIndex === maxIndex) {
+                return `{c2|${numbersFormatter(maxValue)}}`;
+              }
+            }
+            return '';
+          },
+          rich: {
+            c0: { color: positiveColor },
+            c1: { color: negativeColor },
+            c2: { color: positiveColor },
+          },
+        },
+      },
+    ];
+  }
   if (useColorLegend && colorThresholds) {
     const thresholds = colorThresholds.split(',').map(item => Number(item));
     const [min, max] =

@@ -375,7 +375,7 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-  console.log('series, ', series[0].data);
+  console.log('series, ', formData);
   const chartValues = series[0].data?.map(
     (d: [number, number]) => d[1],
   ) as number[];
@@ -400,6 +400,7 @@ export default function transformProps(
       colorThresholds: formData.colorThresholds,
       useColorLegend: formData.useColorLegend,
       avgValue,
+      showAverageLine: formData.showAverageLine,
     }),
     tooltip: {
       trigger: 'axis',
@@ -415,5 +416,6 @@ export default function transformProps(
     isPanelMode,
     panelColumns: formData.panelColumns,
     avgValue,
+    headerValue: series[0].data[series[0].data.length - 1][1] as number,
   };
 }

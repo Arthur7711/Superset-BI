@@ -674,6 +674,7 @@ export function dedupBigBarSeries({
   useColorLegend,
   colorThresholds,
   avgValue,
+  showAverageLine,
 }: {
   series: SeriesOption;
   positiveColor: string;
@@ -686,6 +687,7 @@ export function dedupBigBarSeries({
   useColorLegend: boolean;
   colorThresholds?: string;
   avgValue: number | null;
+  showAverageLine?: boolean;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
@@ -705,6 +707,24 @@ export function dedupBigBarSeries({
 
   const minIndex = dataValues.indexOf(minValue);
   const maxIndex = dataValues.indexOf(maxValue);
+  const marklineData = {
+    symbol: 'none',
+    lineStyle: {
+      type: 'dashed',
+    },
+    label: {
+      show: false,
+    },
+    data: [
+      {
+        yAxis: Number(avgValue),
+        lineStyle: {
+          color: avgColor,
+          width: Number(showAverageLine),
+        },
+      },
+    ],
+  };
   if (colorOnlyLast) {
     return [
       {
@@ -743,6 +763,7 @@ export function dedupBigBarSeries({
             c2: { color: positiveColor },
           },
         },
+        markLine: marklineData,
       },
     ];
   }
@@ -798,6 +819,7 @@ export function dedupBigBarSeries({
             c2: { color: positiveColor },
           },
         },
+        markLine: marklineData,
       },
     ];
   }
@@ -861,7 +883,6 @@ export function dedupBigBarSeries({
           lineStyle: {
             type: 'dashed',
             width: 1,
-            // color: dashedColor,
           },
           label: {
             show: false,
@@ -877,6 +898,7 @@ export function dedupBigBarSeries({
               yAxis: Number(avgValue),
               lineStyle: {
                 color: avgColor,
+                width: Number(showAverageLine),
               },
             },
           ],
@@ -921,6 +943,7 @@ export function dedupBigBarSeries({
           c2: { color: positiveColor },
         },
       },
+      markLine: marklineData,
     },
   ];
 }

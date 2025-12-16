@@ -5,31 +5,9 @@ import { TimeseriesChartTransformedProps } from './types';
 import { ExtraControls } from '../components/ExtraControls';
 import { ColumBlock, MainBlock } from '../UIWatermark';
 import { UserDataWatermark } from '../Watermark/UserDataWatermark';
-import {
-  HeaderBlock,
-  MetricCount,
-  MetricName,
-  UpperBlock,
-} from './UIComponents';
-
-const RenderHeader = ({
-  option,
-  headerFontSize,
-}: {
-  option: any;
-  headerFontSize: number;
-}) => {
-  // console.log('option', option);
-  const serie = option.series[0];
-  const allData = serie.data;
-  const lastItem = allData[allData.length - 1][1];
-  return (
-    <HeaderBlock>
-      <MetricName>{serie.name}</MetricName>
-      <MetricCount fontSize={headerFontSize}>{lastItem}</MetricCount>
-    </HeaderBlock>
-  );
-};
+import { UpperBlock } from './UIComponents';
+import { RenderHeader } from './components/RenderHeader';
+import { colorController } from './helpers/colorController';
 
 export default function EchartsTimeseries(
   props: TimeseriesChartTransformedProps,
@@ -68,19 +46,29 @@ export default function EchartsTimeseries(
     avgValue,
     headerValue,
   } = props;
+  const { warningColor, positiveColor, negativeColor } = formData;
   const echartRef = useRef<EchartsHandler | null>(null);
   // eslint-disable-next-line no-param-reassign
   refs.echartRef = echartRef;
   const extraControlRef = useRef<HTMLDivElement>(null);
+  const maxPanelCount =
+    echartOptions.length > panelColumns ? panelColumns : echartOptions.length;
   const [extraControlHeight, setExtraControlHeight] = useState(0);
-  console.log('formData', formData);
+  const selectedColor = colorController({
+    warningColor,
+    positiveColor,
+    negativeColor,
+    headerValue,
+    showGoal: formData.showGoal,
+    goalValue: formData.goalValue,
+    colorThresholds: formData.colorThresholds,
+    useColorLegend: formData.useColorLegend,
+  });
 
   useEffect(() => {
     const updatedHeight = extraControlRef.current?.offsetHeight || 0;
     setExtraControlHeight(updatedHeight);
   }, [formData.showExtraControls]);
-  const maxPanelCount =
-    echartOptions.length > panelColumns ? panelColumns : echartOptions.length;
   return (
     <div>
       <UpperBlock cols={maxPanelCount} gap={maxPanelCount > 1 ? 8 : 0}>
@@ -89,6 +77,7 @@ export default function EchartsTimeseries(
             <RenderHeader
               option={option}
               headerFontSize={formData.headerFontSize}
+              headerColor={selectedColor}
             />
             {formData.showTrend && (
               <MainBlock>

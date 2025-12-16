@@ -2,6 +2,9 @@ import { styled } from '@superset-ui/core';
 
 const periodTextColor = '#999999';
 const metricNameColor = '#666666';
+const whiteColor = '#FFFFFF';
+const bgRed = '#e8e8e8';
+
 export const MainBlock = styled.div`
   position: relative;
 `;
@@ -89,4 +92,56 @@ export const PeriodBlocksContainer = styled.div`
   gap: 10px;
   font-size: 9px;
   margin-bottom: 4px;
+`;
+
+export const ProgressMainBlock = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 10px;
+`;
+
+export const GraySpan = styled.span`
+  display: ${periodTextColor};
+`;
+
+export const GoalPercentSpan = styled.span`
+  font-size: 7px;
+  font-weight: 600;
+  color: ${whiteColor};
+`;
+
+export const ProgressBarContainer = styled.div`
+  flex: 1;
+  height: 6px;
+  background-color: ${bgRed};
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+`;
+
+export const ProgressBar = styled.div`
+  ${({
+    goalProgress,
+    positiveColor,
+  }: {
+    goalProgress: number;
+    positiveColor: string;
+  }) => `
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: ${goalProgress}%;
+  background-color: ${positiveColor};
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;`}
+`;
+
+export const GoalValueText = styled.span`
+  font-weight: 500;
+  color: ${metricNameColor};
 `;

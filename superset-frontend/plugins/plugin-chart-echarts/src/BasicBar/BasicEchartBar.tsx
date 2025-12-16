@@ -69,6 +69,7 @@ export default function EchartsTimeseries(
     const updatedHeight = extraControlRef.current?.offsetHeight || 0;
     setExtraControlHeight(updatedHeight);
   }, [formData.showExtraControls]);
+  console.log('showGoal', formData);
   return (
     <div>
       <UpperBlock cols={maxPanelCount} gap={maxPanelCount > 1 ? 8 : 0}>
@@ -82,6 +83,10 @@ export default function EchartsTimeseries(
               warningColor={warningColor}
               negativeColor={negativeColor}
               positiveColor={positiveColor}
+              goalValue={formData.goalValue}
+              showGoalProgress={formData.showGoalProgress}
+              showGoal={formData.showGoal}
+              showGoalPercent={formData.showGoalPercent}
             />
             {formData.showTrend && (
               <MainBlock>

@@ -78,6 +78,10 @@ export default function EchartsTimeseries(
               option={option}
               headerFontSize={formData.headerFontSize}
               headerColor={selectedColor}
+              showDot={formData.showWarningDot}
+              warningColor={warningColor}
+              negativeColor={negativeColor}
+              positiveColor={positiveColor}
             />
             {formData.showTrend && (
               <MainBlock>

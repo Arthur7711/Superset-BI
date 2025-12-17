@@ -33,11 +33,13 @@ export const MetricCard: FC<MetricCardProps> = ({
   warningColor,
   headerFontSize,
   useGradient,
+  echartOptions,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const numberRef = useRef<HTMLDivElement>(null);
   const [adaptedFontSize, setAdaptedFontSize] = useState(headerFontSize);
-
+  const mainBlockRef = useRef<null | HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
   // Adapt font size to fit container width
   useEffect(() => {
     if (numberRef.current) {
@@ -64,6 +66,18 @@ export const MetricCard: FC<MetricCardProps> = ({
       setAdaptedFontSize(testSize);
     }
   }, [card.formattedNumber, width, headerFontSize]);
+
+  useEffect(() => {
+    if (mainBlockRef?.current) {
+      const { offsetWidth, offsetHeight } = mainBlockRef.current;
+      console.log(
+        'mainBlockRef',
+        mainBlockRef.current.parentNode,
+        offsetWidth,
+        offsetHeight,
+      );
+    }
+  }, [mainBlockRef]);
 
   const numberColor = useMemo(() => {
     if (card.bigNumber === null) return '#262626';
@@ -92,7 +106,7 @@ export const MetricCard: FC<MetricCardProps> = ({
   ]);
 
   const warningDotColor = useMemo(() => {
-    console.log('memo');
+    // console.log('memo');
     return getWarningDotColor(
       card.bigNumber,
       useColorLegend,
@@ -137,6 +151,7 @@ export const MetricCard: FC<MetricCardProps> = ({
 
   return (
     <div
+      ref={mainBlockRef}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -155,6 +170,7 @@ export const MetricCard: FC<MetricCardProps> = ({
           color: '#666',
           marginBottom: '4px',
           lineHeight: 1.2,
+          display: size.height < 180 || size.width < 180 ? 'none' : 'block',
         }}
       >
         {card.metricName}
@@ -169,7 +185,9 @@ export const MetricCard: FC<MetricCardProps> = ({
       >
         <div
           style={{
-            fontSize: `${adaptedFontSize}px`,
+            fontSize: `${
+              size.height < 180 || size.width < 180 ? 14 : adaptedFontSize
+            }px`,
             fontWeight: 700,
             color: numberColor,
             lineHeight: 1,
@@ -293,7 +311,7 @@ export const MetricCard: FC<MetricCardProps> = ({
       {showLegend && showTrend && (
         <div
           style={{
-            display: 'flex',
+            display: size.height < 180 || size.width < 180 ? 'none' : 'flex',
             gap: '10px',
             fontSize: '9px',
             color: '#999',

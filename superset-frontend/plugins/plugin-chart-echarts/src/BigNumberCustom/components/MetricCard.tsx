@@ -70,12 +70,7 @@ export const MetricCard: FC<MetricCardProps> = ({
   useEffect(() => {
     if (mainBlockRef?.current) {
       const { offsetWidth, offsetHeight } = mainBlockRef.current;
-      console.log(
-        'mainBlockRef',
-        mainBlockRef.current.parentNode,
-        offsetWidth,
-        offsetHeight,
-      );
+      setSize({ height: offsetHeight, width: offsetWidth });
     }
   }, [mainBlockRef]);
 
@@ -148,7 +143,7 @@ export const MetricCard: FC<MetricCardProps> = ({
     headerSection + comparisonsHeight + progressHeight + legendHeight + 8;
   const chartHeight = Math.max(height - usedHeight, 40);
   const chartWidth = Math.max(width - 16, 60);
-
+  console.log(2222222222, card.comparisons);
   return (
     <div
       ref={mainBlockRef}

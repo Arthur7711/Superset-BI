@@ -6,8 +6,9 @@ import { ExtraControls } from '../components/ExtraControls';
 import { ColumBlock, MainBlock } from '../UIWatermark';
 import { UserDataWatermark } from '../Watermark/UserDataWatermark';
 import { UpperBlock } from './UIComponents';
-import { RenderHeader } from './components/RenderHeader';
+import { RenderHeader, RenderHeaderRef } from './components/RenderHeader';
 import { colorController } from './helpers/colorController';
+import { parseComparisonLags } from './helpers/comperisions';
 
 export default function EchartsTimeseries(
   props: TimeseriesChartTransformedProps,
@@ -46,14 +47,15 @@ export default function EchartsTimeseries(
     avgValue,
     headerValue,
   } = props;
+  // from props get missing values but check how to get data, labelName and more
   const { warningColor, positiveColor, negativeColor } = formData;
   const echartRef = useRef<EchartsHandler | null>(null);
   // eslint-disable-next-line no-param-reassign
   refs.echartRef = echartRef;
-  const extraControlRef = useRef<HTMLDivElement>(null);
+  // const extraControlRef = useRef<HTMLDivElement>(null);
   const maxPanelCount =
     echartOptions.length > panelColumns ? panelColumns : echartOptions.length;
-  const [extraControlHeight, setExtraControlHeight] = useState(0);
+  const [extraHeight, setExtraHeight] = useState(0);
   const selectedColor = colorController({
     warningColor,
     positiveColor,
@@ -64,18 +66,21 @@ export default function EchartsTimeseries(
     colorThresholds: formData.colorThresholds,
     useColorLegend: formData.useColorLegend,
   });
+  const headerRef = useRef<RenderHeaderRef>(null);
 
   useEffect(() => {
-    const updatedHeight = extraControlRef.current?.offsetHeight || 0;
-    setExtraControlHeight(updatedHeight);
-  }, [formData.showExtraControls]);
-  console.log('showGoal', formData);
+    if (headerRef.current) {
+      setExtraHeight(headerRef.current.height);
+    }
+  }, []);
+  const comparisonLags = parseComparisonLags(formData.comparisonLags);
   return (
     <div>
       <UpperBlock cols={maxPanelCount} gap={maxPanelCount > 1 ? 8 : 0}>
         {echartOptions.map(option => (
           <ColumBlock key={option.title?.text || 'echart-column'}>
             <RenderHeader
+              ref={headerRef}
               option={option}
               headerFontSize={formData.headerFontSize}
               headerColor={selectedColor}
@@ -87,21 +92,19 @@ export default function EchartsTimeseries(
               showGoalProgress={formData.showGoalProgress}
               showGoal={formData.showGoal}
               showGoalPercent={formData.showGoalPercent}
+              avgValue={avgValue}
+              comparisonLags={comparisonLags}
+              comparisonType={formData.comparisonType}
+              compareSuffix={formData.compareSuffix}
             />
             {formData.showTrend && (
               <MainBlock>
-                <div ref={extraControlRef}>
-                  <ExtraControls
-                    formData={formData}
-                    setControlValue={setControlValue}
-                  />
-                </div>
                 <UserDataWatermark />
 
                 <Echart
                   ref={echartRef}
                   refs={refs}
-                  height={height - extraControlHeight}
+                  height={height - extraHeight}
                   width={width}
                   echartOptions={option}
                 />

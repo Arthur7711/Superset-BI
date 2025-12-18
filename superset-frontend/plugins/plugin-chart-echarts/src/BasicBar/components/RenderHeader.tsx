@@ -107,7 +107,6 @@ export const RenderHeader = forwardRef<
 
     const comparisons = calculateComparisons(
       option.series[0].data,
-      option.series[0].name,
       comparisonType,
       comparisonLags,
       avgValue,
@@ -115,18 +114,6 @@ export const RenderHeader = forwardRef<
       compareSuffix,
     );
 
-    console.log(
-      'metricCards',
-      comparisons,
-      // option.series[0],
-      // data: option.series[0].data,
-      // metricLabel: option.series[0].name,
-      // comparisonType,
-      // comparisonLags,
-      // avgValue,
-      // goalValue,
-      // compareSuffix,
-    );
     return (
       <HeaderBlock ref={containerRef}>
         <MetricName>{serie.name}</MetricName>
@@ -162,16 +149,18 @@ export const RenderHeader = forwardRef<
           </ProgressMainBlock>
         )}
 
-        <PeriodBlocksContainer>
-          <PeriodBlock>
-            <ColoredSquare color={positiveColor} />
-            {factVSplan}
-          </PeriodBlock>
-          <PeriodBlock>
-            <ColoredSquare color={negativeColor} />
-            {planVSfact}
-          </PeriodBlock>
-        </PeriodBlocksContainer>
+        {showGoalProgress && showGoal && goalValue && (
+          <PeriodBlocksContainer>
+            <PeriodBlock>
+              <ColoredSquare color={positiveColor} />
+              {factVSplan}
+            </PeriodBlock>
+            <PeriodBlock>
+              <ColoredSquare color={negativeColor} />
+              {planVSfact}
+            </PeriodBlock>
+          </PeriodBlocksContainer>
+        )}
       </HeaderBlock>
     );
   },

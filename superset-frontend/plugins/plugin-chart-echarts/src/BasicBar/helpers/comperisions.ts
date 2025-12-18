@@ -25,7 +25,6 @@ export function parseComparisonLags(lagsString: string): ComparisonLag[] {
 
 export function calculateComparisons(
   data: any[],
-  metricLabel: string,
   comparisonType: string,
   comparisonLags: ComparisonLag[],
   avgValue: number | null,
@@ -36,7 +35,7 @@ export function calculateComparisons(
     return [];
   }
 
-  const currentValue = data[data.length - 1]?.[metricLabel];
+  const currentValue = data[data.length - 1][1];
   if (typeof currentValue !== 'number') {
     return [];
   }
@@ -48,7 +47,7 @@ export function calculateComparisons(
     for (const lag of comparisonLags) {
       const compareIndex = data.length - 1 - lag.periods;
       if (compareIndex >= 0) {
-        const compareValue = data[compareIndex]?.[metricLabel];
+        const compareValue = data[compareIndex]?.[1];
         if (typeof compareValue === 'number' && compareValue !== 0) {
           const diff =
             ((currentValue - compareValue) / Math.abs(compareValue)) * 100;

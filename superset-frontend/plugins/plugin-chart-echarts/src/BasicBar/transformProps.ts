@@ -110,6 +110,7 @@ export default function transformProps(
     percentageThreshold,
     richTooltip,
     seriesType,
+    trendChartType,
     showLegend,
     showValue,
     sliceId,
@@ -264,7 +265,7 @@ export default function transformProps(
         markerEnabled,
         markerSize,
         areaOpacity: opacity,
-        seriesType,
+        seriesType: trendChartType || seriesType,
         legendState,
         stack,
         formatter: forcePercentFormatter
@@ -345,7 +346,7 @@ export default function transformProps(
       truncateXAxis,
       xAxisMin,
       xAxisMax,
-      seriesType,
+      trendChartType || seriesType,
     ),
   };
   let yAxis: any = {
@@ -375,7 +376,6 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-  // console.log('series, ', series);
   const isPanelMode = series.length > 1;
   const echartOptions: EChartsCoreOption[] = series.map(serie => {
     const chartValues = serie.data?.map(

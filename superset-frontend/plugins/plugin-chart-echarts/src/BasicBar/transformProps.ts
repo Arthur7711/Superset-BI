@@ -375,37 +375,40 @@ export default function transformProps(
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
   }
-  console.log('series, ', formData);
-  const chartValues = series[0].data?.map(
-    (d: [number, number]) => d[1],
-  ) as number[];
-  const avgValue =
-    chartValues.length > 0
-      ? chartValues.reduce((a, b) => a + b, 0) / chartValues.length
-      : null;
+  // console.log('series, ', series);
   const isPanelMode = series.length > 1;
-  const echartOptions: EChartsCoreOption[] = series.map(serie => ({
-    useUTC: true,
-    xAxis,
-    yAxis,
-    series: dedupBigBarSeries({
-      series: serie,
-      positiveColor: formData.positiveColor,
-      negativeColor: formData.negativeColor,
-      warningColor: formData.warningColor,
-      showGoal: formData.showGoal,
-      goalValue: formData.goalValue,
-      colorOnlyLast: formData.colorOnlyLast,
-      showMinMax: formData.showMinMax,
-      colorThresholds: formData.colorThresholds,
-      useColorLegend: formData.useColorLegend,
+  const echartOptions: EChartsCoreOption[] = series.map(serie => {
+    const chartValues = serie.data?.map(
+      (d: [number, number]) => d[1],
+    ) as number[];
+    const avgValue =
+      chartValues.length > 0
+        ? chartValues.reduce((a, b) => a + b, 0) / chartValues.length
+        : null;
+    return {
+      useUTC: true,
+      xAxis,
+      yAxis,
+      series: dedupBigBarSeries({
+        series: serie,
+        positiveColor: formData.positiveColor,
+        negativeColor: formData.negativeColor,
+        warningColor: formData.warningColor,
+        showGoal: formData.showGoal,
+        goalValue: formData.goalValue,
+        colorOnlyLast: formData.colorOnlyLast,
+        showMinMax: formData.showMinMax,
+        colorThresholds: formData.colorThresholds,
+        useColorLegend: formData.useColorLegend,
+        avgValue,
+        showAverageLine: formData.showAverageLine,
+      }),
+      tooltip: {
+        trigger: 'axis',
+      },
       avgValue,
-      showAverageLine: formData.showAverageLine,
-    }),
-    tooltip: {
-      trigger: 'axis',
-    },
-  }));
+    };
+  });
 
   return {
     echartOptions,
@@ -415,7 +418,8 @@ export default function transformProps(
     refs,
     isPanelMode,
     panelColumns: formData.panelColumns,
-    avgValue,
     headerValue: series[0].data[series[0].data.length - 1][1] as number,
+    metricName: series[0].name,
+    metricData: series[0].data,
   };
 }

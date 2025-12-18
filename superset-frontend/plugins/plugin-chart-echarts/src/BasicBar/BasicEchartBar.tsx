@@ -44,7 +44,6 @@ export default function EchartsTimeseries(
     formData,
     setControlValue,
     echartOptions,
-    avgValue,
     headerValue,
   } = props;
   // from props get missing values but check how to get data, labelName and more
@@ -92,7 +91,6 @@ export default function EchartsTimeseries(
               showGoalProgress={formData.showGoalProgress}
               showGoal={formData.showGoal}
               showGoalPercent={formData.showGoalPercent}
-              avgValue={avgValue}
               comparisonLags={comparisonLags}
               comparisonType={formData.comparisonType}
               compareSuffix={formData.compareSuffix}

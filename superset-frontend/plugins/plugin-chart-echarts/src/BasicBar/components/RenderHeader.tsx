@@ -50,7 +50,6 @@ export const RenderHeader = forwardRef<
     showGoalProgress?: boolean;
     showGoal?: boolean;
     showGoalPercent?: boolean;
-    avgValue: number | null;
     comparisonLags: ComparisonLag[];
     comparisonType: string;
     compareSuffix: string;
@@ -69,7 +68,6 @@ export const RenderHeader = forwardRef<
       showGoalProgress,
       showGoal,
       showGoalPercent,
-      avgValue,
       comparisonLags,
       comparisonType,
       compareSuffix,
@@ -104,12 +102,11 @@ export const RenderHeader = forwardRef<
 
     const goalProgress =
       showGoal && goalValue ? Math.min((lastItem / goalValue) * 100, 100) : 0;
-
     const comparisons = calculateComparisons(
       option.series[0].data,
       comparisonType,
       comparisonLags,
-      avgValue,
+      option.avgValue,
       goalValue,
       compareSuffix,
     );

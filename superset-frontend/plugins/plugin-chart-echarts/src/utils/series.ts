@@ -727,28 +727,32 @@ export function dedupBigBarSeries({
       },
     ],
   };
+  const markPointMinMax = showMinMax
+    ? [
+        {
+          type: 'max',
+          name: 'Max',
+          label: { color: positiveColor, position: 'top' },
+          itemStyle: { color: positiveColor },
+        },
+        {
+          type: 'min',
+          name: 'Min',
+          label: { color: negativeColor, position: 'top' },
+          itemStyle: { color: negativeColor },
+        },
+      ]
+    : [];
   const markPoint = {
     silent: true,
     symbol: 'circle',
-    showSymbol: true,
-    symbolSize: 6,
+    symbolSize: 4,
     label: {
       show: true,
       fontSize: 11,
     },
     data: [
-      {
-        type: 'max',
-        name: 'Max',
-        label: { color: positiveColor, position: 'top' },
-        itemStyle: { color: positiveColor },
-      },
-      {
-        type: 'min',
-        name: 'Min',
-        label: { color: negativeColor, position: 'bottom' },
-        itemStyle: { color: negativeColor },
-      },
+      ...markPointMinMax,
       {
         name: 'Last',
         coord: [lastIndex, lastValue],
@@ -757,6 +761,7 @@ export function dedupBigBarSeries({
           position: 'top',
           show: true,
         },
+        itemStyle: { color: positiveColor },
       },
     ],
   };
@@ -764,12 +769,12 @@ export function dedupBigBarSeries({
     chartVariant === 'line'
       ? {
           symbol: 'circle',
-          symbolSize: 6,
+          symbolSize: 4,
           showSymbol: true,
           markPoint,
           lineStyle: {
             color: grayColor,
-            width: 2,
+            width: 1,
           },
         }
       : {};

@@ -675,6 +675,7 @@ export function dedupBigBarSeries({
   colorThresholds,
   avgValue,
   showAverageLine,
+  chartVariant,
 }: {
   series: SeriesOption;
   positiveColor: string;
@@ -688,6 +689,7 @@ export function dedupBigBarSeries({
   colorThresholds?: string;
   avgValue: number | null;
   showAverageLine?: boolean;
+  chartVariant: string;
 }): SeriesOption[] {
   const counter = new Map<string, number>();
   const grayColor = '#ccc';
@@ -701,7 +703,7 @@ export function dedupBigBarSeries({
   counter.set(id, count + 1);
   const lastIndex = series.data ? series.data.length - 1 : -1;
   const dataValues = series.data?.map((item: [number, number]) => item[1]);
-
+  const lastValue = series.data?.[lastIndex];
   const minValue = Math.min(...dataValues);
   const maxValue = Math.max(...dataValues);
 
@@ -725,6 +727,52 @@ export function dedupBigBarSeries({
       },
     ],
   };
+  const markPoint = {
+    silent: true,
+    symbol: 'circle',
+    showSymbol: true,
+    symbolSize: 6,
+    label: {
+      show: true,
+      fontSize: 11,
+    },
+    data: [
+      {
+        type: 'max',
+        name: 'Max',
+        label: { color: positiveColor, position: 'top' },
+        itemStyle: { color: positiveColor },
+      },
+      {
+        type: 'min',
+        name: 'Min',
+        label: { color: negativeColor, position: 'bottom' },
+        itemStyle: { color: negativeColor },
+      },
+      {
+        name: 'Last',
+        coord: [lastIndex, lastValue],
+        label: {
+          color: positiveColor,
+          position: 'top',
+          show: true,
+        },
+      },
+    ],
+  };
+  const lineChartExtraControllers =
+    chartVariant === 'line'
+      ? {
+          symbol: 'circle',
+          symbolSize: 6,
+          showSymbol: true,
+          markPoint,
+          lineStyle: {
+            color: grayColor,
+            width: 2,
+          },
+        }
+      : {};
   if (colorOnlyLast) {
     return [
       {
@@ -764,6 +812,7 @@ export function dedupBigBarSeries({
           },
         },
         markLine: marklineData,
+        ...lineChartExtraControllers,
       },
     ];
   }
@@ -820,6 +869,7 @@ export function dedupBigBarSeries({
           },
         },
         markLine: marklineData,
+        ...lineChartExtraControllers,
       },
     ];
   }
@@ -903,6 +953,7 @@ export function dedupBigBarSeries({
             },
           ],
         },
+        ...lineChartExtraControllers,
       },
     ];
   }
@@ -944,6 +995,7 @@ export function dedupBigBarSeries({
         },
       },
       markLine: marklineData,
+      ...lineChartExtraControllers,
     },
   ];
 }

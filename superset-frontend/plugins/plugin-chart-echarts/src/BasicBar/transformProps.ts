@@ -385,6 +385,7 @@ export default function transformProps(
       chartValues.length > 0
         ? chartValues.reduce((a, b) => a + b, 0) / chartValues.length
         : null;
+    console.log('formData', formData);
     return {
       useUTC: true,
       xAxis,
@@ -402,11 +403,33 @@ export default function transformProps(
         useColorLegend: formData.useColorLegend,
         avgValue,
         showAverageLine: formData.showAverageLine,
+        chartVariant: formData.trendChartType,
       }),
       tooltip: {
         trigger: 'axis',
       },
       avgValue,
+      markPoint: {
+        symbol: 'circle',
+        symbolSize: 8,
+        label: {
+          show: true,
+          fontSize: 11,
+          // formatter: params => params.value,
+        },
+        data: [
+          {
+            type: 'max',
+            name: 'Max',
+            itemStyle: { color: '#00b894' }, // green
+          },
+          {
+            type: 'min',
+            name: 'Min',
+            itemStyle: { color: '#d63031' }, // red
+          },
+        ],
+      },
     };
   });
 

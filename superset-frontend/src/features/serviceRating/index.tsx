@@ -6,9 +6,11 @@ import { GetRatingInfo } from './hooks/GetRatingInfo';
 import {
   ButtonContainer,
   CommentBLock,
+  MainBlock,
   QuestionContainer,
   SaveButton,
   SelectsLabel,
+  Title,
 } from './stylesContants';
 import { nextText, submitText } from './constants';
 
@@ -38,10 +40,8 @@ export function ServiceRating() {
 
   return (
     <ServiceModal isOpen={isModalVisible} onClose={onClose}>
-      <div style={{ maxHeight: '60vh' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '32px' }}>
-          Оцените пожалуйста наш сервис
-        </h2>
+      <MainBlock>
+        <Title>Оцените пожалуйста наш сервис</Title>
         {data?.map(item => (
           <QuestionContainer key={item.id}>
             <h4>{item?.text}</h4>
@@ -105,7 +105,7 @@ export function ServiceRating() {
             {data && activeItemIndex < data?.length - 1 ? nextText : submitText}
           </SaveButton>
         </ButtonContainer>
-      </div>
+      </MainBlock>
     </ServiceModal>
   );
 }

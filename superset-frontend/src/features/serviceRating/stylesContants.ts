@@ -2,6 +2,13 @@
 
 import { styled } from '@superset-ui/core';
 
+export const MainBlock = styled.div`
+  max-height: 60vh;
+`;
+export const Title = styled.h2`
+  text-align: center;
+  margin-bottom: 32px;
+`;
 export const ButtonContainer = styled.div`
   display: flex;
   align-items: center;

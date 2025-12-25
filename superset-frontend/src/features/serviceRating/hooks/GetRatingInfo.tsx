@@ -65,8 +65,8 @@ export const GetRatingInfo = () => {
   useEffect(() => {
     if (user?.email) {
       (async () => {
-        const data = await getQuestions(user.email);
-        // const data = questions;
+        // const data = await getQuestions(user.email);
+        const data = questions;
         if (data?.length) {
           setIsModalVisible(true);
           setData(data);

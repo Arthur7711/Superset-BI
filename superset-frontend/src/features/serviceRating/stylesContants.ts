@@ -61,3 +61,9 @@ export const SelectsLabel = styled.label`
 export const CommentBLock = styled.div`
   margin-top: 8px;
 `;
+
+export const QuestionContainer = styled.div`
+  margin: 50px 0;
+  border-bottom: 2px dashed gray;
+  padding-bottom: 8px;
+`;

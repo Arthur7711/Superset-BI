@@ -8,6 +8,13 @@ export const ButtonContainer = styled.div`
   justify-content: flex-end;
   margin: 16px 0;
 `;
+export const SaveButton = styled.button`
+  background-color: rgba(255, 165, 0, 0.7);
+  color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+`;
 export const DetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -37,4 +44,20 @@ export const StarsContainer = styled.div`
     color: lightgray;
     font-size: 56px;
   }
+`;
+
+export const SelectsLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+
+  & input[type='checkbox'] {
+    accent-color: orange;
+  }
+`;
+
+export const CommentBLock = styled.div`
+  margin-top: 8px;
 `;

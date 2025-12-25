@@ -45,9 +45,13 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-// buttonTitle,
-// onHandledPrimaryAction,
-export function ServiceModal({ children, isOpen, onClose }: ModalProps) {
+export function ServiceModal({
+  children,
+  isOpen,
+  onClose,
+  // buttonTitle,
+  // onHandledPrimaryAction,
+}: ModalProps) {
   return (
     <StyledModal
       show={isOpen}

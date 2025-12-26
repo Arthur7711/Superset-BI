@@ -32,6 +32,7 @@ export const StarsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 40px;
 
   span {
     cursor: pointer;
@@ -70,7 +71,7 @@ export const CommentBLock = styled.div`
 `;
 
 export const QuestionContainer = styled.div`
-  margin: 50px 0;
+  margin: 22px 0 0 0;
   border-bottom: 2px dashed gray;
-  padding-bottom: 8px;
+  padding-bottom: 22px;
 `;

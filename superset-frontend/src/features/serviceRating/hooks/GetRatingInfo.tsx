@@ -19,6 +19,12 @@ export const GetRatingInfo = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
+  const [saveData, setSaveData] = useState<
+    {
+      choices: string[];
+      id: number | string;
+    }[]
+  >([]);
   const { user } = GetUserData();
 
   const rateItem = () => {
@@ -33,23 +39,23 @@ export const GetRatingInfo = () => {
       const multiChoiceData = comment
         ? [...multiChoice.filter(el => el !== other), comment]
         : multiChoice;
-      postAnswer(
-        user.email,
-        activeItem.id,
-        activeItem.is_multichoice ? multiChoiceData : [`${rating}`],
-      ).then(d => {
-        const nextElement = data[nexIndex];
-        setRating(0);
-        if (nextElement) {
-          setActiveItemIndex(nexIndex);
-          setActiveItem(nextElement);
-        } else {
-          setActiveItem(null);
-          setData(null);
-          setIsModalVisible(false);
-          setMultiChoice([]);
-        }
-      });
+      // postAnswer(
+      //   user.email,
+      //   activeItem.id,
+      //   activeItem.is_multichoice ? multiChoiceData : [`${rating}`],
+      // ).then(d => {
+      const nextElement = data[nexIndex];
+      setRating(0);
+      if (nextElement) {
+        setActiveItemIndex(nexIndex);
+        setActiveItem(nextElement);
+      } else {
+        setActiveItem(null);
+        setData(null);
+        setIsModalVisible(false);
+        setMultiChoice([]);
+      }
+      // });
     }
   };
   const onCheck = (item: string) => {
@@ -62,12 +68,26 @@ export const GetRatingInfo = () => {
   const closeModal = () => {
     setIsModalVisible(false);
   };
+  const onRating = (id: number | string, rating: number) => {
+    const item = saveData.find(el => el.id === id);
+    const otherItems = saveData.filter(el => el.id !== id);
+    if (item) {
+      item.choices = [`${rating}`];
+      setSaveData([...otherItems, item]);
+    }
+  };
+  const getRating = (id: number | string) => {
+    const selectedItem = saveData.find(el => el.id === id);
+    return Number(selectedItem?.choices[0]);
+  };
   useEffect(() => {
     if (user?.email) {
       (async () => {
         // const data = await getQuestions(user.email);
         const data = questions;
         if (data?.length) {
+          const innerData = data.map(el => ({ id: el.id, choices: [] }));
+          setSaveData(innerData);
           setIsModalVisible(true);
           setData(data);
           setActiveItem(data?.[0]);
@@ -75,14 +95,14 @@ export const GetRatingInfo = () => {
       })();
     }
   }, [user?.email]);
-  useEffect(() => {
-    if (multiChoice.includes(other)) {
-      setShowComment(true);
-    } else {
-      setShowComment(false);
-      setComment('');
-    }
-  }, [activeItem, multiChoice]);
+  // useEffect(() => {
+  //   if (multiChoice.includes(other)) {
+  //     setShowComment(true);
+  //   } else {
+  //     setShowComment(false);
+  //     setComment('');
+  //   }
+  // }, [activeItem, multiChoice]);
 
   return {
     data,
@@ -98,5 +118,8 @@ export const GetRatingInfo = () => {
     showComment,
     comment,
     setComment,
+    saveData,
+    onRating,
+    getRating,
   };
 };

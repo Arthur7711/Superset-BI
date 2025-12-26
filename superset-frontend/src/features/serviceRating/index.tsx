@@ -32,6 +32,9 @@ export function ServiceRating() {
     comment,
     setComment,
     showComment,
+    saveData,
+    onRating,
+    getRating,
   } = GetRatingInfo();
   const onClose = () => {
     closeModal();
@@ -42,37 +45,43 @@ export function ServiceRating() {
     <ServiceModal isOpen={isModalVisible} onClose={onClose}>
       <MainBlock>
         <Title>Оцените пожалуйста наш сервис</Title>
-        {data?.map(item => (
-          <QuestionContainer key={item.id}>
-            <h4>{item?.text}</h4>
-            {!item?.is_multichoice && (
-              <Stars rating={rating} onChange={setRating} />
-            )}
-            <div>
-              {item?.is_multichoice &&
-                item.answers_to_choice.map(el => (
-                  <div key={el}>
-                    <SelectsLabel>
-                      <input
-                        type="checkbox"
-                        checked={multiChoice.includes(el)}
-                        onChange={() => onCheck(el)}
+        {data &&
+          !!data.length &&
+          data?.map((item, i) => (
+            <QuestionContainer key={item.id}>
+              <h4>{item.text}</h4>
+              {!item.is_multichoice && (
+                <Stars
+                  rating={getRating(item.id)}
+                  onChange={rating => onRating(item.id, rating)}
+                />
+              )}
+              {item.is_multichoice && (
+                <div>
+                  {item?.answers_to_choice.map(el => (
+                    <div key={el}>
+                      <SelectsLabel>
+                        <input
+                          type="checkbox"
+                          checked={multiChoice.includes(el)}
+                          onChange={() => onCheck(el)}
+                        />
+                        <span>{el}</span>
+                      </SelectsLabel>
+                    </div>
+                  ))}
+                  <CommentBLock>
+                    {showComment && (
+                      <TextArea
+                        value={comment}
+                        onChange={e => setComment(e.target.value)}
                       />
-                      <span>{el}</span>
-                    </SelectsLabel>
-                  </div>
-                ))}
-              <CommentBLock>
-                {showComment && (
-                  <TextArea
-                    value={comment}
-                    onChange={e => setComment(e.target.value)}
-                  />
-                )}
-              </CommentBLock>
-            </div>
-          </QuestionContainer>
-        ))}
+                    )}
+                  </CommentBLock>
+                </div>
+              )}
+            </QuestionContainer>
+          ))}
         {/* <h4>{activeItem?.text}</h4>
         {!activeItem?.is_multichoice && (
           <Stars rating={rating} onChange={setRating} />

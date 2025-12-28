@@ -48,9 +48,9 @@ const StyledModal = styled(Modal)`
 export function ServiceModal({
   children,
   isOpen,
-  onClose,
   // buttonTitle,
   // onHandledPrimaryAction,
+  onClose,
 }: ModalProps) {
   return (
     <StyledModal
@@ -62,6 +62,7 @@ export function ServiceModal({
       hideFooter // remove footer
       // primaryButtonName={buttonTitle}
       // onHandledPrimaryAction={onHandledPrimaryAction}
+      width="60vw"
     >
       {children}
     </StyledModal>

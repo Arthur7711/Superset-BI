@@ -27,6 +27,12 @@ export const GetRatingInfo = () => {
   >([]);
   const { user } = GetUserData();
 
+  const rateItems = () => {
+    if (saveData && user?.email) {
+      console.log('saveData', saveData, multiChoice);
+    }
+  };
+
   const rateItem = () => {
     if (
       activeItem &&
@@ -95,14 +101,29 @@ export const GetRatingInfo = () => {
       })();
     }
   }, [user?.email]);
-  // useEffect(() => {
-  //   if (multiChoice.includes(other)) {
-  //     setShowComment(true);
-  //   } else {
-  //     setShowComment(false);
-  //     setComment('');
-  //   }
-  // }, [activeItem, multiChoice]);
+
+  useEffect(() => {
+    if (data && multiChoice) {
+      if (multiChoice.includes(other)) {
+        setShowComment(true);
+      } else {
+        setShowComment(false);
+        setComment('');
+      }
+      const multiChoiceItem = data.find(el => el.is_multichoice);
+      if (multiChoiceItem) {
+        const item = saveData.find(el => el.id === multiChoiceItem.id);
+        const otherItems = saveData.filter(el => el.id !== multiChoiceItem.id);
+        if (item) {
+          item.choices =
+            comment && multiChoice.includes(other)
+              ? [...multiChoice.filter(el => el !== other), comment]
+              : multiChoice;
+          setSaveData([...otherItems, item]);
+        }
+      }
+    }
+  }, [data, multiChoice, comment]);
 
   return {
     data,
@@ -121,5 +142,6 @@ export const GetRatingInfo = () => {
     saveData,
     onRating,
     getRating,
+    rateItems,
   };
 };

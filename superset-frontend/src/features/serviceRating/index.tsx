@@ -12,7 +12,7 @@ import {
   SelectsLabel,
   Title,
 } from './stylesContants';
-import { nextText, submitText } from './constants';
+import { submitText } from './constants';
 
 const { TextArea } = Input;
 
@@ -21,20 +21,21 @@ export function ServiceRating() {
   const {
     data,
     onCheck,
-    rateItem,
-    activeItem,
+    // rateItem,
+    // activeItem,
     multiChoice,
-    rating,
-    setRating,
-    activeItemIndex,
+    // rating,
+    // setRating,
+    // activeItemIndex,
     isModalVisible,
     closeModal,
     comment,
     setComment,
     showComment,
-    saveData,
+    // saveData,
     onRating,
     getRating,
+    rateItems,
   } = GetRatingInfo();
   const onClose = () => {
     closeModal();
@@ -47,7 +48,7 @@ export function ServiceRating() {
         <Title>Оцените пожалуйста наш сервис</Title>
         {data &&
           !!data.length &&
-          data?.map((item, i) => (
+          data?.map(item => (
             <QuestionContainer key={item.id}>
               <h4>{item.text}</h4>
               {!item.is_multichoice && (
@@ -110,8 +111,8 @@ export function ServiceRating() {
           </CommentBLock>
         </div> */}
         <ButtonContainer>
-          <SaveButton onClick={rateItem} type="button">
-            {data && activeItemIndex < data?.length - 1 ? nextText : submitText}
+          <SaveButton onClick={rateItems} type="button">
+            {submitText}
           </SaveButton>
         </ButtonContainer>
       </MainBlock>

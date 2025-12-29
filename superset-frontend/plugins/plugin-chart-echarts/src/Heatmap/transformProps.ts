@@ -127,6 +127,23 @@ export default function transformProps(
     currencyFormat,
   );
 
+  function getAxisUniqueLabels(
+    data: { [key: string]: string | number }[],
+    axisLabel: string,
+  ): (string | number)[] {
+    const seen = new Set();
+
+    return data
+      .map(row => row[axisLabel] ?? NULL_STRING)
+      .filter(value => {
+        if (seen.has(value)) {
+          return false;
+        }
+        seen.add(value);
+        return true;
+      });
+  }
+
   let [min, max] = (valueBounds || []).map(parseAxisBound);
   if (min === undefined) {
     min =
@@ -163,11 +180,26 @@ export default function transformProps(
     },
   ];
 
+  const MIN_CELL_WIDTH = 40;
+  const MIN_CELL_HEIGHT = 28;
+  const xAxisLabels = getAxisUniqueLabels(data, xAxisLabel);
+  const yAxisLabels = getAxisUniqueLabels(data, yAxisLabel);
+  const xCount = xAxisLabels.length;
+  const yCount = yAxisLabels.length;
+
+  const gridWidth = Math.max(Math.round(xCount * MIN_CELL_WIDTH), width);
+  const gridHeight = Math.max(
+    Math.round((yCount * MIN_CELL_HEIGHT) / 2),
+    height,
+  );
+  console.log('this', gridWidth, gridHeight);
   const echartOptions: EChartsOption = {
     grid: {
       containLabel: true,
       bottom: bottomMargin,
       left: leftMargin,
+      width: gridWidth,
+      height: gridHeight,
     },
     series,
     tooltip: {
@@ -243,8 +275,8 @@ export default function transformProps(
   return {
     refs,
     echartOptions,
-    width,
-    height,
+    width: gridWidth,
+    height: gridHeight,
     formData,
   };
 }

@@ -1,7 +1,7 @@
 export const questions = [
   {
     id: 1,
-    text: 'Насколько в целом вы удовлетворены работой с Superset?',
+    text: 'Насколько вы в целом удовлетворены работой с Superset за последний месяц?',
     is_multichoice: false,
     answers_to_choice: ['1', '2', '3', '4', '5'],
   },

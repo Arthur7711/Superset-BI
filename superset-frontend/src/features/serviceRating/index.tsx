@@ -1,4 +1,4 @@
-import { Input } from 'antd';
+import { Input, Checkbox } from 'antd-v5';
 import { ServiceModal } from './Modal';
 import { Stars } from './Stars';
 import { useModalTimer } from './hooks/useModalTimer';
@@ -17,33 +17,28 @@ import { submitText } from './constants';
 const { TextArea } = Input;
 
 export function ServiceRating() {
-  // const { connectToCookies, isModalVisible } = useModalTimer();
   const {
     data,
     onCheck,
-    // rateItem,
-    // activeItem,
     multiChoice,
-    // rating,
-    // setRating,
-    // activeItemIndex,
     isModalVisible,
     closeModal,
     comment,
     setComment,
     showComment,
-    // saveData,
     onRating,
     getRating,
     rateItems,
+    isDisabled,
+    userId,
   } = GetRatingInfo();
+  const { connectToCookies, isVisible } = useModalTimer(userId);
   const onClose = () => {
     closeModal();
-    // connectToCookies();
+    connectToCookies();
   };
-
   return (
-    <ServiceModal isOpen={isModalVisible} onClose={onClose}>
+    <ServiceModal isOpen={isModalVisible && isVisible} onClose={onClose}>
       <MainBlock>
         <Title>Оцените пожалуйста наш сервис</Title>
         {data &&
@@ -51,6 +46,14 @@ export function ServiceRating() {
           data?.map(item => (
             <QuestionContainer key={item.id}>
               <h4>{item.text}</h4>
+              {!item.is_multichoice && (
+                <ul>
+                  <li>{item.answers_to_choice[0]}</li>
+                  <li>
+                    {item.answers_to_choice[item.answers_to_choice.length - 1]}
+                  </li>
+                </ul>
+              )}
               {!item.is_multichoice && (
                 <Stars
                   rating={getRating(item.id)}
@@ -62,8 +65,7 @@ export function ServiceRating() {
                   {item?.answers_to_choice.map(el => (
                     <div key={el}>
                       <SelectsLabel>
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={multiChoice.includes(el)}
                           onChange={() => onCheck(el)}
                         />
@@ -83,35 +85,8 @@ export function ServiceRating() {
               )}
             </QuestionContainer>
           ))}
-        {/* <h4>{activeItem?.text}</h4>
-        {!activeItem?.is_multichoice && (
-          <Stars rating={rating} onChange={setRating} />
-        )} */}
-        {/* <div>
-          {activeItem?.is_multichoice &&
-            activeItem.answers_to_choice.map(el => (
-              <div key={el}>
-                <SelectsLabel>
-                  <input
-                    type="checkbox"
-                    checked={multiChoice.includes(el)}
-                    onChange={() => onCheck(el)}
-                  />
-                  <span>{el}</span>
-                </SelectsLabel>
-              </div>
-            ))}
-          <CommentBLock>
-            {showComment && (
-              <TextArea
-                value={comment}
-                onChange={e => setComment(e.target.value)}
-              />
-            )}
-          </CommentBLock>
-        </div> */}
         <ButtonContainer>
-          <SaveButton onClick={rateItems} type="button">
+          <SaveButton onClick={rateItems} type="button" disabled={isDisabled}>
             {submitText}
           </SaveButton>
         </ButtonContainer>

@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getQuestions, postAnswer } from '../services/questionsServices';
+import {
+  getQuestions,
+  postAnswer,
+  postAnswers,
+} from '../services/questionsServices';
 import { GetUserData } from './GetUserData';
 import { questions } from '../mockData';
 
@@ -21,15 +25,23 @@ export const GetRatingInfo = () => {
   const [showComment, setShowComment] = useState(false);
   const [saveData, setSaveData] = useState<
     {
-      choices: string[];
-      id: number | string;
+      answers: string[];
+      id: number;
     }[]
   >([]);
+  const [isDisabled, setDisabled] = useState(true);
   const { user } = GetUserData();
 
   const rateItems = () => {
-    if (saveData && user?.email) {
+    if (saveData && user?.email && !isDisabled) {
       console.log('saveData', saveData, multiChoice);
+      postAnswers(user.email, saveData).then(() => {
+        setData(null);
+        setIsModalVisible(false);
+        setMultiChoice([]);
+        setSaveData([]);
+        setComment('');
+      });
     }
   };
 
@@ -78,21 +90,23 @@ export const GetRatingInfo = () => {
     const item = saveData.find(el => el.id === id);
     const otherItems = saveData.filter(el => el.id !== id);
     if (item) {
-      item.choices = [`${rating}`];
+      item.answers = [`${rating}`];
       setSaveData([...otherItems, item]);
     }
   };
   const getRating = (id: number | string) => {
     const selectedItem = saveData.find(el => el.id === id);
-    return Number(selectedItem?.choices[0]);
+    return Number(selectedItem?.answers[0]);
   };
+
   useEffect(() => {
     if (user?.email) {
       (async () => {
         // const data = await getQuestions(user.email);
         const data = questions;
+        console.log('data', data);
         if (data?.length) {
-          const innerData = data.map(el => ({ id: el.id, choices: [] }));
+          const innerData = data.map(el => ({ id: el.id, answers: [] }));
           setSaveData(innerData);
           setIsModalVisible(true);
           setData(data);
@@ -115,7 +129,7 @@ export const GetRatingInfo = () => {
         const item = saveData.find(el => el.id === multiChoiceItem.id);
         const otherItems = saveData.filter(el => el.id !== multiChoiceItem.id);
         if (item) {
-          item.choices =
+          item.answers =
             comment && multiChoice.includes(other)
               ? [...multiChoice.filter(el => el !== other), comment]
               : multiChoice;
@@ -124,6 +138,11 @@ export const GetRatingInfo = () => {
       }
     }
   }, [data, multiChoice, comment]);
+
+  useEffect(() => {
+    const isEmptyItem = saveData.find(el => !el.answers.length);
+    setDisabled(!!isEmptyItem);
+  }, [saveData]);
 
   return {
     data,
@@ -143,5 +162,7 @@ export const GetRatingInfo = () => {
     onRating,
     getRating,
     rateItems,
+    isDisabled,
+    userId: user?.email || '',
   };
 };

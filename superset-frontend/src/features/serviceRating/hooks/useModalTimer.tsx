@@ -4,19 +4,19 @@ import { setCookie, getCookie } from '../utils/cookiesController';
 
 const COOKIE_KEY = 'modal_last_shown';
 
-export function useModalTimer() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+export function useModalTimer(userId: string) {
+  const [isVisible, setModalVisible] = useState(false);
   const location = useLocation();
 
   const connectToCookies = () => {
-    setCookie(COOKIE_KEY, 'shown', 1);
-    setIsModalVisible(false);
+    setCookie(`${COOKIE_KEY}_${userId}`, 'shown', 1);
+    setModalVisible(false);
   };
   useEffect(() => {
-    const cookie = getCookie(COOKIE_KEY);
+    const cookie = getCookie(`${COOKIE_KEY}_${userId}`);
     if (!cookie) {
-      setIsModalVisible(true);
+      setModalVisible(true);
     }
   }, [location.pathname]);
-  return { isModalVisible, connectToCookies };
+  return { isVisible, connectToCookies };
 }

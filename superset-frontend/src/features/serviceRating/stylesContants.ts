@@ -1,6 +1,7 @@
 /* eslint-disable theme-colors/no-literal-colors */
 
 import { styled } from '@superset-ui/core';
+import { Radio } from 'antd-v5';
 
 export const MainBlock = styled.div`
   max-height: 60vh;
@@ -13,14 +14,18 @@ export const ButtonContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: 16px 0;
+  padding: 16px 0;
 `;
 export const SaveButton = styled.button`
-  background-color: rgba(255, 165, 0, 0.7);
-  color: rgba(0, 0, 0, 0.7);
+  background-color: #20a7c9;
   border: none;
   border-radius: 4px;
   font-weight: 600;
+  color: #ffffff;
+
+  &:disabled {
+    background: #d6d2d2;
+  }
 `;
 export const DetailsContainer = styled.div`
   display: flex;
@@ -54,6 +59,17 @@ export const StarsContainer = styled.div`
   }
 `;
 
+export const RadioGroup = styled(Radio.Group)`
+  label {
+    flex-direction: column;
+  }
+`;
+export const RadioContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const SelectsLabel = styled.label`
   display: flex;
   align-items: center;
@@ -62,7 +78,7 @@ export const SelectsLabel = styled.label`
   padding: 0;
 
   & input[type='checkbox'] {
-    accent-color: orange;
+    accent-color: #20a7c9;
   }
 `;
 
@@ -73,5 +89,5 @@ export const CommentBLock = styled.div`
 export const QuestionContainer = styled.div`
   margin: 22px 0 0 0;
   border-bottom: 2px dashed gray;
-  padding-bottom: 22px;
+  // padding-bottom: 22px;
 `;

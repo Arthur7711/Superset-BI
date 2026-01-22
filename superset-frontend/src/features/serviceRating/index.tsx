@@ -1,4 +1,6 @@
-import { Input, Checkbox } from 'antd-v5';
+import { Input } from 'antd-v5';
+import { getUrlParam } from 'src/utils/urlUtils';
+import { URL_PARAMS } from 'src/constants';
 import { ServiceModal } from './Modal';
 import { Stars } from './Stars';
 import { useModalTimer } from './hooks/useModalTimer';
@@ -7,9 +9,10 @@ import {
   ButtonContainer,
   CommentBLock,
   MainBlock,
+  MultiContainer,
   QuestionContainer,
+  RadioMultiGroup,
   SaveButton,
-  SelectsLabel,
   Title,
 } from './stylesContants';
 import { submitText } from './constants';
@@ -19,13 +22,10 @@ const { TextArea } = Input;
 export function ServiceRating() {
   const {
     data,
-    onCheck,
-    multiChoice,
     isModalVisible,
     closeModal,
     comment,
     setComment,
-    showComment,
     onRating,
     getRating,
     rateItems,
@@ -37,10 +37,14 @@ export function ServiceRating() {
     closeModal();
     connectToCookies();
   };
+
+  const standalone = getUrlParam(URL_PARAMS.standalone);
+  if (standalone) return <></>;
+
   return (
     <ServiceModal isOpen={isModalVisible && isVisible} onClose={onClose}>
       <MainBlock>
-        <Title>Оцените пожалуйста наш сервис</Title>
+        <Title>Оцените качество сервиса</Title>
         {data &&
           !!data.length &&
           data?.map(item => (
@@ -56,25 +60,25 @@ export function ServiceRating() {
               )}
               {!item.is_multichoice && (
                 <Stars
-                  rating={getRating(item.id)}
+                  rating={Number(getRating(item.id))}
                   onChange={rating => onRating(item.id, rating)}
                 />
               )}
               {item.is_multichoice && (
                 <div>
-                  {item?.answers_to_choice.map(el => (
-                    <div key={el}>
-                      <SelectsLabel>
-                        <Checkbox
-                          checked={multiChoice.includes(el)}
-                          onChange={() => onCheck(el)}
-                        />
-                        <span>{el}</span>
-                      </SelectsLabel>
-                    </div>
-                  ))}
+                  <MultiContainer>
+                    <RadioMultiGroup
+                      options={item?.answers_to_choice.map(el => ({
+                        value: el,
+                        label: `${el}`,
+                        id: el,
+                      }))}
+                      value={getRating(item.id)}
+                      onChange={el => onRating(item.id, el.target.value)}
+                    />
+                  </MultiContainer>
                   <CommentBLock>
-                    {showComment && (
+                    {getRating(item.id) === 'Другое' && (
                       <TextArea
                         value={comment}
                         onChange={e => setComment(e.target.value)}

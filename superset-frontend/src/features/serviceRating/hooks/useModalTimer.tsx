@@ -9,14 +9,16 @@ export function useModalTimer(userId: string) {
   const location = useLocation();
 
   const connectToCookies = () => {
-    setCookie(`${COOKIE_KEY}_${userId}`, 'shown', 1);
+    setCookie(`${COOKIE_KEY}_${userId}`, 'shown', 0.5);
     setModalVisible(false);
   };
   useEffect(() => {
-    const cookie = getCookie(`${COOKIE_KEY}_${userId}`);
-    if (!cookie) {
-      setModalVisible(true);
+    if (userId) {
+      const cookie = getCookie(`${COOKIE_KEY}_${userId}`);
+      if (!cookie) {
+        setModalVisible(true);
+      }
     }
-  }, [location.pathname]);
+  }, [location.pathname, userId]);
   return { isVisible, connectToCookies };
 }

@@ -91,3 +91,15 @@ export const QuestionContainer = styled.div`
   border-bottom: 2px dashed gray;
   // padding-bottom: 22px;
 `;
+
+export const RadioMultiGroup = styled(Radio.Group)`
+  label {
+    flex-direction: row;
+    display: flex;
+  }
+`;
+export const MultiContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+`;

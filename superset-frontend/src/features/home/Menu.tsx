@@ -35,6 +35,7 @@ import {
   MenuData,
 } from 'src/types/bootstrapTypes';
 import RightMenu from './RightMenu';
+import { ServiceRating } from '../serviceRating';
 
 interface MenuProps {
   data: MenuData;
@@ -301,69 +302,72 @@ export function Menu({
     );
   };
   return (
-    <StyledHeader className="top" id="main-menu" role="navigation">
-      <Global styles={globalStyles(theme)} />
-      <Row>
-        <Col md={16} xs={24}>
-          <Tooltip
-            id="brand-tooltip"
-            placement="bottomLeft"
-            title={brand.tooltip}
-            arrowPointAtCenter
-          >
-            {isFrontendRoute(window.location.pathname) ? (
-              <GenericLink className="navbar-brand" to={brand.path}>
-                <img src={brand.icon} alt={brand.alt} />
-              </GenericLink>
-            ) : (
-              <a className="navbar-brand" href={brand.path} tabIndex={-1}>
-                <img src={brand.icon} alt={brand.alt} />
-              </a>
+    <>
+      <StyledHeader className="top" id="main-menu" role="navigation">
+        <Global styles={globalStyles(theme)} />
+        <Row>
+          <Col md={16} xs={24}>
+            <Tooltip
+              id="brand-tooltip"
+              placement="bottomLeft"
+              title={brand.tooltip}
+              arrowPointAtCenter
+            >
+              {isFrontendRoute(window.location.pathname) ? (
+                <GenericLink className="navbar-brand" to={brand.path}>
+                  <img src={brand.icon} alt={brand.alt} />
+                </GenericLink>
+              ) : (
+                <a className="navbar-brand" href={brand.path} tabIndex={-1}>
+                  <img src={brand.icon} alt={brand.alt} />
+                </a>
+              )}
+            </Tooltip>
+            {brand.text && (
+              <div className="navbar-brand-text">
+                <span>{brand.text}</span>
+              </div>
             )}
-          </Tooltip>
-          {brand.text && (
-            <div className="navbar-brand-text">
-              <span>{brand.text}</span>
-            </div>
-          )}
-          <DropdownMenu
-            mode={showMenu}
-            data-test="navbar-top"
-            className="main-nav"
-            selectedKeys={activeTabs}
-          >
-            {menu.map((item, index) => {
-              const props = {
-                index,
-                ...item,
-                isFrontendRoute: isFrontendRoute(item.url),
-                childs: item.childs?.map(c => {
-                  if (typeof c === 'string') {
-                    return c;
-                  }
+            <DropdownMenu
+              mode={showMenu}
+              data-test="navbar-top"
+              className="main-nav"
+              selectedKeys={activeTabs}
+            >
+              {menu.map((item, index) => {
+                const props = {
+                  index,
+                  ...item,
+                  isFrontendRoute: isFrontendRoute(item.url),
+                  childs: item.childs?.map(c => {
+                    if (typeof c === 'string') {
+                      return c;
+                    }
 
-                  return {
-                    ...c,
-                    isFrontendRoute: isFrontendRoute(c.url),
-                  };
-                }),
-              };
+                    return {
+                      ...c,
+                      isFrontendRoute: isFrontendRoute(c.url),
+                    };
+                  }),
+                };
 
-              return renderSubMenu(props);
-            })}
-          </DropdownMenu>
-        </Col>
-        <Col md={8} xs={24}>
-          <RightMenu
-            align={screens.md ? 'flex-end' : 'flex-start'}
-            settings={settings}
-            navbarRight={navbarRight}
-            isFrontendRoute={isFrontendRoute}
-            environmentTag={environmentTag}
-          />
-        </Col>
-      </Row>
-    </StyledHeader>
+                return renderSubMenu(props);
+              })}
+            </DropdownMenu>
+          </Col>
+          <Col md={8} xs={24}>
+            <RightMenu
+              align={screens.md ? 'flex-end' : 'flex-start'}
+              settings={settings}
+              navbarRight={navbarRight}
+              isFrontendRoute={isFrontendRoute}
+              environmentTag={environmentTag}
+            />
+          </Col>
+        </Row>
+      </StyledHeader>
+      <ServiceRating />
+    </>
   );
 }
 

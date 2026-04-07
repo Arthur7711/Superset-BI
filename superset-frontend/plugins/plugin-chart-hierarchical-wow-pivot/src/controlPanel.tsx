@@ -87,15 +87,46 @@ const allColumnsControl: typeof sharedControls.groupby = {
   visibility: isRawMode,
   resetOnHide: false,
 };
+function createAxisControl(): ControlSetRow[] {
+  // const isXAxis = axis === 'x';
+  // const isVertical = (controls: ControlStateMapping) =>
+  //   Boolean(controls?.orientation.value === OrientationType.Vertical);
+  // const isHorizontal = (controls: ControlStateMapping) =>
+  //   Boolean(controls?.orientation.value === OrientationType.Horizontal);
+  console.log('sharedControls', sharedControls);
+  return [
+    [
+      {
+        name: 'x_axis_time_format',
+        config: {
+          ...sharedControls.x_axis_time_format,
+          default: 'smart_date',
+          description: `${D3_TIME_FORMAT_DOCS}. ${TIME_SERIES_DESCRIPTION_TEXT}`,
+          visibility: ({ controls }: ControlPanelsContainerProps) =>
+            'horizontal',
+          disableStash: true,
+          resetOnHide: false,
+        },
+      },
+    ],
+    // [
+    //   {
+    //     name: xAxisLabelRotation.name,
+    //     config: {
+    //       ...xAxisLabelRotation.config,
+    //       visibility: ({ controls }: ControlPanelsContainerProps) =>
+    //         isXAxis ? isVertical(controls) : isHorizontal(controls),
+    //       disableStash: true,
+    //       resetOnHide: false,
+    //     },
+    //   },
+    // ],
+    ['currency_format'],
+  ];
+}
 const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.legacyTimeseriesTime,
-    // {
-    //   ...sections.legacyTimeseriesTime,
-    //   controlSetRows: sections.legacyTimeseriesTime.controlSetRows.filter(
-    //     row => !row.includes('time_range'),
-    //   ),
-    // },
     {
       label: t('Query'),
       expanded: true,

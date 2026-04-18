@@ -32,3 +32,19 @@ export function formatWoW(
   const formatter = getNumberFormatter(formatStr || DEFAULT_PERCENT_FORMAT);
   return formatter(value);
 }
+
+export function formatPrevText(timeGrain: string): string {
+  if(timeGrain === 'P1D') return '7D ago';
+  return 'Previous';
+}
+
+export function formatWoWText(timeGrain: string): string {
+  switch(timeGrain) {
+    case 'P1D': return '7D ago,%';
+    case 'P1W': return 'WoW%';
+    case 'P1M': return 'MoM%';
+    case 'P3M': return 'QoQ%';
+    case 'P1Y': return 'YoY%';
+    default: return 'PoP%';
+  }
+}

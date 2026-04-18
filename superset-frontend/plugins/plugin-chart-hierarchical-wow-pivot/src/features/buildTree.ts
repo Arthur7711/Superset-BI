@@ -1,6 +1,6 @@
-import { CurrencyFormatter, NumberFormatter } from '@superset-ui/core';
-import { calculateDelta, calculateWoW } from './calculations';
-import { TreeNode, TreeNodeData, FlatRow } from './types';
+import { calculateDelta, calculateWoW } from '../helpers/calculations';
+import { TreeNode, FlatRow } from '../types';
+import { getPreviousPeriod } from '../helpers/getPreviousPeriod';
 
 export function buildTree(
   rows: Record<string, any>[],
@@ -8,9 +8,12 @@ export function buildTree(
   fullMetrics: string[],
   metricKeys: string[],
   showRootRow: boolean,
+  xAxis: string,
+  compareLag?: number,
+  timeGrainSqla?: 'P1D' | 'P1W' | 'P1M' | 'P3M' | 'P1Y',
 ): TreeNode {
   const root: TreeNode = {
-    name: 'All Categories',
+    name: 'Total',
     key: '__root__',
     level: 0,
     children: [],
@@ -35,16 +38,33 @@ export function buildTree(
         };
         current.children.push(child);
       }
-
+      
       if (depth === hierarchyColumns.length - 1) {
         for (const mk of metricKeys) {
-          const prev = fullMetrics.find(el => el !== mk && el.includes(mk));
+          const pvDate = getPreviousPeriod({dateInput: row[xAxis], unit: timeGrainSqla, period: compareLag});
+          const prev = rows.find((el, i) => {
+            return new Date(el[xAxis]).setHours(0, 0, 0, 0) === pvDate.setHours(0, 0, 0, 0) && el[colName] === row[colName]
+          });
+          // const prev = fullMetrics.find(el => el !== mk && el.includes(mk));
           const curVal = toNum(row[mk]);
-          const prevVal = toNum(row[`${prev}`]);
-          child.data[`${mk}_cur`] = curVal; //? defaultFormatter(curVal) : null;
-          child.data[`${mk}_prev`] = prevVal; //? defaultFormatter(prevVal) : null;
-          child.data[`${mk}_delta`] = calculateDelta(curVal, prevVal);
-          child.data[`${mk}_wow`] = calculateWoW(curVal, prevVal);
+          // const prevVal = toNum(row[`${prev}`]);
+          const prevVal = toNum(prev?.[mk]);
+
+          // [`${mk}_cur`]
+          if(!Object.keys(child.data).includes('xAxis')) {
+            child.data[`${mk}_cur`] = curVal; //? defaultFormatter(curVal) : null;
+            child.data[`${mk}_prev`] = prevVal; //? defaultFormatter(prevVal) : null;
+            child.data[`${mk}_delta`] = calculateDelta(curVal, prevVal);
+            child.data[`${mk}_wow`] = calculateWoW(curVal, prevVal);
+            child.data['xAxis'] = row[xAxis];
+          } else if(Object.keys(child.data).includes('xAxis') && new Date(child.data.xAxis) <= new Date(row[xAxis])){
+            child.data[`${mk}_cur`] = curVal; //? defaultFormatter(curVal) : null;
+            child.data[`${mk}_prev`] = prevVal; //? defaultFormatter(prevVal) : null;
+            child.data[`${mk}_delta`] = calculateDelta(curVal, prevVal);
+            child.data[`${mk}_wow`] = calculateWoW(curVal, prevVal);
+            child.data['xAxis'] = row[xAxis];
+          }
+          
         }
       }
 
@@ -87,7 +107,7 @@ function aggregateNode(
       const cv = child.data[`${mk}_cur`];
       const pv = child.data[`${mk}_prev`];
       if (cv != null) curSum = (curSum ?? 0) + cv;
-      if (pv != null) prevSum = (prevSum ?? 0) + pv;
+      if (pv != null) prevSum = (prevSum ?? 0)  + pv;
     }
 
     node.data[`${mk}_cur`] = curSum;

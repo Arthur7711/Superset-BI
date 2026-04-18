@@ -13,19 +13,18 @@ import { t, styled, CurrencyFormatter, getNumberFormatter } from '@superset-ui/c
 import type { ColumnsType } from 'antd/lib/table';
 import {
   TransformedProps,
-  MetricConfig,
   SortConfig,
   SubColumn,
   TreeNode,
   ConditionalFormatConfig,
 } from './types';
-import { flattenTree, collectAllKeys, collectEveryKey } from './buildTree';
-import { sortTree } from './sorting';
-import { searchTree } from './searchTree';
-import { formatMetricValue, formatDelta, formatWoW } from './formatting';
-import { exportCSV } from './ExportCSV';
-import Search from './Search';
-import MetricToggle from './MetricToggle';
+import { flattenTree, collectAllKeys, collectEveryKey } from './features/buildTree';
+import { sortTree } from './features/sorting';
+import { searchTree } from './features/searchTree';
+import { formatWoW, formatPrevText, formatWoWText } from './helpers/formatting';
+import { exportCSV } from './features/ExportCSV';
+import Search from './components/Search';
+import MetricToggle from './components/MetricToggle';
 import {
   StyledContainer,
   StyledTableContainer,
@@ -33,6 +32,7 @@ import {
   StyledPositiveValue,
   StyledNegativeValue,
 } from './styles';
+
 
 const StyledButton = styled(Button)`
   border: 2px solid rgb(187, 187, 187);
@@ -49,12 +49,12 @@ const FlexSpace = styled(Space)`
   gap: 8px;
   flex-shrink: 0;
 `;
-const SUB_COLUMNS: { key: SubColumn; label: string }[] = [
-  { key: 'cur', label: 'Current' },
-  { key: 'delta', label: 'Δ' },
-  { key: 'prev', label: 'Previous' },
-  { key: 'wow', label: 'WoW%' },
-];
+// const SUB_COLUMNS: { key: SubColumn; label: string }[] = [
+//   { key: 'cur', label: 'Current' },
+//   { key: 'delta', label: 'Δ' },
+//   { key: 'prev', label: 'Previous' },
+//   { key: 'wow', label: 'WoW%' },
+// ];
 
 export default function HierarchicalWowPivot(props: TransformedProps) {
   const {
@@ -67,8 +67,9 @@ export default function HierarchicalWowPivot(props: TransformedProps) {
     conditionalFormatting,
     currencyFormat,
     valueFormat,
-    columnFormats,
-    currencyFormats,
+    timeGrainSqla,
+    makeRevertDeltaDeviations,
+    makeRevertPopDeviations,
   } = props;
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,6 +80,15 @@ export default function HierarchicalWowPivot(props: TransformedProps) {
   const [enabledMetricKeys, setEnabledMetricKeys] = useState<Set<string>>(
     () => new Set(metrics.map(m => m.key)),
   );
+
+  const SUB_COLUMNS: { key: SubColumn; label: string }[] = useMemo(() => {
+    return [
+      { key: "cur", label: "Current" },
+      { key: "delta", label: "Δ" },
+      { key: "prev", label: formatPrevText(timeGrainSqla) },
+      { key: "wow", label: formatWoWText(timeGrainSqla) },
+    ];
+  }, [timeGrainSqla]);
 
   const enabledMetrics = useMemo(
     () => metrics.filter(m => enabledMetricKeys.has(m.key)),
@@ -172,38 +182,50 @@ export default function HierarchicalWowPivot(props: TransformedProps) {
       collectEveryKey(sortedTree),
       showRootRow,
     );
-    exportCSV({flatRows:allRows, enabledMetrics, formatter: defaultFormatter});
-  }, [sortedTree, showRootRow, enabledMetrics]);
+    const SUB_LABELS: Record<string, string> = SUB_COLUMNS.reduce((acc, sc) => {
+      acc[sc.key as string] = sc.label;
+      return acc;
+    }, {})
+    exportCSV({flatRows:allRows, enabledMetrics, formatter: defaultFormatter, SUB_LABELS });
+  }, [sortedTree, showRootRow, enabledMetrics, SUB_COLUMNS]);
 
   const renderCellValue = useCallback(
     (value: number | null, subCol: SubColumn, cf: ConditionalFormatConfig) => {
       if (subCol === 'cur' || subCol === 'prev') {
         return defaultFormatter(value);
-        // return formatMetricValue(value, valueFormat);
       }
 
       if (subCol === 'delta') {
-        const text = defaultFormatter(value); //formatDelta(value);
+        const text = defaultFormatter(value);
         if (!cf.enabled || value == null) return text;
-        if (value > cf.positiveThreshold)
-          return <StyledPositiveValue>{text}</StyledPositiveValue>;
-        if (value < cf.negativeThreshold)
-          return <StyledNegativeValue>{text}</StyledNegativeValue>;
+        if (value > cf.positiveThreshold){
+          if(makeRevertDeltaDeviations) return <StyledNegativeValue>{text}</StyledNegativeValue>;
+          return <StyledPositiveValue>{text}</StyledPositiveValue>
+        };
+        if (value < cf.negativeThreshold){
+          if(makeRevertDeltaDeviations) return <StyledPositiveValue>{text}</StyledPositiveValue>;
+          return <StyledNegativeValue>{text}</StyledNegativeValue>
+        };
         return text;
       }
 
       if (subCol === 'wow') {
         const text = formatWoW(value);
         if (!cf.enabled || value == null) return text;
-        if (value > cf.positiveThreshold)
-          return <Tag color="green">{text}</Tag>;
-        if (value < cf.negativeThreshold) return <Tag color="red">{text}</Tag>;
+        if (value > cf.positiveThreshold){
+          if(makeRevertPopDeviations) return <Tag color="red">{text}</Tag>;
+          return <Tag color="green">{text}</Tag>
+        };
+        if (value < cf.negativeThreshold) {
+          if(makeRevertPopDeviations) return <Tag color="green">{text}</Tag>;
+          return <Tag color="red">{text}</Tag>
+        };
         return <Tag>{text}</Tag>;
       }
       // ?? '—'
       return String(value);
     },
-    [defaultFormatter],
+    [defaultFormatter, makeRevertDeltaDeviations, makeRevertPopDeviations],
   );
 
   const getSortIcon = (metricKey: string, subColumn: SubColumn) => {
@@ -223,7 +245,7 @@ export default function HierarchicalWowPivot(props: TransformedProps) {
 
   const columns: ColumnsType<TreeNode> = useMemo(() => {
     const categoryColumn: any = {
-      title: t('Category'),
+      title: t(' '),
       dataIndex: 'name',
       key: 'category',
       width: 280,
@@ -298,8 +320,6 @@ export default function HierarchicalWowPivot(props: TransformedProps) {
     renderCellValue,
   ]);
 
-  // console.log('defaultFormatter', defaultFormatter(52345.678), tableData);
-  // console.log('customFormatsArray', customFormatsArray);
   if (!tree.children.length) {
     return (
       <StyledContainer height={height}>
@@ -376,6 +396,7 @@ export default function HierarchicalWowPivot(props: TransformedProps) {
           size="small"
           bordered
           rowKey="key"
+          tableLayout="auto"
         />
       </StyledTableContainer>
     </StyledContainer>

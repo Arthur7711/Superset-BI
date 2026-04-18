@@ -1,4 +1,4 @@
-import { TreeNode, SortConfig } from './types';
+import { TreeNode, SortConfig } from '../types';
 
 export function sortTree(node: TreeNode, sortConfig: SortConfig | null): TreeNode {
   if (!sortConfig) return node;

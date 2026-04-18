@@ -1,13 +1,13 @@
-import { FlatRow, MetricConfig, SubColumn } from './types';
-import { formatMetricValue, formatDelta, formatWoW } from './formatting';
+import { FlatRow, MetricConfig, SubColumn } from '../types';
+import { formatWoW } from '../helpers/formatting';
 
 const SUB_COLUMNS: SubColumn[] = ['cur', 'delta', 'prev', 'wow'];
-const SUB_LABELS: Record<SubColumn, string> = {
-  cur: 'Current',
-  delta: 'Δ',
-  prev: 'Previous',
-  wow: 'WoW%',
-};
+// const SUB_LABELS: Record<SubColumn, string> = {
+//   cur: 'Current',
+//   delta: 'Δ',
+//   prev: 'Previous',
+//   wow: 'WoW%',
+// };
 
 function escapeCSV(value: string): string {
   if (/[",\n\r]/.test(value)) {
@@ -17,11 +17,12 @@ function escapeCSV(value: string): string {
 }
 
 export function exportCSV(
- {flatRows, enabledMetrics, numberFormat, percentFormat, formatter} : { flatRows: FlatRow[],
+ {flatRows, enabledMetrics, numberFormat, percentFormat, formatter, SUB_LABELS} : { flatRows: FlatRow[],
   enabledMetrics: MetricConfig[],
   numberFormat?: string,
+  SUB_LABELS: Record<SubColumn, string>,
   percentFormat?: string,
-  formatter: (value: number | null) => string}
+  formatter: (value: number | null) => string},
 ): void {
   const headers: string[] = ['Category'];
   for (const m of enabledMetrics) {
@@ -42,10 +43,10 @@ export function exportCSV(
       const prev = row.node.data[`${m.key}_prev`];
       const wow = row.node.data[`${m.key}_wow`];
 
-      cells.push(escapeCSV(formatter(cur)));//formatMetricValue(cur, numberFormat)
-      cells.push(escapeCSV(formatter(delta))); //formatDelta(delta, numberFormat)
-      cells.push(escapeCSV(formatter(prev)));//formatMetricValue(cur, numberFormat)
-      cells.push(escapeCSV(formatWoW(wow, percentFormat)));
+      cells.push(escapeCSV(cur));//formatMetricValue(cur, numberFormat)
+      cells.push(escapeCSV(delta)); //formatDelta(delta, numberFormat)
+      cells.push(escapeCSV(prev));//formatMetricValue(cur, numberFormat)
+      cells.push(escapeCSV(wow));
     }
 
     csvRows.push(cells.join(','));

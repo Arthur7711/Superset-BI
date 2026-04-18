@@ -13,5 +13,6 @@ export function calculateWoW(
   if (cur == null || prev == null) return null;
   if (prev === 0 && cur === 0) return 0;
   if (prev === 0) return null;
-  return cur / prev - 1;
+  const makePositiveNegative = cur < 0 && prev < 0 ? -1 : 1;
+  return (cur / prev - 1) * makePositiveNegative;
 }

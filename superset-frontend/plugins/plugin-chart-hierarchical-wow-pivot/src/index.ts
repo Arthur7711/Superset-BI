@@ -2,6 +2,7 @@ import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
 import transformProps from './transformProps';
 import controlPanel from './controlPanel';
 import buildQuery from './buildQuery';
+import thumbnail from './images/thumbnail.png';
 
 const metadata = new ChartMetadata({
   behaviors: [Behavior.InteractiveChart],
@@ -18,7 +19,7 @@ const metadata = new ChartMetadata({
     t('Comparison'),
     t('Featured'),
   ],
-  thumbnail: '',
+  thumbnail,
 });
 
 export class HierarchicalWowPivotPlugin extends ChartPlugin {

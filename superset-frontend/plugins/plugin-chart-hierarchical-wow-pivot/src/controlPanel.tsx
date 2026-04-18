@@ -1,23 +1,17 @@
 import {
-  ChartDataResponseResult,
-  ensureIsArray,
-  GenericDataType,
   isAdhocColumn,
   isPhysicalColumn,
+  ensureIsArray,
   QueryFormColumn,
   QueryMode,
-  SMART_DATE_ID,
+  removeDuplicates,
   t,
-  validateNonEmpty,
 } from '@superset-ui/core';
 import {
   ColumnOption,
-  ControlConfig,
   ControlPanelConfig,
   ControlPanelsContainerProps,
   ControlStateMapping,
-  D3_TIME_FORMAT_OPTIONS,
-  QueryModeLabel,
   sharedControls,
   ControlPanelState,
   ControlState,
@@ -25,13 +19,9 @@ import {
   ColumnMeta,
   defineSavedMetrics,
   getStandardizedControls,
-  sections,
-  ControlSetRow,
-  D3_TIME_FORMAT_DOCS,
+  temporalColumnMixin,
 } from '@superset-ui/chart-controls';
-const TIME_SERIES_DESCRIPTION_TEXT: string = t(
-  'When using other than adaptive formatting, labels may overlap',
-);
+
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
   if (mode === QueryMode.Aggregate || mode === QueryMode.Raw) {
@@ -54,6 +44,7 @@ function isQueryMode(mode: QueryMode) {
 
 const isAggMode = isQueryMode(QueryMode.Aggregate);
 const isRawMode = isQueryMode(QueryMode.Raw);
+const ALLOWED_TIME_GRAINS = new Set(['P1D', 'P1W', 'P1M', 'P3M', 'P1Y']);
 
 const validateAggControlValues = (
   controls: ControlStateMapping,
@@ -87,50 +78,62 @@ const allColumnsControl: typeof sharedControls.groupby = {
   visibility: isRawMode,
   resetOnHide: false,
 };
-function createAxisControl(): ControlSetRow[] {
-  // const isXAxis = axis === 'x';
-  // const isVertical = (controls: ControlStateMapping) =>
-  //   Boolean(controls?.orientation.value === OrientationType.Vertical);
-  // const isHorizontal = (controls: ControlStateMapping) =>
-  //   Boolean(controls?.orientation.value === OrientationType.Horizontal);
-  console.log('sharedControls', sharedControls);
-  return [
-    [
-      {
-        name: 'x_axis_time_format',
-        config: {
-          ...sharedControls.x_axis_time_format,
-          default: 'smart_date',
-          description: `${D3_TIME_FORMAT_DOCS}. ${TIME_SERIES_DESCRIPTION_TEXT}`,
-          visibility: ({ controls }: ControlPanelsContainerProps) =>
-            'horizontal',
-          disableStash: true,
-          resetOnHide: false,
-        },
-      },
-    ],
-    // [
-    //   {
-    //     name: xAxisLabelRotation.name,
-    //     config: {
-    //       ...xAxisLabelRotation.config,
-    //       visibility: ({ controls }: ControlPanelsContainerProps) =>
-    //         isXAxis ? isVertical(controls) : isHorizontal(controls),
-    //       disableStash: true,
-    //       resetOnHide: false,
-    //     },
-    //   },
-    // ],
-    ['currency_format'],
-  ];
-}
 const config: ControlPanelConfig = {
   controlPanelSections: [
-    sections.legacyTimeseriesTime,
     {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
+        ['x_axis'],
+        [
+          {
+            name: 'time_grain_sqla',
+            config: {
+              ...sharedControls.time_grain_sqla,
+              mapStateToProps: (state, controlState) => {
+                const originalMapStateToProps =
+                  sharedControls.time_grain_sqla.mapStateToProps;
+                const mappedState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+
+                return {
+                  ...mappedState,
+                  choices: ensureIsArray(mappedState.choices).filter(choice => {
+                    if (!Array.isArray(choice) || choice.length === 0) {
+                      return false;
+                    }
+                    return ALLOWED_TIME_GRAINS.has(String(choice[0]));
+                  }),
+                };
+              },
+              visibility: ({ controls }) => {
+                const dttmLookup = Object.fromEntries(
+                  ensureIsArray(controls?.groupby?.options).map(option => [
+                    option.column_name,
+                    option.is_dttm,
+                  ]),
+                );
+                const selections = removeDuplicates([
+                  ...ensureIsArray(controls?.groupby?.value),
+                  controls?.x_axis?.value,
+                ]);
+
+                return selections
+                  .map(selection => {
+                    if (isAdhocColumn(selection)) {
+                      return true;
+                    }
+                    if (isPhysicalColumn(selection)) {
+                      return !!dttmLookup[selection];
+                    }
+                    return false;
+                  })
+                  .some(Boolean);
+              },
+            },
+          },
+          'temporal_columns_lookup',
+        ],
         [
           {
             name: 'groupby',
@@ -159,6 +162,8 @@ const config: ControlPanelConfig = {
               },
               rerender: [
                 'metrics',
+                'x_axis',
+                'time_grain_sqla',
                 // , 'percent_metrics'
               ],
               label: t('Hierarchy columns'),
@@ -195,6 +200,8 @@ const config: ControlPanelConfig = {
               }),
               rerender: [
                 'groupby',
+                'x_axis',
+                'time_grain_sqla',
                 // , 'percent_metrics'
               ],
             },
@@ -205,26 +212,21 @@ const config: ControlPanelConfig = {
           },
         ],
         ['adhoc_filters'],
-        // [
-        //   {
-        //     name: 'column_collection',
-        //     config: {
-        //       type: 'CollectionControl',
-        //       label: t('Time series columns'),
-        //       renderTrigger: true,
-        //       validators: [validateNonEmpty],
-        //       controlName: 'TimeSeriesColumnControl',
-        //     },
-        //   },
-        // ],
+        [
+          {
+            name: 'compare_lag',
+            config: {
+              type: 'TextControl',
+              label: t('Comparison Period Lag'),
+              isInt: true,
+              description: t(
+                'Based on granularity, number of time periods to compare against',
+              ),
+            },
+          },
+        ],
+        ['row_limit'],
       ],
-    },
-    {
-      ...sections.timeComparisonControls({
-        multi: false,
-        showCalculationType: false,
-        showFullChoices: true,
-      }),
     },
     {
       label: t('Options'),
@@ -239,7 +241,44 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        ['currency_format'],
+        [
+          {
+            name: 'currency_format',
+            config: {
+              ...sharedControls.currency_format,
+              label: t('Currency format'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'make_revert_delta_deviations',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Make revert Delta deviations'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Make revert deviations for Delta values',
+              ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'make_revert_pop_deviations',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Make revert Period deviations'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Make revert deviations for Period over Period values',
+              ),
+            },
+          },
+        ],
+        // ['currency_format'],
       ],
     },
   ],
@@ -248,6 +287,12 @@ const config: ControlPanelConfig = {
     metrics: getStandardizedControls().popAllMetrics(),
     groupby: getStandardizedControls().popAllColumns(),
   }),
+  controlOverrides: {
+    x_axis: {
+      label: t('TIME GRAIN COLUMN'),
+      ...temporalColumnMixin,
+    },
+  },
 };
 
 export default config;

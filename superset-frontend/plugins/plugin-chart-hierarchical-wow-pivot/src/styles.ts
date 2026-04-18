@@ -27,7 +27,7 @@ export const StyledTableContainer = styled.div`
 
   .ant-table-tbody > tr > td {
     white-space: nowrap;
-  }
+    }
 
   .ant-table-row-expand-icon-cell {
     padding: 0 !important;

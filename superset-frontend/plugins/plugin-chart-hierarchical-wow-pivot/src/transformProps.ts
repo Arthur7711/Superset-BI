@@ -1,15 +1,13 @@
 import {
   ChartProps,
-  CurrencyFormatter,
   getMetricLabel,
-  getNumberFormatter,
+  QueryFormColumn,
 } from '@superset-ui/core';
-import { buildTree } from './buildTree';
+import { buildTree } from './features/buildTree';
 import {
   TransformedProps,
   MetricConfig,
   MetricFormatType,
-  HierarchicalWowFormData,
 } from './types';
 
 export default function transformProps(
@@ -19,39 +17,46 @@ export default function transformProps(
     width,
     height,
     queriesData,
-    formData: rawFormData,
+    formData,
+    rawFormData,
     datasource: { columnFormats = {}, currencyFormats = {} },
   } = chartProps;
-  const formData = rawFormData as HierarchicalWowFormData;
+  // const formData = rawFormData as HierarchicalWowFormData;
+  // const formData = formData as HierarchicalWowFormData;
   const data: Record<string, any>[] = queriesData?.[0]?.data ?? [];
-  const hierarchyColumns: string[] = Array.isArray(formData.groupby)
+  const normalizeColumnName = (column: QueryFormColumn) =>
+    typeof column === 'string' ? column : (column?.label ?? '');
+  const groupbyColumns = Array.isArray(formData.groupby)
     ? formData.groupby
+        .map(normalizeColumnName)
+        .filter((columnName): columnName is string => Boolean(columnName))
     : [];
-  const { valueFormat, currencyFormat } = formData;
+  const hierarchyColumns: string[] = formData.x_axis
+    ? Array.from(new Set([...groupbyColumns, formData.x_axis]))
+    : groupbyColumns;
+  const { 
+    valueFormat, 
+    currencyFormat, 
+    makeRevertDeltaDeviations, 
+    makeRevertPopDeviations 
+  } = formData;
   const colnames = chartProps.queriesData[0].colnames || [];
-  const groups = formData.groupby || [];
-  const fullMetrics = colnames.filter(el => !groups?.includes(el));
-  // need to connect currency and value format
-  // console.log('chartProps', chartProps);
+  const groups = hierarchyColumns;
+  const fullMetrics = colnames.filter((el: string) => !groups?.includes(el));
   const metricKeys = formData.metrics.map(getMetricLabel);
   const showRootRow = formData.show_root_row ?? true;
-
-  // const defaultFormatter = currencyFormat?.symbol
-  //   ? new CurrencyFormatter({
-  //       currency: currencyFormat,
-  //       d3Format: valueFormat,
-  //     })
-  //   : getNumberFormatter(valueFormat);
-  // console.log('defaultFormatterwwwwww', defaultFormatter(52345.678));
+  console.log('formData', formData);
   const tree = buildTree(
     data,
     hierarchyColumns,
     fullMetrics,
     metricKeys,
     showRootRow,
+    formData.xAxis,
+    formData.compareLag,
+    rawFormData?.extra_form_data?.time_grain_sqla || formData.timeGrainSqla,
     // defaultFormatter,
   );
-
   const metrics: MetricConfig[] = metricKeys.map(key => ({
     key,
     label: key,
@@ -78,5 +83,8 @@ export default function transformProps(
     currencyFormat,
     columnFormats,
     currencyFormats,
+    timeGrainSqla: rawFormData?.extra_form_data?.time_grain_sqla || formData.timeGrainSqla,
+    makeRevertDeltaDeviations,
+    makeRevertPopDeviations,
   };
 }

@@ -1,35 +1,8 @@
-// import { buildQueryContext } from '@superset-ui/core';
-// import { HierarchicalWowFormData } from './types';
-// import {
-//   isTimeComparison,
-//   timeCompareOperator,
-// } from '@superset-ui/chart-controls';
-
-// export default function buildQuery(formData: HierarchicalWowFormData) {
-//   const { hierarchy_columns: hierarchyColumns, metrics } = formData;
-//   return buildQueryContext(formData, baseQueryObject => {
-//     const time_offsets = isTimeComparison(formData, baseQueryObject)
-//         ? formData.time_compare
-//         : [];
-//     console.log('hierarchyColumns', formData, baseQueryObject);
-//     return [
-//       {
-//         ...baseQueryObject,
-//         columns: hierarchyColumns,
-//         metrics,
-//         orderby: [],
-//         time_offsets,
-
-//       },
-//     ]
-//   });
-// }
 
 import {
   AdhocColumn,
   buildQueryContext,
   ensureIsArray,
-  getMetricLabel,
   getTimeOffset,
   isPhysicalColumn,
   parseDttmToDate,
@@ -45,8 +18,6 @@ import {
   timeCompareOperator,
 } from '@superset-ui/chart-controls';
 import { isEmpty } from 'lodash';
-// import { TableChartFormData } from './types';
-// import { updateExternalFormData } from './DataTable/utils/externalAPIs';
 
 type TableChartFormData = any;
 /**
@@ -70,15 +41,16 @@ const buildQuery: BuildQuery<TableChartFormData> = (
   options,
 ) => {
   const {
-    // percent_metrics: percentMetrics,
-    // order_desc: orderDesc = false,
     extra_form_data,
   } = formData;
   const queryMode = getQueryMode(formData);
   const time_grain_sqla =
     extra_form_data?.time_grain_sqla || formData.time_grain_sqla;
+  const selectedXAxis = extra_form_data?.x_axis || formData.x_axis;
+  const resolvedXAxis = Array.isArray(selectedXAxis)
+    ? selectedXAxis[0]
+    : selectedXAxis;
   let formDataCopy = formData;
-  // never include time in raw records mode
   if (queryMode === QueryMode.Raw) {
     formDataCopy = {
       ...formData,
@@ -132,23 +104,25 @@ const buildQuery: BuildQuery<TableChartFormData> = (
     let temporalColumn = null;
 
     if (queryMode === QueryMode.Aggregate) {
+      const groupbyColumns = ensureIsArray(formData.groupby);
+      const aggregateColumns = resolvedXAxis
+        ? removeDuplicates([...groupbyColumns, resolvedXAxis])
+        : groupbyColumns;
+      columns = aggregateColumns;
+
       metrics = metrics || [];
       if (metrics?.length > 0) {
         orderby = [[metrics[0], false]];
       }
-      // Add the operator for the time comparison if some is selected
       if (!isEmpty(timeOffsets)) {
         postProcessing.push(timeCompareOperator(formData, baseQueryObject));
       }
-
       const temporalColumnsLookup = formData?.temporal_columns_lookup;
-      // Filter out the column if needed and prepare the temporal column object
-
       columns = columns.filter(col => {
         const shouldBeAdded =
           isPhysicalColumn(col) &&
           time_grain_sqla &&
-          temporalColumnsLookup?.[col];
+          (temporalColumnsLookup?.[col] || formData.granularity_sqla === col);
 
         if (shouldBeAdded && !temporalColumnAdded) {
           temporalColumn = {
@@ -164,7 +138,6 @@ const buildQuery: BuildQuery<TableChartFormData> = (
         return true;
       });
 
-      // So we ensure the temporal column is added first
       if (temporalColumn) {
         columns = [temporalColumn, ...columns];
       }
@@ -195,7 +168,6 @@ const buildQuery: BuildQuery<TableChartFormData> = (
       ...moreProps,
     };
 
-    // Because we use same buildQuery for all table on the page we need split them by id
     options?.hooks?.setCachedChanges({
       [formData.slice_id]: queryObject.filters,
     });
@@ -212,8 +184,8 @@ const buildQuery: BuildQuery<TableChartFormData> = (
         row_limit: 0,
         row_offset: 0,
         post_processing: [],
-        order_desc: undefined, // we don't need orderby stuff here,
-        orderby: undefined, // because this query will be used for get total aggregation.
+        order_desc: undefined, // don't need orderby stuff here,
+        orderby: undefined, // bcause this query will be used for get total aggregation.
       });
     }
 
@@ -221,8 +193,6 @@ const buildQuery: BuildQuery<TableChartFormData> = (
   });
 };
 
-// Use this closure to cache changing of external filters, if we have server pagination we need reset page to 0, after
-// external filter changed
 export const cachedBuildQuery = (): BuildQuery<TableChartFormData> => {
   let cachedChanges: any = {};
   const setCachedChanges = (newChanges: any) => {

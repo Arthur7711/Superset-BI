@@ -50,6 +50,7 @@ export interface FlatRow {
 }
 
 export interface HierarchicalWowFormData extends QueryFormData {
+  x_axis?: string;
   hierarchy_columns: string[];
   /** Populated by hidden control; maps column name -> is temporal */
   temporal_columns_lookup?: Record<string, boolean>;
@@ -84,4 +85,7 @@ export interface TransformedProps {
   currencyFormat: Currency;
   columnFormats: JsonObject;
   currencyFormats: Record<string, Currency>;
+  timeGrainSqla: string;
+  makeRevertDeltaDeviations?: boolean;
+  makeRevertPopDeviations?: boolean;
 }

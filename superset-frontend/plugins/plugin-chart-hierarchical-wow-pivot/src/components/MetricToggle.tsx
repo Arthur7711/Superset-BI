@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@superset-ui/core';
 import { Checkbox, Space } from 'antd';
-import { MetricConfig } from './types';
+import { MetricConfig } from '../types';
 
 interface MetricToggleProps {
   metrics: MetricConfig[];

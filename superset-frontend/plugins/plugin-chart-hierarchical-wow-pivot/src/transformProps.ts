@@ -1,14 +1,45 @@
 import {
   ChartProps,
+  CurrencyFormatter,
+  ensureIsArray,
   getMetricLabel,
+  getNumberFormatter,
   QueryFormColumn,
+  ValueFormatter,
 } from '@superset-ui/core';
+import type { SelectedFiltersType } from './types';
 import { buildTree } from './features/buildTree';
 import {
   TransformedProps,
   MetricConfig,
   MetricFormatType,
 } from './types';
+import type { MetricFormatsValue } from './components/MetricFormatsControl';
+
+function buildMetricFormatters(
+  metricKeys: string[],
+  metricFormats: MetricFormatsValue = {},
+): { metricFormatters: Record<string, ValueFormatter>; defaultFormatter: ValueFormatter } {
+  const defaultFormatter = getNumberFormatter();
+  const metricFormatters: Record<string, ValueFormatter> = {};
+
+  metricKeys.forEach(key => {
+    const entry = metricFormats[key];
+    if (!entry) return;
+
+    const { valueFormat: fmt, currency_format: curr } = entry;
+    if (curr?.symbol) {
+      metricFormatters[key] = new CurrencyFormatter({
+        currency: { symbol: curr.symbol, symbolPosition: curr.symbolPosition ?? 'prefix' },
+        d3Format: fmt,
+      });
+    } else if (fmt) {
+      metricFormatters[key] = getNumberFormatter(fmt);
+    }
+  });
+
+  return { metricFormatters, defaultFormatter };
+}
 
 export default function transformProps(
   chartProps: ChartProps,
@@ -19,51 +50,70 @@ export default function transformProps(
     queriesData,
     formData,
     rawFormData,
-    datasource: { columnFormats = {}, currencyFormats = {} },
+    hooks,
+    filterState,
+    emitCrossFilters,
+    datasource: { columnFormats = {}, currencyFormats = {}, verboseMap = {} },
   } = chartProps;
-  // const formData = rawFormData as HierarchicalWowFormData;
-  // const formData = formData as HierarchicalWowFormData;
-  const data: Record<string, any>[] = queriesData?.[0]?.data ?? [];
+  const { selectedFilters } = (filterState ?? {}) as {
+    selectedFilters?: SelectedFiltersType;
+  };
   const normalizeColumnName = (column: QueryFormColumn) =>
     typeof column === 'string' ? column : (column?.label ?? '');
-  const groupbyColumns = Array.isArray(formData.groupby)
-    ? formData.groupby
-        .map(normalizeColumnName)
-        .filter((columnName): columnName is string => Boolean(columnName))
-    : [];
+  const rawGroupby: QueryFormColumn[] = ensureIsArray(formData.groupby);
+  const rawXAxis: QueryFormColumn | undefined = formData.x_axis;
+  const groupbyColumns = rawGroupby
+    .map(normalizeColumnName)
+    .filter((columnName): columnName is string => Boolean(columnName));
   const hierarchyColumns: string[] = formData.x_axis
     ? Array.from(new Set([...groupbyColumns, formData.x_axis]))
     : groupbyColumns;
-  const { 
-    valueFormat, 
-    currencyFormat, 
-    makeRevertDeltaDeviations, 
-    makeRevertPopDeviations 
-  } = formData;
-  const colnames = chartProps.queriesData[0].colnames || [];
+  const metricFormats: MetricFormatsValue =
+    formData.metricFormats ?? rawFormData?.metric_formats ?? {};
+
+  // Each of the first `groupbyColumns.length` queries corresponds to one level
+  // of the hierarchy: query i contains groupby[0..i] + x_axis aggregated rows.
+  // Remaining queries (e.g. show_totals) are ignored here.
+  const levelCount = Math.max(groupbyColumns.length, 1);
+  const perLevelData: Record<string, any>[][] = [];
+  for (let i = 0; i < levelCount; i++) {
+    perLevelData.push(queriesData?.[i]?.data ?? []);
+  }
+  const deepestQueryIndex = levelCount - 1;
+  const colnames = queriesData?.[deepestQueryIndex]?.colnames || [];
   const groups = hierarchyColumns;
   const fullMetrics = colnames.filter((el: string) => !groups?.includes(el));
   const metricKeys = formData.metrics.map(getMetricLabel);
   const showRootRow = formData.show_root_row ?? true;
-  console.log('formData', formData);
   const tree = buildTree(
-    data,
+    perLevelData,
     hierarchyColumns,
+    groupbyColumns,
     fullMetrics,
     metricKeys,
     showRootRow,
     formData.xAxis,
     formData.compareLag,
     rawFormData?.extra_form_data?.time_grain_sqla || formData.timeGrainSqla,
-    // defaultFormatter,
   );
-  const metrics: MetricConfig[] = metricKeys.map(key => ({
+  const metrics: MetricConfig[] = metricKeys.map((key: string) => ({
     key,
     label: key,
     formatType: MetricFormatType.Number,
     decimals: 0,
     compact: false,
   }));
+
+  const { metricFormatters, defaultFormatter } = buildMetricFormatters(
+    metricKeys,
+    metricFormats,
+  );
+
+  const revertDeltaMap: Record<string, boolean> = {};
+  metricKeys.forEach((key: string) => {
+    const entry = metricFormats[key];
+    if (entry?.revertDelta) revertDeltaMap[key] = true;
+  });
 
   return {
     width,
@@ -79,12 +129,21 @@ export default function transformProps(
       negativeThreshold: Number(formData.negative_threshold) || 0,
     },
     hierarchyColumns,
-    valueFormat,
-    currencyFormat,
+    metricFormatters,
+    defaultFormatter,
     columnFormats,
     currencyFormats,
     timeGrainSqla: rawFormData?.extra_form_data?.time_grain_sqla || formData.timeGrainSqla,
-    makeRevertDeltaDeviations,
-    makeRevertPopDeviations,
+    revertDeltaMap,
+    enabledMetrics: ensureIsArray(
+      formData.enabledMetrics ?? rawFormData?.enabled_metrics,
+    ),
+    setControlValue: hooks?.setControlValue,
+    setDataMask: hooks?.setDataMask ?? (() => {}),
+    selectedFilters: selectedFilters ?? null,
+    emitCrossFilters,
+    verboseMap,
+    rawGroupby,
+    rawXAxis,
   };
 }

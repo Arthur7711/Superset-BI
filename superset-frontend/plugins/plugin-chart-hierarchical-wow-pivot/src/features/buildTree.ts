@@ -3,8 +3,9 @@ import { TreeNode, FlatRow } from '../types';
 import { getPreviousPeriod } from '../helpers/getPreviousPeriod';
 
 export function buildTree(
-  rows: Record<string, any>[],
+  rowsPerLevel: Record<string, any>[][],
   hierarchyColumns: string[],
+  groupbyColumns: string[],
   fullMetrics: string[],
   metricKeys: string[],
   showRootRow: boolean,
@@ -13,70 +14,146 @@ export function buildTree(
   timeGrainSqla?: 'P1D' | 'P1W' | 'P1M' | 'P3M' | 'P1Y',
 ): TreeNode {
   const root: TreeNode = {
-    name: 'Total',
-    key: '__root__',
+    name: '',
+    key: '',
     level: 0,
     children: [],
     data: {},
   };
+  const ensureChild = (
+    parent: TreeNode,
+    value: any,
+    depth: number,
+  ): TreeNode => {
+    const nodeKey = parent.key
+      ? `${parent.key}/${String(value)}`
+      : String(value);
+    let child = parent.children.find(c => c.key === nodeKey);
+    if (!child) {
+      child = {
+        name: String(value),
+        key: nodeKey,
+        level: depth,
+        children: [],
+        data: {},
+        rawValue: value,
+      };
+      parent.children.push(child);
+    }
+    return child;
+  };
 
-  for (const row of rows) {
-    let current = root;
-    for (let depth = 0; depth < hierarchyColumns.length; depth++) {
-      const colName = hierarchyColumns[depth];
-      const value = row[colName] ?? 'Unknown';
-      const nodeKey = `${current.key}/${String(value)}`;
+  const applyMetrics = (
+    node: TreeNode,
+    row: Record<string, any>,
+    levelRows: Record<string, any>[],
+    matchColumns: string[],
+  ) => {
+    const existingX = node.data.xAxis;
+    const rowX = row[xAxis];
+    const shouldOverwrite =
+      existingX == null ||
+      (rowX != null && new Date(existingX) <= new Date(rowX));
+    if (!shouldOverwrite) return;
 
-      let child = current.children.find(c => c.key === nodeKey);
-      if (!child) {
-        child = {
-          name: String(value),
-          key: nodeKey,
-          level: depth + 1,
-          children: [],
-          data: {},
-        };
-        current.children.push(child);
+    const pvDate = getPreviousPeriod({
+      dateInput: rowX,
+      unit: timeGrainSqla,
+      period: compareLag,
+    });
+    const prev = levelRows.find(el => {
+      const elX = el[xAxis];
+      if (elX == null) return false;
+      if (new Date(elX).setHours(0, 0, 0, 0) !== pvDate.setHours(0, 0, 0, 0)) {
+        return false;
       }
-      
-      if (depth === hierarchyColumns.length - 1) {
-        for (const mk of metricKeys) {
-          const pvDate = getPreviousPeriod({dateInput: row[xAxis], unit: timeGrainSqla, period: compareLag});
-          const prev = rows.find((el, i) => {
-            return new Date(el[xAxis]).setHours(0, 0, 0, 0) === pvDate.setHours(0, 0, 0, 0) && el[colName] === row[colName]
-          });
-          // const prev = fullMetrics.find(el => el !== mk && el.includes(mk));
-          const curVal = toNum(row[mk]);
-          // const prevVal = toNum(row[`${prev}`]);
-          const prevVal = toNum(prev?.[mk]);
+      return matchColumns.every(col => el[col] === row[col]);
+    });
 
-          // [`${mk}_cur`]
-          if(!Object.keys(child.data).includes('xAxis')) {
-            child.data[`${mk}_cur`] = curVal; //? defaultFormatter(curVal) : null;
-            child.data[`${mk}_prev`] = prevVal; //? defaultFormatter(prevVal) : null;
-            child.data[`${mk}_delta`] = calculateDelta(curVal, prevVal);
-            child.data[`${mk}_wow`] = calculateWoW(curVal, prevVal);
-            child.data['xAxis'] = row[xAxis];
-          } else if(Object.keys(child.data).includes('xAxis') && new Date(child.data.xAxis) <= new Date(row[xAxis])){
-            child.data[`${mk}_cur`] = curVal; //? defaultFormatter(curVal) : null;
-            child.data[`${mk}_prev`] = prevVal; //? defaultFormatter(prevVal) : null;
-            child.data[`${mk}_delta`] = calculateDelta(curVal, prevVal);
-            child.data[`${mk}_wow`] = calculateWoW(curVal, prevVal);
-            child.data['xAxis'] = row[xAxis];
-          }
-          
+    for (const mk of metricKeys) {
+      const curVal = toNum(row[mk]);
+      const prevVal = toNum(prev?.[mk]);
+      node.data[`${mk}_cur`] = curVal;
+      node.data[`${mk}_prev`] = prevVal;
+      node.data[`${mk}_delta`] = calculateDelta(curVal, prevVal);
+      node.data[`${mk}_wow`] = calculateWoW(curVal, prevVal);
+    }
+    node.data.xAxis = rowX;
+  };
+
+  for (let depth = 1; depth <= groupbyColumns.length; depth++) {
+    const levelRows = rowsPerLevel[depth - 1] ?? [];
+    const matchColumns = hierarchyColumns.slice(0, depth);
+    for (const row of levelRows) {
+      if (depth > 1) {
+        const topValue = row[hierarchyColumns[0]] //?? 'Unknown';
+        const topKey = String(topValue);
+        const topNode = root.children.find(c => c.key === topKey);
+        const topX = topNode?.data.xAxis;
+        const rowX = row[xAxis];
+        if (
+          !topNode ||
+          topX == null ||
+          rowX == null ||
+          new Date(rowX).setHours(0, 0, 0, 0) !==
+            new Date(topX).setHours(0, 0, 0, 0)
+        ) {
+          continue;
         }
       }
+      let current = root;
+      for (let d = 0; d < depth; d++) {
+        const colName = hierarchyColumns[d];
+        // const value = row[colName] ?? 'Unknown';
+        // current = ensureChild(current, value, d + 1);
+        const value = row[colName];
+        // if(value !== null){
+          current = ensureChild(current, value, d + 1);
+        // }
+      }
+      applyMetrics(current, row, levelRows, matchColumns);
+    }
+  }
 
-      current = child;
+  if (hierarchyColumns.length > groupbyColumns.length) {
+    const deepestLevel = rowsPerLevel[rowsPerLevel.length - 1] ?? [];
+    for (const row of deepestLevel) {
+      const topValue = row[hierarchyColumns[0]] // ?? 'Unknown';
+      const topKey = String(topValue);
+      const topNode = root.children.find(c => c.key === topKey);
+      const topX = topNode?.data.xAxis;
+      const rowX = row[xAxis];
+      if (
+        !topNode ||
+        topX == null ||
+        rowX == null ||
+        new Date(rowX).setHours(0, 0, 0, 0) !==
+          new Date(topX).setHours(0, 0, 0, 0)
+      ) {
+        continue;
+      }
+      let current = root;
+      for (let d = 0; d < hierarchyColumns.length; d++) {
+        const colName = hierarchyColumns[d];
+        // from here
+        const value = row[colName];
+        // if(value !== null){
+          current = ensureChild(current, value, d + 1);
+        // }
+        // const value = row[colName] ?? 'Unknown';
+        // current = ensureChild(current, value, d + 1);
+      }
+      applyMetrics(
+        current,
+        row,
+        deepestLevel,
+        hierarchyColumns.slice(0, hierarchyColumns.length - 1),
+      );
     }
   }
 
   aggregateNode(root, metricKeys);
 
-  if (!showRootRow) {
-    return root;
-  }
   return root;
 }
 
@@ -125,7 +202,7 @@ export function flattenTree(
   const result: FlatRow[] = [];
 
   function walk(n: TreeNode, depth: number) {
-    const isRoot = n.key === '__root__';
+    const isRoot = n.level === 0;
     if (isRoot && !showRootRow) {
       for (const child of n.children) {
         walk(child, 0);

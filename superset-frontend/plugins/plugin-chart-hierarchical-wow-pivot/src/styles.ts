@@ -1,5 +1,6 @@
 import { styled } from '@superset-ui/core';
 
+
 export const StyledContainer = styled.div<{ height: number }>`
   width: 100%;
   height: ${({ height }) => height}px;
@@ -54,4 +55,25 @@ export const StyledHighlight = styled.mark`
   background: ${({ theme }) => theme.colors.warning.light1};
   padding: 0;
   border-radius: 2px;
+`;
+
+export const StyledNameCell = styled.p<{ $clickable?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
+  user-select: text;
+
+  &:hover {
+    background: ${({ theme, $clickable }) =>
+      $clickable ? theme.colors.grayscale.light3 : 'transparent'};
+  }
+
+  &.pvt-active {
+    background: ${({ theme }) => theme.colors.primary.light4};
+    color: ${({ theme }) => theme.colors.primary.dark1};
+  }
 `;

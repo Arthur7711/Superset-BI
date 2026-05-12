@@ -1,4 +1,18 @@
-import { QueryFormData, QueryFormMetric, ChartProps, JsonObject, Currency } from '@superset-ui/core';
+import {
+  QueryFormData,
+  QueryFormMetric,
+  ChartProps,
+  JsonObject,
+  Currency,
+  ValueFormatter,
+  HandlerFunction,
+  DataRecordValue,
+  QueryFormColumn,
+  SetDataMaskHook,
+} from '@superset-ui/core';
+import type { MetricFormatEntry } from './components/MetricFormatsControl';
+
+export type SelectedFiltersType = Record<string, DataRecordValue[]>;
 
 export enum MetricFormatType {
   Number = 'number',
@@ -39,6 +53,7 @@ export interface TreeNode {
   level: number;
   children: TreeNode[];
   data: TreeNodeData;
+  rawValue?: DataRecordValue;
 }
 
 export interface FlatRow {
@@ -60,7 +75,7 @@ export interface HierarchicalWowFormData extends QueryFormData {
   show_root_row: boolean;
   show_level_badges: boolean;
   time_shift: string;
-  metric_formats?: Record<string, Partial<MetricConfig>>;
+  metric_formats?: Record<string, MetricFormatEntry>;
   conditional_formatting: boolean;
   positive_threshold: number;
   negative_threshold: number;
@@ -81,11 +96,20 @@ export interface TransformedProps {
   showLevelBadges: boolean;
   conditionalFormatting: ConditionalFormatConfig;
   hierarchyColumns: string[];
-  valueFormat?: string;
-  currencyFormat: Currency;
+  metricFormatters: Record<string, ValueFormatter>;
+  defaultFormatter: ValueFormatter;
   columnFormats: JsonObject;
   currencyFormats: Record<string, Currency>;
   timeGrainSqla: string;
-  makeRevertDeltaDeviations?: boolean;
-  makeRevertPopDeviations?: boolean;
+  revertDeltaMap: Record<string, boolean>;
+  enabledMetrics?: string[];
+  /** Explore hook: persist enabled metric keys when toggling in-chart */
+  setControlValue?: HandlerFunction;
+  /** Cross-filter wiring (matches plugin-chart-pivot-table) */
+  setDataMask: SetDataMaskHook;
+  selectedFilters?: SelectedFiltersType | null;
+  emitCrossFilters?: boolean;
+  verboseMap?: Record<string, string>;
+  rawGroupby: QueryFormColumn[];
+  rawXAxis?: QueryFormColumn;
 }

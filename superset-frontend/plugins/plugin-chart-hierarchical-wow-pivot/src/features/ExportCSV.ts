@@ -1,5 +1,4 @@
 import { FlatRow, MetricConfig, SubColumn } from '../types';
-import { formatWoW } from '../helpers/formatting';
 
 const SUB_COLUMNS: SubColumn[] = ['cur', 'delta', 'prev', 'wow'];
 // const SUB_LABELS: Record<SubColumn, string> = {

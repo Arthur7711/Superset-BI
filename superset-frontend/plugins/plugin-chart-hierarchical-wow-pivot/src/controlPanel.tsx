@@ -2,6 +2,7 @@ import {
   isAdhocColumn,
   isPhysicalColumn,
   ensureIsArray,
+  getMetricLabel,
   QueryFormColumn,
   QueryMode,
   removeDuplicates,
@@ -21,6 +22,7 @@ import {
   getStandardizedControls,
   temporalColumnMixin,
 } from '@superset-ui/chart-controls';
+import MetricFormatsControl from './components/MetricFormatsControl';
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
@@ -45,6 +47,14 @@ function isQueryMode(mode: QueryMode) {
 const isAggMode = isQueryMode(QueryMode.Aggregate);
 const isRawMode = isQueryMode(QueryMode.Raw);
 const ALLOWED_TIME_GRAINS = new Set(['P1D', 'P1W', 'P1M', 'P3M', 'P1Y']);
+
+// const DEFAULT_TOTAL_GROUPBY = {
+//   label: 'Total',
+//   sqlExpression: "'Total'",
+//   expressionType: 'SQL' as const,
+//   hasCustomLabel: true,
+//   optionName: 'groupby_total_default',
+// };
 
 const validateAggControlValues = (
   controls: ControlStateMapping,
@@ -140,6 +150,20 @@ const config: ControlPanelConfig = {
             override: {
               visibility: isAggMode,
               resetOnHide: false,
+              // this new code
+              // default: [DEFAULT_TOTAL_GROUPBY],
+              // initialValue: (
+              //   control: ControlState,
+              //   _state: ControlPanelState | null,
+              // ) => {
+              //   const groups = ensureIsArray(control.value);
+              //   const hasTotalGroup = groups.find(group => group?.optionName === 'groupby_total_default');
+              //   if (hasTotalGroup) {
+              //     return groups;
+              //   }else{
+              //     return [DEFAULT_TOTAL_GROUPBY,...groups];
+              //   }
+              // },
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
@@ -202,7 +226,7 @@ const config: ControlPanelConfig = {
                 'groupby',
                 'x_axis',
                 'time_grain_sqla',
-                // , 'percent_metrics'
+                'metric_formats',
               ],
             },
           },
@@ -226,6 +250,21 @@ const config: ControlPanelConfig = {
           },
         ],
         ['row_limit'],
+        [
+          {
+            name: 'enabled_metrics',
+            config: {
+              type: 'HiddenControl',
+              label: t('Enabled metrics'),
+              hidden: true,
+              description: t(
+                'Which metrics are visible in the chart; updated from chart checkboxes',
+              ),
+              default: [],
+              renderTrigger: true,
+            },
+          },
+        ],
       ],
     },
     {
@@ -234,51 +273,32 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
-            name: 'valueFormat',
+            name: 'metric_formats',
             config: {
-              ...sharedControls.y_axis_format,
-              label: t('Value format'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'currency_format',
-            config: {
-              ...sharedControls.currency_format,
-              label: t('Currency format'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'make_revert_delta_deviations',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Make revert Delta deviations'),
-              renderTrigger: true,
-              default: false,
+              type: MetricFormatsControl,
+              label: t('Metric Formats'),
               description: t(
-                'Make revert deviations for Delta values',
+                'Configure number format and currency for each metric individually',
               ),
-            },
-          },
-        ],
-        [
-          {
-            name: 'make_revert_pop_deviations',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Make revert Period deviations'),
               renderTrigger: true,
-              default: false,
-              description: t(
-                'Make revert deviations for Period over Period values',
-              ),
+              default: {},
+              shouldMapStateToProps: () => true,
+              mapStateToProps: (state: ControlPanelState) => {
+                const allLabels = ensureIsArray(
+                  state.controls?.metrics?.value,
+                ).map(getMetricLabel);
+                const enabled = ensureIsArray(
+                  state.controls?.enabled_metrics?.value,
+                );
+                const filtered =
+                  enabled.length > 0
+                    ? allLabels.filter(label => enabled.includes(label))
+                    : allLabels;
+                return { metricLabels: filtered };
+              },
             },
           },
         ],
-        // ['currency_format'],
       ],
     },
   ],

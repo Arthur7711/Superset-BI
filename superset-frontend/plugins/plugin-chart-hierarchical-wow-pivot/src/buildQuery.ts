@@ -100,15 +100,41 @@ const buildQuery: BuildQuery<TableChartFormData> = (
         : [],
     );
 
-    let temporalColumnAdded = false;
-    let temporalColumn = null;
+    let temporalColumn: AdhocColumn | null = null;
+    let groupbyColumns: any[] = [];
+
+    const resolveLevelColumns = (baseCols: any[]) => {
+      const temporalColumnsLookup = formData?.temporal_columns_lookup;
+      let levelTemporalColumn: AdhocColumn | null = null;
+      const filtered = baseCols.filter(col => {
+        const shouldBeAdded =
+          isPhysicalColumn(col) &&
+          time_grain_sqla &&
+          (temporalColumnsLookup?.[col] || formData.granularity_sqla === col);
+
+        if (shouldBeAdded && !levelTemporalColumn) {
+          levelTemporalColumn = {
+            timeGrain: time_grain_sqla,
+            columnType: 'BASE_AXIS',
+            sqlExpression: col,
+            label: col,
+            expressionType: 'SQL',
+          } as AdhocColumn;
+          return false;
+        }
+        return true;
+      });
+      const levelColumns = levelTemporalColumn
+        ? [levelTemporalColumn, ...filtered]
+        : filtered;
+      return { columns: levelColumns, temporalColumn: levelTemporalColumn };
+    };
 
     if (queryMode === QueryMode.Aggregate) {
-      const groupbyColumns = ensureIsArray(formData.groupby);
+      groupbyColumns = ensureIsArray(formData.groupby);
       const aggregateColumns = resolvedXAxis
         ? removeDuplicates([...groupbyColumns, resolvedXAxis])
         : groupbyColumns;
-      columns = aggregateColumns;
 
       metrics = metrics || [];
       if (metrics?.length > 0) {
@@ -117,30 +143,10 @@ const buildQuery: BuildQuery<TableChartFormData> = (
       if (!isEmpty(timeOffsets)) {
         postProcessing.push(timeCompareOperator(formData, baseQueryObject));
       }
-      const temporalColumnsLookup = formData?.temporal_columns_lookup;
-      columns = columns.filter(col => {
-        const shouldBeAdded =
-          isPhysicalColumn(col) &&
-          time_grain_sqla &&
-          (temporalColumnsLookup?.[col] || formData.granularity_sqla === col);
 
-        if (shouldBeAdded && !temporalColumnAdded) {
-          temporalColumn = {
-            timeGrain: time_grain_sqla,
-            columnType: 'BASE_AXIS',
-            sqlExpression: col,
-            label: col,
-            expressionType: 'SQL',
-          } as AdhocColumn;
-          temporalColumnAdded = true;
-          return false; // Do not include this in the output; it's added separately
-        }
-        return true;
-      });
-
-      if (temporalColumn) {
-        columns = [temporalColumn, ...columns];
-      }
+      const deepest = resolveLevelColumns(aggregateColumns);
+      columns = deepest.columns;
+      temporalColumn = deepest.temporalColumn;
     }
 
     const moreProps: Partial<QueryObject> = {};
@@ -172,6 +178,20 @@ const buildQuery: BuildQuery<TableChartFormData> = (
       [formData.slice_id]: queryObject.filters,
     });
 
+    const perLevelQueries: QueryObject[] = [];
+    if (queryMode === QueryMode.Aggregate && groupbyColumns.length > 1) {
+      for (let i = 1; i < groupbyColumns.length; i++) {
+        const levelBase = resolvedXAxis
+          ? removeDuplicates([...groupbyColumns.slice(0, i), resolvedXAxis])
+          : groupbyColumns.slice(0, i);
+        const { columns: levelColumns } = resolveLevelColumns(levelBase);
+        perLevelQueries.push({
+          ...queryObject,
+          columns: levelColumns,
+        });
+      }
+    }
+
     const extraQueries: QueryObject[] = [];
     if (
       metrics?.length &&
@@ -189,7 +209,7 @@ const buildQuery: BuildQuery<TableChartFormData> = (
       });
     }
 
-    return [queryObject, ...extraQueries];
+    return [...perLevelQueries, queryObject, ...extraQueries];
   });
 };
 

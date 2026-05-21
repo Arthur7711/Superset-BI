@@ -31,7 +31,7 @@
     "@types/d3-scale": "^2.1.1",
     "@types/d3-time": "^3.0.3",
     "@types/d3-time-format": "^2.1.0",
-    "@types/enzyme": "^3.10.18",
+    "@types/enzyme": "^3.10.19",
     "@types/fetch-mock": "^7.3.8",
     "@types/json-bigint": "^1.0.4",
     "@types/lodash": "^4.17.0",
